@@ -5,22 +5,20 @@ import axios from "axios";
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:8000/api/login/", {
-        email,
-        password,
-      });
+      const userData = { username: email, password };
+      console.log("Login Process", userData);
 
-      // Handle the response (e.g., store authentication token, navigate to home screen)
-      console.log("Login successful:", response.data);
+      const result = await login(userData);
+      console.log("Login successful:", result);
+      // Handle successful login, e.g., store tokens, navigate to another screen
     } catch (error) {
-      // Handle login error (e.g., display error message)
-      console.error("Login failed:", error.message);
+      setError("Login failed. Please check your credentials.");
+      console.error("Login failed:", error);
     }
-
-    console.log(`Email: ${email}, Password: ${password}`);
   };
 
   return (
@@ -40,6 +38,7 @@ const LoginScreen = ({ navigation }) => {
         autoCapitalize="none"
       />
       <Button title="Login" onPress={handleLogin} />
+      {error && <Text style={{ color: "red" }}>{error}</Text>}
       <Text
         style={styles.registerText}
         onPress={() => navigation.navigate("Register")}

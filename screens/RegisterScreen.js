@@ -2,23 +2,29 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import axios from "axios";
+import { register } from "../api/authApi";
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState(null);
 
   const handleRegister = async () => {
-    console.log(`Email: ${email}, Password: ${password}`);
     try {
-      const response = await axios.post("http://localhost:8000/api/register/", {
-        email,
-        password,
-      });
+      if (password !== confirmPassword) {
+        setError("Passwords do not match");
+        return;
+      }
 
-      console.log("Registration successful:", response.data);
+      const userData = { username: email, email, password };
+      console.log("Registration Process", userData);
+      const result = await register(userData);
+      console.log("Registration successful:", result);
+      // Handle successful registration, e.g., navigate to another screen
     } catch (error) {
-      console.error("Registration failed:", error.message);
+      setError("Registration failed. Please try again."); // You can customize this message based on the error
+      console.error("Registration failed:", error);
     }
   };
 
@@ -46,6 +52,7 @@ const RegisterScreen = ({ navigation }) => {
         autoCapitalize="none"
       />
       <Button title="Register" onPress={handleRegister} />
+      {error && <Text style={{ color: "red" }}>{error}</Text>}
       <Text
         style={styles.loginText}
         onPress={() => navigation.navigate("Login")}
