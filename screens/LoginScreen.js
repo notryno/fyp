@@ -1,20 +1,28 @@
+// LoginScreen.js
+
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet } from "react-native";
-import axios from "axios";
+import { login } from "../api/authApi";
+import { useAuth } from "../api/authContext";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const { signIn } = useAuth();
 
   const handleLogin = async () => {
     try {
-      const userData = { username: email, password };
+      const userData = { email, password };
       console.log("Login Process", userData);
 
       const result = await login(userData);
       console.log("Login successful:", result);
-      // Handle successful login, e.g., store tokens, navigate to another screen
+      // Call signIn with the user's token upon successful login
+      signIn(result.access_token);
+
+      // Navigate to the "Home" screen
+      navigation.navigate("Home");
     } catch (error) {
       setError("Login failed. Please check your credentials.");
       console.error("Login failed:", error);

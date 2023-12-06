@@ -1,23 +1,16 @@
-import { StatusBar } from "expo-status-bar";
+// App.js
+
 import { NavigationContainer } from "@react-navigation/native";
-import { useState } from "react";
-import {
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-  Platform,
-  ScrollView,
-  TextInput,
-  Button,
-} from "react-native";
+import { AuthProvider } from "./api/authContext";
 import { HomeStack } from "./navigation/stack";
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <HomeStack></HomeStack>
-    </NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer>
+        <HomeStack />
+      </NavigationContainer>
+    </AuthProvider>
   );
 }
 /*

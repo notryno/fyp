@@ -1,14 +1,16 @@
 // RegisterScreen.js
+
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet } from "react-native";
-import axios from "axios";
 import { register } from "../api/authApi";
+import RegisterSuccess from "./RegisterSuccess";
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState(null);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
   const handleRegister = async () => {
     try {
@@ -21,12 +23,18 @@ const RegisterScreen = ({ navigation }) => {
       console.log("Registration Process", userData);
       const result = await register(userData);
       console.log("Registration successful:", result);
-      // Handle successful registration, e.g., navigate to another screen
+      setRegistrationSuccess(true);
     } catch (error) {
       setError("Registration failed. Please try again."); // You can customize this message based on the error
+      console.log(error);
       console.error("Registration failed:", error);
     }
   };
+
+  if (registrationSuccess) {
+    // Render the success screen
+    return <RegisterSuccess />;
+  }
 
   return (
     <View style={styles.container}>

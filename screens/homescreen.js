@@ -1,3 +1,5 @@
+//HomeScreen.js
+
 import { useNavigation } from "@react-navigation/native";
 import { View, Text, StyleSheet, Button } from "react-native";
 
@@ -11,8 +13,8 @@ const HomeScreen = () => {
         onPress={() => navigation.navigate("Event")}
       />
       <Button
-        title="Go to Login"
-        onPress={() => navigation.navigate("Login")}
+        title="Go to Events 2"
+        onPress={() => navigation.navigate("Event")}
       />
     </View>
   );
