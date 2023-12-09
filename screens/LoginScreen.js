@@ -20,9 +20,6 @@ const LoginScreen = ({ navigation }) => {
       console.log("Login successful:", result);
       // Call signIn with the user's token upon successful login
       signIn(result.access_token);
-
-      // Navigate to the "Home" screen
-      navigation.navigate("Home");
     } catch (error) {
       setError("Login failed. Please check your credentials.");
       console.error("Login failed:", error);
