@@ -2,13 +2,13 @@
 
 import { NavigationContainer } from "@react-navigation/native";
 import { AuthProvider } from "./api/authContext";
-import { HomeStack } from "./navigation/stack";
+import MainNavigator, { HomeStack } from "./navigation/stack";
 
 export default function App() {
   return (
     <AuthProvider>
       <NavigationContainer>
-        <HomeStack />
+        <MainNavigator />
       </NavigationContainer>
     </AuthProvider>
   );
