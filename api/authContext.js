@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
 
   const signOut = () => {
     setUserToken(null);
+    console.log("User logged out");
   };
 
   return (

@@ -1,12 +1,20 @@
 // ProfileScreen.js
 
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Button } from "react-native";
+import { useAuth } from "../api/authContext";
 
 const ProfileScreen = () => {
+  const { signOut } = useAuth();
+
+  const handleLogout = () => {
+    signOut();
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Profile Screen</Text>
+      <Button title="Logout" onPress={handleLogout} />
     </View>
   );
 };
