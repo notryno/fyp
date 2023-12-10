@@ -6,6 +6,8 @@ import { register } from "../api/authApi";
 import RegisterSuccess from "./RegisterSuccess";
 
 const RegisterScreen = ({ navigation }) => {
+  const [first_name, setFirstName] = useState("");
+  const [last_name, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -19,7 +21,13 @@ const RegisterScreen = ({ navigation }) => {
         return;
       }
 
-      const userData = { username: email, email, password };
+      const userData = {
+        first_name,
+        last_name,
+        username: email,
+        email,
+        password,
+      };
       console.log("Registration Process", userData);
       const result = await register(userData);
       console.log("Registration successful:", result);
@@ -39,6 +47,18 @@ const RegisterScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="First Name"
+        autoCompleteType="given-name"
+        onChangeText={(text) => setFirstName(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Last Name"
+        autoCompleteType="family-name"
+        onChangeText={(text) => setLastName(text)}
+      />
       <TextInput
         style={styles.input}
         placeholder="Email"
