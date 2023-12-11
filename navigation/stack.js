@@ -3,6 +3,7 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import HomeScreen from "../screens/HomeScreen";
 import EventData from "../screens/eventdata";
 import LoginScreen from "../screens/LoginScreen";
@@ -10,12 +11,15 @@ import RegisterScreen from "../screens/RegisterScreen";
 import { useAuth } from "../api/authContext";
 import { Ionicons } from "@expo/vector-icons";
 import SearchScreen from "../screens/SearchScreen";
-import CalendarScreen from "../screens/CalendarScreen";
+import CalendarScreenList from "../screens/CalendarScreenList";
+import CalendarScreenCalendar from "../screens/CalendarScreenCalendar";
 import ProfileScreen from "../screens/ProfileScreen";
 import NotificationScreen from "../screens/NotificationScreen";
+import { SafeAreaView } from "react-native";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+const TopTab = createMaterialTopTabNavigator();
 
 const HomeStack = () => {
   return (
@@ -34,11 +38,14 @@ const SearchStack = () => {
   );
 };
 
-const CalendarStack = () => {
+const CalendarTopTab = () => {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="Calendar" component={CalendarScreen} />
-    </Stack.Navigator>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+      <TopTab.Navigator>
+        <TopTab.Screen name="List" component={CalendarScreenList} />
+        <TopTab.Screen name="Calendar" component={CalendarScreenCalendar} />
+      </TopTab.Navigator>
+    </SafeAreaView>
   );
 };
 
@@ -104,7 +111,7 @@ const MainNavigator = () => {
       />
       <Tab.Screen
         name="CalendarTab"
-        component={CalendarStack}
+        component={CalendarTopTab}
         options={{ headerShown: false, tabBarLabel: "Calendar" }}
       />
       <Tab.Screen
