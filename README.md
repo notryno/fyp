@@ -1,3 +1,3 @@
 # FYP
-## Project: College Scheduling App
-## Owner: Ryan Chogen Lepcha
+Project: College Scheduling App
+Owner: Ryan Chogen Lepcha
