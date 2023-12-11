@@ -6,7 +6,7 @@ import { View, Text, StyleSheet } from "react-native";
 const CalendarScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Calendar Screen</Text>
+      <Text style={styles.text}>Calendar List Screen</Text>
     </View>
   );
 };

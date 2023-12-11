@@ -15,7 +15,7 @@ import CalendarScreenList from "../screens/CalendarScreenList";
 import CalendarScreenCalendar from "../screens/CalendarScreenCalendar";
 import ProfileScreen from "../screens/ProfileScreen";
 import NotificationScreen from "../screens/NotificationScreen";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, Text, View } from "react-native";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -42,8 +42,44 @@ const CalendarTopTab = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <TopTab.Navigator>
-        <TopTab.Screen name="List" component={CalendarScreenList} />
-        <TopTab.Screen name="Calendar" component={CalendarScreenCalendar} />
+        <TopTab.Screen
+          name="List"
+          component={CalendarScreenList}
+          options={{
+            tabBarLabel: ({ focused }) => (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Ionicons
+                  name={focused ? "list" : "list-outline"}
+                  size={18}
+                  color="black"
+                  style={{ marginRight: 5 }}
+                />
+                <Text style={{ fontWeight: focused ? "bold" : "normal" }}>
+                  List
+                </Text>
+              </View>
+            ),
+          }}
+        />
+        <TopTab.Screen
+          name="Calendar"
+          component={CalendarScreenCalendar}
+          options={{
+            tabBarLabel: ({ focused }) => (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Ionicons
+                  name={focused ? "calendar" : "calendar-outline"}
+                  size={18}
+                  color="black"
+                  style={{ marginRight: 5 }}
+                />
+                <Text style={{ fontWeight: focused ? "bold" : "normal" }}>
+                  Calendar
+                </Text>
+              </View>
+            ),
+          }}
+        />
       </TopTab.Navigator>
     </SafeAreaView>
   );
@@ -68,8 +104,16 @@ const ProfileStack = () => {
 const AuthStack = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen
+        name="Login"
+        component={LoginScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Register"
+        component={RegisterScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };

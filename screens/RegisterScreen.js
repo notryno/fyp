@@ -50,13 +50,13 @@ const RegisterScreen = ({ navigation }) => {
       <TextInput
         style={styles.input}
         placeholder="First Name"
-        autoCompleteType="given-name"
+        autoCompleteType="name"
         onChangeText={(text) => setFirstName(text)}
       />
       <TextInput
         style={styles.input}
         placeholder="Last Name"
-        autoCompleteType="family-name"
+        autoCompleteType="name"
         onChangeText={(text) => setLastName(text)}
       />
       <TextInput
