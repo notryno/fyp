@@ -1,9 +1,10 @@
 // RegisterScreen.js
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import { register } from "../api/authApi";
 import RegisterSuccess from "./RegisterSuccess";
+import * as ImagePicker from "expo-image-picker";
 
 const RegisterScreen = ({ navigation }) => {
   const [first_name, setFirstName] = useState("");
@@ -13,6 +14,32 @@ const RegisterScreen = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState(null);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [profile_picture, setProfilePicture] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== "web") {
+        const { status } =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+          alert("Sorry, we need camera roll permissions to make this work!");
+        }
+      }
+    })();
+  }, []);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setProfilePicture(result.uri);
+    }
+  };
 
   const handleRegister = async () => {
     try {
@@ -27,6 +54,7 @@ const RegisterScreen = ({ navigation }) => {
         username: email,
         email,
         password,
+        profile_picture,
       };
       console.log("Registration Process", userData);
       const result = await register(userData);
@@ -47,6 +75,11 @@ const RegisterScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
+      {profile_picture && (
+        <Image source={{ uri: profile_picture }} style={styles.profileImage} />
+      )}
+
+      <Button title="Pick an image from camera roll" onPress={pickImage} />
       <TextInput
         style={styles.input}
         placeholder="First Name"
