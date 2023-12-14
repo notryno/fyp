@@ -3,6 +3,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Button, Image } from "react-native";
 import { useAuth } from "../api/authContext";
+import { BASE_URL } from "../api/authApi";
 
 const ProfileScreen = () => {
   const { signOut, userProfile } = useAuth();
@@ -13,14 +14,20 @@ const ProfileScreen = () => {
 
   console.log("User Profile:", userProfile);
 
+  const modifiedURL = BASE_URL.replace(/\/api\/$/, "");
+
+  console.log("Profile Picture:", modifiedURL + userProfile);
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Profile Screen</Text>
-      {userProfile && userProfile.profile_picture && (
+      {userProfile ? (
         <Image
-          source={{ uri: userProfile.profile_picture }}
+          source={{ uri: modifiedURL + userProfile }}
           style={styles.profileImage}
         />
+      ) : (
+        <Text>Loading profile image...</Text>
       )}
       <Button title="Logout" onPress={handleLogout} />
     </View>

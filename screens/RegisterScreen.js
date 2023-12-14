@@ -1,7 +1,7 @@
 // RegisterScreen.js
 
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Image } from "react-native";
 import { register } from "../api/authApi";
 import RegisterSuccess from "./RegisterSuccess";
 import * as ImagePicker from "expo-image-picker";
@@ -15,6 +15,8 @@ const RegisterScreen = ({ navigation }) => {
   const [error, setError] = useState(null);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [profile_picture, setProfilePicture] = useState(null);
+  const timestamp = new Date().getTime();
+  const fileName = `profile_picture_${timestamp}.jpg`;
 
   useEffect(() => {
     (async () => {
@@ -35,9 +37,11 @@ const RegisterScreen = ({ navigation }) => {
       aspect: [4, 3],
       quality: 1,
     });
+    console.log("Image Picker Result", result);
 
-    if (!result.cancelled) {
-      setProfilePicture(result.uri);
+    if (!result.canceled) {
+      console.log("Image Picker Result URI", result.assets[0].uri);
+      setProfilePicture(result.assets[0].uri);
     }
   };
 
@@ -48,27 +52,32 @@ const RegisterScreen = ({ navigation }) => {
         return;
       }
 
-      const userData = {
-        first_name,
-        last_name,
-        username: email,
-        email,
-        password,
-        profile_picture,
-      };
-      console.log("Registration Process", userData);
-      const result = await register(userData);
+      const formData = new FormData();
+      formData.append("first_name", first_name);
+      formData.append("last_name", last_name);
+      formData.append("username", email);
+      formData.append("email", email);
+      formData.append("password", password);
+      formData.append("profile_picture", {
+        uri: profile_picture,
+        type: "image/jpeg",
+        name: fileName,
+      });
+
+      console.log("Registration Process", formData);
+
+      const result = await register(formData);
+
       console.log("Registration successful:", result);
       setRegistrationSuccess(true);
     } catch (error) {
-      setError("Registration failed. Please try again."); // You can customize this message based on the error
+      setError("Registration failed. Please try again.");
       console.log(error);
       console.error("Registration failed:", error);
     }
   };
 
   if (registrationSuccess) {
-    // Render the success screen
     return <RegisterSuccess />;
   }
 

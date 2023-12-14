@@ -18,8 +18,9 @@ const LoginScreen = ({ navigation }) => {
 
       const result = await login(userData);
       console.log("Login successful:", result);
+      console.log("Profile Picture result:", result.profile_picture);
       // Call signIn with the user's token upon successful login
-      signIn(result.access_token);
+      signIn(result.access_token, result.profile_picture);
     } catch (error) {
       setError("Login failed. Please check your credentials.");
       console.error("Login failed:", error);
