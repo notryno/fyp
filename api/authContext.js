@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   const signIn = (token, profile) => {
     setUserToken(token);
     setUserProfile(profile);
-    console.log("Profile:", profile);
+    console.log("Signed in UserProfile:", profile);
     console.log("Sign in Token:", token);
   };
 

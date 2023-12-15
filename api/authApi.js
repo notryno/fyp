@@ -31,11 +31,9 @@ export const login = async (userData) => {
     return response.data;
   } catch (error) {
     if (error.response) {
-      // Handle specific login-related errors
       if (error.response.data.email) {
         throw error.response.data.email[0];
       }
-      // Handle other errors
       console.error("Server responded with an error:", error.response.data);
       throw "Login failed due to server error";
     } else if (error.request) {
@@ -45,5 +43,53 @@ export const login = async (userData) => {
       console.error("Error setting up the request:", error.message);
       throw "Error setting up the request";
     }
+  }
+};
+
+export const getUserData = async (userToken) => {
+  try {
+    console.log("User Token inside getUser:", userToken);
+    const response = await axios.get(`${BASE_URL}get_user_data/`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    throw "Error fetching user data";
+  }
+};
+
+export const updateUserData = async (userToken, newData) => {
+  try {
+    const formData = new FormData();
+    formData.append("username", newData.email);
+    formData.append("email", newData.email);
+    formData.append("first_name", newData.first_name);
+    formData.append("last_name", newData.last_name);
+
+    if (newData.profile_picture && newData.profile_picture.uri) {
+      const timestamp = new Date().getTime();
+      const fileName = `profile_picture_${timestamp}.jpg`;
+
+      formData.append("profile_picture", {
+        uri: newData.profile_picture.uri,
+        name: fileName,
+        type: "image/jpeg",
+      });
+    }
+
+    const response = await axios.post(`${BASE_URL}get_user_data/`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+    console.log("Response from updateUserData:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating personal details:", error);
+    throw "Error updating personal details";
   }
 };

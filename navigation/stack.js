@@ -15,7 +15,8 @@ import CalendarScreenList from "../screens/CalendarScreenList";
 import CalendarScreenCalendar from "../screens/CalendarScreenCalendar";
 import ProfileScreen from "../screens/ProfileScreen";
 import NotificationScreen from "../screens/NotificationScreen";
-import { SafeAreaView, Text, View } from "react-native";
+import { SafeAreaView, Text, View, TouchableOpacity } from "react-native";
+import PersonalDetails from "../screens/PersonalDetails";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -97,6 +98,21 @@ const ProfileStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen
+        name="PersonalDetails"
+        component={PersonalDetails}
+        options={({ navigation }) => ({
+          title: "Personal Details",
+          headerRight: () => (
+            <TouchableOpacity
+              style={{ marginRight: 16 }}
+              onPress={() => navigation.setParams({ update: true })}
+            >
+              <Text style={{ color: "#007aff", fontSize: 16 }}>Update</Text>
+            </TouchableOpacity>
+          ),
+        })}
+      />
     </Stack.Navigator>
   );
 };
