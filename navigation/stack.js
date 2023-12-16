@@ -6,42 +6,99 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import HomeScreen from "../screens/HomeScreen";
 import EventData from "../screens/eventdata";
-import LoginScreen from "../screens/LoginScreen";
-import RegisterScreen from "../screens/RegisterScreen";
+import LoginScreen from "../screens/auth/LoginScreen";
+import RegisterScreen from "../screens/auth/RegisterScreen";
 import { useAuth } from "../api/authContext";
 import { Ionicons } from "@expo/vector-icons";
 import SearchScreen from "../screens/SearchScreen";
-import CalendarScreenList from "../screens/CalendarScreenList";
-import CalendarScreenCalendar from "../screens/CalendarScreenCalendar";
-import ProfileScreen from "../screens/ProfileScreen";
+import CalendarScreenList from "../screens/calendar/CalendarScreenList";
+import CalendarScreenCalendar from "../screens/calendar/CalendarScreenCalendar";
+import ProfileScreen from "../screens/profile/ProfileScreen";
 import NotificationScreen from "../screens/NotificationScreen";
 import { SafeAreaView, Text, View, TouchableOpacity } from "react-native";
-import PersonalDetails from "../screens/PersonalDetails";
+import PersonalDetails from "../screens/profile/PersonalDetails";
+import TaskScreen from "../screens/TaskScreen";
+import { useNavigation } from "@react-navigation/native";
+import ChangeFirstName from "../screens/profile/ChangeFirstName";
+import ChangeLastName from "../screens/profile/ChangeLastName";
+import ChangePassword from "../screens/profile/changePassword";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
+const CalendarStack = createStackNavigator();
 
 const HomeStack = () => {
+  const navigation = useNavigation();
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{
+          headerRight: () => (
+            <TouchableOpacity
+              style={{ marginRight: 16 }}
+              onPress={() => navigation.navigate("HomeTask")}
+            >
+              <Ionicons name="list-outline" size={24} color="#007aff" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="HomeTask"
+        component={TaskScreen}
+        options={{ title: "Task" }}
+      />
       <Stack.Screen name="Event" component={EventData} />
     </Stack.Navigator>
   );
 };
 
 const SearchStack = () => {
+  const navigation = useNavigation();
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Search" component={SearchScreen} />
+      <Stack.Screen
+        name="Search"
+        component={SearchScreen}
+        options={{
+          headerRight: () => (
+            <TouchableOpacity
+              style={{ marginRight: 16 }}
+              onPress={() => navigation.navigate("SearchTask")}
+            >
+              <Ionicons name="list-outline" size={24} color="#007aff" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="SearchTask"
+        component={TaskScreen}
+        options={{ title: "Task" }}
+      />
     </Stack.Navigator>
   );
 };
 
 const CalendarTopTab = () => {
+  const navigation = useNavigation();
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          padding: 16,
+        }}
+      >
+        <Text style={{ fontSize: 20, fontWeight: "bold" }}>Calendar</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("CalendarTask")}>
+          <Ionicons name="list-outline" size={24} color="#007aff" />
+        </TouchableOpacity>
+      </View>
       <TopTab.Navigator>
         <TopTab.Screen
           name="List"
@@ -87,22 +144,67 @@ const CalendarTopTab = () => {
 };
 
 const NotificationStack = () => {
+  const navigation = useNavigation();
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Notification" component={NotificationScreen} />
+      <Stack.Screen
+        name="Notification"
+        component={NotificationScreen}
+        options={{
+          headerRight: () => (
+            <TouchableOpacity
+              style={{ marginRight: 16 }}
+              onPress={() => navigation.navigate("NotificationTask")}
+            >
+              <Ionicons name="list-outline" size={24} color="#007aff" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="NotificationTask"
+        component={TaskScreen}
+        options={{ title: "Task" }}
+      />
     </Stack.Navigator>
   );
 };
 
 const ProfileStack = () => {
+  const navigation = useNavigation();
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          headerRight: () => (
+            <TouchableOpacity
+              style={{ marginRight: 16 }}
+              onPress={() => navigation.navigate("ProfileTask")}
+            >
+              <Ionicons name="list-outline" size={24} color="#007aff" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
       <Stack.Screen
         name="PersonalDetails"
         component={PersonalDetails}
-        options={({ navigation }) => ({
+        options={{
           title: "Personal Details",
+        }}
+      />
+      <Stack.Screen
+        name="ProfileTask"
+        component={TaskScreen}
+        options={{ title: "Task" }}
+      />
+      <Stack.Screen
+        name="ChangeFirstName"
+        component={ChangeFirstName}
+        options={({ navigation }) => ({
+          title: "Change First Name",
           headerRight: () => (
             <TouchableOpacity
               style={{ marginRight: 16 }}
@@ -112,6 +214,28 @@ const ProfileStack = () => {
             </TouchableOpacity>
           ),
         })}
+      />
+      <Stack.Screen
+        name="ChangeLastName"
+        component={ChangeLastName}
+        options={({ navigation }) => ({
+          title: "Change Last Name",
+          headerRight: () => (
+            <TouchableOpacity
+              style={{ marginRight: 16 }}
+              onPress={() => navigation.setParams({ update: true })}
+            >
+              <Text style={{ color: "#007aff", fontSize: 16 }}>Update</Text>
+            </TouchableOpacity>
+          ),
+        })}
+      />
+      <Stack.Screen
+        name="Password"
+        component={ChangePassword}
+        options={{
+          title: "Change Password",
+        }}
       />
     </Stack.Navigator>
   );
@@ -131,6 +255,23 @@ const AuthStack = () => {
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
+  );
+};
+
+const CalendarStackNavigator = () => {
+  return (
+    <CalendarStack.Navigator>
+      <CalendarStack.Screen
+        name="CalendarTopTab"
+        component={CalendarTopTab}
+        options={{ headerShown: false }}
+      />
+      <CalendarStack.Screen
+        name="CalendarTask"
+        component={TaskScreen}
+        options={{ title: "Task" }}
+      />
+    </CalendarStack.Navigator>
   );
 };
 
@@ -171,7 +312,7 @@ const MainNavigator = () => {
       />
       <Tab.Screen
         name="CalendarTab"
-        component={CalendarTopTab}
+        component={CalendarStackNavigator}
         options={{ headerShown: false, tabBarLabel: "Calendar" }}
       />
       <Tab.Screen

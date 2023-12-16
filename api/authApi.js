@@ -64,32 +64,114 @@ export const getUserData = async (userToken) => {
 export const updateUserData = async (userToken, newData) => {
   try {
     const formData = new FormData();
-    formData.append("username", newData.email);
-    formData.append("email", newData.email);
-    formData.append("first_name", newData.first_name);
-    formData.append("last_name", newData.last_name);
 
-    if (newData.profile_picture && newData.profile_picture.uri) {
+    Object.keys(newData).forEach((key) => {
+      formData.append(key, newData[key]);
+    });
+
+    const response = await axios.patch(
+      `${BASE_URL}update_user_data/`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    );
+
+    console.log("Response from updateUserData:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating user data:", error);
+    throw "Error updating user data";
+  }
+};
+
+export const updateProfilePicture = async (userToken, newProfilePicture) => {
+  try {
+    const formData = new FormData();
+
+    if (newProfilePicture && newProfilePicture.uri) {
       const timestamp = new Date().getTime();
       const fileName = `profile_picture_${timestamp}.jpg`;
 
       formData.append("profile_picture", {
-        uri: newData.profile_picture.uri,
+        uri: newProfilePicture.uri,
         name: fileName,
         type: "image/jpeg",
       });
     }
+    console.log("User Token inside updateProfilePicture:", userToken);
+    console.log("FormData inside updateProfilePicture:", formData);
+    const response = await axios.patch(
+      `${BASE_URL}update_user_data/`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    );
 
-    const response = await axios.post(`${BASE_URL}get_user_data/`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${userToken}`,
-      },
-    });
-    console.log("Response from updateUserData:", response.data);
+    console.log("Response from updateProfilePicture:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Error updating personal details:", error);
-    throw "Error updating personal details";
+    console.log("Error updating profile picture:", error);
+    console.error("Error updating profile picture:", error);
+    throw "Error updating profile picture";
   }
 };
+
+export const updatePassword = async (userToken, passwordData) => {
+  try {
+    const response = await axios.patch(
+      `${BASE_URL}update_password/`,
+      passwordData,
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error updating password:", error);
+    throw "Error updating password";
+  }
+};
+
+// export const updateUserData = async (userToken, newData) => {
+//   try {
+//     const formData = new FormData();
+//     formData.append("username", newData.email);
+//     formData.append("email", newData.email);
+//     formData.append("first_name", newData.first_name);
+//     formData.append("last_name", newData.last_name);
+
+//     if (newData.profile_picture && newData.profile_picture.uri) {
+//       const timestamp = new Date().getTime();
+//       const fileName = `profile_picture_${timestamp}.jpg`;
+
+//       formData.append("profile_picture", {
+//         uri: newData.profile_picture.uri,
+//         name: fileName,
+//         type: "image/jpeg",
+//       });
+//     }
+
+//     const response = await axios.post(`${BASE_URL}get_user_data/`, formData, {
+//       headers: {
+//         "Content-Type": "multipart/form-data",
+//         Authorization: `Bearer ${userToken}`,
+//       },
+//     });
+//     console.log("Response from updateUserData:", response.data);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error updating personal details:", error);
+//     throw "Error updating personal details";
+//   }
+// };

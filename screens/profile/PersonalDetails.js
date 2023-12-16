@@ -10,32 +10,34 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import { useAuth } from "../api/authContext";
+import { useAuth } from "../../api/authContext";
 import * as ImagePicker from "expo-image-picker";
-import { BASE_URL, getUserData, updateUserData } from "../api/authApi";
-import { useRoute } from "@react-navigation/native";
+import { BASE_URL, getUserData, updateUserData } from "../../api/authApi";
+import { useRoute, useFocusEffect } from "@react-navigation/native";
+import { updateProfilePicture } from "../../api/authApi";
 
-const PersonalDetails = (navigation) => {
+const PersonalDetails = ({ navigation }) => {
   const { userToken, signIn } = useAuth();
   const [userData, setUserData] = useState({});
   const [newData, setNewData] = useState({});
   const [image, setImage] = useState(null);
   const route = useRoute();
+  const [isPressedFirstName, setIsPressedFirstName] = useState(false);
+  const [isPressedLastName, setIsPressedLastName] = useState(false);
 
   const modifiedURL = BASE_URL.replace(/\/api\/$/, "");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getUserData(userToken);
-        console.log("Personal details:", data);
-        setUserData(data.user_data);
-        setNewData(data.user_data);
-      } catch (error) {
-        console.error("Error fetching personal details:", error);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const data = await getUserData(userToken);
+      console.log("Personal details in the screen:", data);
+      setNewData(data.user_data);
+    } catch (error) {
+      console.error("Error fetching personal details:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
   }, [userToken]);
 
@@ -46,19 +48,11 @@ const PersonalDetails = (navigation) => {
     }
   }, [route.params?.update]);
 
-  const handleUpdate = async () => {
-    try {
-      console.log("User Token:", userToken);
-      const updatedData = await updateUserData(userToken, newData);
-      console.log("newData:", newData);
-      console.log("updatedData:", updatedData);
-      setUserData(updatedData);
-      signIn(userToken, updatedData.profile_picture);
-      console.log("Personal details updated successfully:", updatedData);
-    } catch (error) {
-      console.error("Error updating personal details:", error);
-    }
-  };
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchData();
+    }, [])
+  );
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -70,12 +64,19 @@ const PersonalDetails = (navigation) => {
 
     if (!result.cancelled) {
       setImage(result.uri);
-      setNewData({ ...newData, profile_picture: { uri: result.uri } });
+      try {
+        await updateProfilePicture(userToken, { uri: result.uri });
+        const updatedData = await getUserData(userToken);
+        setUserData(updatedData.user_data);
+        signIn(userToken, updatedData.user_data.profile_picture);
+      } catch (error) {
+        console.error("Error updating profile picture:", error);
+      }
     }
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <View style={styles.imageContainer}>
         {image ? (
           <Image source={{ uri: image }} style={styles.profileImage} />
@@ -87,32 +88,58 @@ const PersonalDetails = (navigation) => {
         ) : (
           <Text>Loading profile image...</Text>
         )}
-        <Button title="Edit Profile" onPress={pickImage} />
+        <Button title="Edit picture" onPress={pickImage} />
       </View>
 
       <View style={styles.line} />
 
-      <View style={styles.inputContainer}>
+      <TouchableOpacity
+        style={[
+          styles.inputContainer,
+          isPressedFirstName && { backgroundColor: "#dcdcdc" },
+        ]}
+        onPressIn={() => {
+          setIsPressedFirstName(true);
+        }}
+        onPressOut={() => {
+          setIsPressedFirstName(false);
+        }}
+        onPress={() => navigation.navigate("ChangeFirstName")}
+        activeOpacity={1}
+      >
         <Text style={styles.label}>First Name</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter First Name"
           value={newData.first_name}
-          onChangeText={(text) => setNewData({ ...newData, first_name: text })}
+          editable={false}
         />
-      </View>
+      </TouchableOpacity>
 
       <View style={styles.rightLine} />
 
-      <View style={styles.inputContainer}>
+      <TouchableOpacity
+        style={[
+          styles.inputContainer,
+          isPressedLastName && { backgroundColor: "#dcdcdc" },
+        ]}
+        onPressIn={() => {
+          setIsPressedLastName(true);
+        }}
+        onPressOut={() => {
+          setIsPressedLastName(false);
+        }}
+        onPress={() => navigation.navigate("ChangeLastName")}
+        activeOpacity={1}
+      >
         <Text style={styles.label}>Last Name</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter Last Name"
           value={newData.last_name}
-          onChangeText={(text) => setNewData({ ...newData, last_name: text })}
+          editable={false}
         />
-      </View>
+      </TouchableOpacity>
 
       <View style={styles.rightLine} />
 
@@ -129,7 +156,12 @@ const PersonalDetails = (navigation) => {
       <View style={styles.line} />
 
       <TouchableOpacity style={styles.buttonContainer}>
-        <Text style={styles.buttonText}>Change Password</Text>
+        <Text
+          style={styles.buttonText}
+          onPress={() => navigation.navigate("Password")}
+        >
+          Change Password
+        </Text>
       </TouchableOpacity>
 
       <View style={styles.line} />
@@ -144,7 +176,6 @@ const PersonalDetails = (navigation) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
   },
   imageContainer: {
@@ -172,7 +203,6 @@ const styles = StyleSheet.create({
     marginRight: "5%",
   },
   input: {
-    width: "70%",
     fontSize: 16,
   },
   line: {

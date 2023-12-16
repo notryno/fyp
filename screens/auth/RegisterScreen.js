@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Image } from "react-native";
-import { register } from "../api/authApi";
+import { register } from "../../api/authApi";
 import RegisterSuccess from "./RegisterSuccess";
 import * as ImagePicker from "expo-image-picker";
 
