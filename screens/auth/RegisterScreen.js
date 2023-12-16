@@ -5,6 +5,7 @@ import { View, Text, TextInput, Button, StyleSheet, Image } from "react-native";
 import { register } from "../../api/authApi";
 import RegisterSuccess from "./RegisterSuccess";
 import * as ImagePicker from "expo-image-picker";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const RegisterScreen = ({ navigation }) => {
   const [first_name, setFirstName] = useState("");
@@ -84,11 +85,15 @@ const RegisterScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
-      {profile_picture && (
+      {profile_picture ? (
         <Image source={{ uri: profile_picture }} style={styles.profileImage} />
+      ) : (
+        <View style={styles.defaultProfileContainer}>
+          <Ionicons name="person-outline" size={50} color="gray" />
+        </View>
       )}
 
-      <Button title="Pick an image from camera roll" onPress={pickImage} />
+      <Button title="Add Picture" onPress={pickImage} />
       <TextInput
         style={styles.input}
         placeholder="First Name"
@@ -121,6 +126,7 @@ const RegisterScreen = ({ navigation }) => {
         onChangeText={(text) => setConfirmPassword(text)}
         autoCapitalize="none"
       />
+      <View style={{ marginBottom: 10 }} />
       <Button title="Register" onPress={handleRegister} />
       {error && <Text style={{ color: "red" }}>{error}</Text>}
       <Text
@@ -149,13 +155,26 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: "gray",
     borderWidth: 1,
-    marginBottom: 16,
+    marginTop: 16,
     paddingLeft: 8,
   },
   loginText: {
     marginTop: 20,
     color: "blue",
     textDecorationLine: "underline",
+  },
+  defaultProfileContainer: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "lightgray",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  profileImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
   },
 });
 
