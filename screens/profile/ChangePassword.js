@@ -1,10 +1,10 @@
-// ChangePassword.js
-
 import React, { useState } from "react";
-import { View, Text, TextInput, Button } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import { updatePassword } from "../../api/authApi";
+import { useAuth } from "../../api/authContext";
 
-const ChangePassword = ({ userToken, navigation }) => {
+const ChangePassword = () => {
+  const { userToken } = useAuth();
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -29,25 +29,32 @@ const ChangePassword = ({ userToken, navigation }) => {
   };
 
   return (
-    <View>
-      <Text>Old Password</Text>
+    <View style={styles.container}>
+      <Text style={styles.infoText}>
+        Your password is best to be at least six characters and should include a
+        combination of numbers, letters and special characters (!$@%).
+      </Text>
       <TextInput
+        style={styles.input}
         secureTextEntry
         value={oldPassword}
+        placeholder="Current Password"
         onChangeText={setOldPassword}
       />
 
-      <Text>New Password</Text>
       <TextInput
+        style={styles.input}
         secureTextEntry
         value={newPassword}
+        placeholder="New Password"
         onChangeText={setNewPassword}
       />
 
-      <Text>Confirm Password</Text>
       <TextInput
+        style={styles.input}
         secureTextEntry
         value={confirmPassword}
+        placeholder="Confirm New Password"
         onChangeText={setConfirmPassword}
       />
 
@@ -55,5 +62,26 @@ const ChangePassword = ({ userToken, navigation }) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: 16,
+  },
+  infoText: {
+    marginBottom: 16,
+    fontSize: 14,
+    color: "#666",
+  },
+  input: {
+    height: 50,
+    borderRadius: 8,
+    borderColor: "gray",
+    borderWidth: 1,
+    marginBottom: 16,
+    paddingHorizontal: 8,
+  },
+});
 
 export default ChangePassword;

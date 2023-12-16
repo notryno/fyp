@@ -21,7 +21,7 @@ import TaskScreen from "../screens/TaskScreen";
 import { useNavigation } from "@react-navigation/native";
 import ChangeFirstName from "../screens/profile/ChangeFirstName";
 import ChangeLastName from "../screens/profile/ChangeLastName";
-import ChangePassword from "../screens/profile/changePassword";
+import ChangePassword from "../screens/profile/ChangePassword";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();

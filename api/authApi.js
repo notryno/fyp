@@ -1,6 +1,7 @@
 //authApi.js
 
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const BASE_URL = "http://localhost:8000/api/";
 
@@ -28,6 +29,11 @@ export const register = async (userData) => {
 export const login = async (userData) => {
   try {
     const response = await axios.post(`${BASE_URL}login/`, userData);
+
+    const csrfToken = extractCSRFTokenFromCookies(response);
+
+    await storeCSRFToken(csrfToken);
+
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -43,6 +49,37 @@ export const login = async (userData) => {
       console.error("Error setting up the request:", error.message);
       throw "Error setting up the request";
     }
+  }
+};
+
+const extractCSRFTokenFromCookies = (response) => {
+  const cookies = response.headers["set-cookie"];
+  if (cookies) {
+    const csrfCookie = cookies.find((cookie) =>
+      cookie.startsWith("csrftoken=")
+    );
+    if (csrfCookie) {
+      return csrfCookie.split(";")[0].split("=")[1];
+    }
+  }
+  return null;
+};
+
+const storeCSRFToken = async (csrfToken) => {
+  try {
+    await AsyncStorage.setItem("csrfToken", csrfToken);
+  } catch (error) {
+    console.error("Error storing CSRF token:", error);
+  }
+};
+
+const getCSRFToken = async () => {
+  try {
+    const csrfToken = await AsyncStorage.getItem("csrfToken");
+    return csrfToken;
+  } catch (error) {
+    console.error("Error retrieving CSRF token:", error);
+    return null;
   }
 };
 
@@ -126,11 +163,21 @@ export const updateProfilePicture = async (userToken, newProfilePicture) => {
 
 export const updatePassword = async (userToken, passwordData) => {
   try {
+    const csrfToken = await getCSRFToken();
+    console.log("User Token inside updatePassword:", userToken);
+    console.log("CSRF Token inside updatePassword:", csrfToken);
+    console.log("Password Data inside updatePassword:", passwordData);
+
     const response = await axios.patch(
       `${BASE_URL}update_password/`,
-      passwordData,
+      {
+        oldPassword: passwordData.oldPassword,
+        newPassword: passwordData.newPassword,
+      },
       {
         headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
           Authorization: `Bearer ${userToken}`,
         },
       }
@@ -142,36 +189,3 @@ export const updatePassword = async (userToken, passwordData) => {
     throw "Error updating password";
   }
 };
-
-// export const updateUserData = async (userToken, newData) => {
-//   try {
-//     const formData = new FormData();
-//     formData.append("username", newData.email);
-//     formData.append("email", newData.email);
-//     formData.append("first_name", newData.first_name);
-//     formData.append("last_name", newData.last_name);
-
-//     if (newData.profile_picture && newData.profile_picture.uri) {
-//       const timestamp = new Date().getTime();
-//       const fileName = `profile_picture_${timestamp}.jpg`;
-
-//       formData.append("profile_picture", {
-//         uri: newData.profile_picture.uri,
-//         name: fileName,
-//         type: "image/jpeg",
-//       });
-//     }
-
-//     const response = await axios.post(`${BASE_URL}get_user_data/`, formData, {
-//       headers: {
-//         "Content-Type": "multipart/form-data",
-//         Authorization: `Bearer ${userToken}`,
-//       },
-//     });
-//     console.log("Response from updateUserData:", response.data);
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error updating personal details:", error);
-//     throw "Error updating personal details";
-//   }
-// };
