@@ -15,6 +15,7 @@ import * as ImagePicker from "expo-image-picker";
 import { BASE_URL, getUserData, updateUserData } from "../../api/authApi";
 import { useRoute, useFocusEffect } from "@react-navigation/native";
 import { updateProfilePicture } from "../../api/authApi";
+import { Ionicons } from "@expo/vector-icons";
 
 const PersonalDetails = ({ navigation }) => {
   const { userToken, signIn } = useAuth();
@@ -86,7 +87,9 @@ const PersonalDetails = ({ navigation }) => {
             style={styles.profileImage}
           />
         ) : (
-          <Text>Loading profile image...</Text>
+          <View style={styles.defaultProfileContainer}>
+            <Ionicons name="person-outline" size={50} color="gray" />
+          </View>
         )}
         <Button title="Edit picture" onPress={pickImage} />
       </View>
@@ -228,6 +231,14 @@ const styles = StyleSheet.create({
     color: "#007aff",
     fontSize: 16,
     textAlign: "center",
+  },
+  defaultProfileContainer: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "lightgray",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

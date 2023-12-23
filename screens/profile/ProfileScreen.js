@@ -49,7 +49,9 @@ const ProfileScreen = () => {
           style={styles.profileImage}
         />
       ) : (
-        <Text>Loading profile image...</Text>
+        <View style={styles.defaultProfileContainer}>
+          <Ionicons name="person-outline" size={50} color="gray" />
+        </View>
       )}
 
       <View style={styles.infoContainer}>
@@ -224,6 +226,14 @@ const styles = StyleSheet.create({
     borderBottomColor: "lightgray",
     borderBottomWidth: 1,
     marginVertical: 10,
+  },
+  defaultProfileContainer: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "lightgray",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
