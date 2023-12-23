@@ -19,6 +19,7 @@ import DatePicker from "@react-native-community/datetimepicker";
 const TaskScreen = () => {
   const [tasks, setTasks] = useState([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState(new Date());
   const [dueTime, setDueTime] = useState(new Date());
   const { userToken } = useAuth();
@@ -54,19 +55,23 @@ const TaskScreen = () => {
 
       console.log("Due Date:", dueDate);
       console.log("All Day:", allDay);
+
       // Send a request to create a new task
       await createTask(userToken, {
         title: newTaskTitle,
-        description: "Your description",
+        description: description,
         due_date: formattedDueDate,
         due_time: formattedDueTime,
         all_day: allDay,
       });
+
       // Fetch tasks again after adding a new task
       const response = await getTasks(userToken);
       setTasks(response);
+
       // Clear the input field
       setNewTaskTitle("");
+      setDescription("");
       setDueDate(new Date());
       setDueTime(new Date());
       setAllDay(false);
@@ -135,6 +140,11 @@ const TaskScreen = () => {
         placeholder="New Task Title"
         value={newTaskTitle}
         onChangeText={(text) => setNewTaskTitle(text)}
+      />
+      <TextInput
+        placeholder="Description"
+        value={description}
+        onChangeText={(text) => setDescription(text)}
       />
       <DatePicker
         style={{ width: 200 }}
