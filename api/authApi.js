@@ -206,12 +206,16 @@ export const getTasks = async (userToken) => {
 
 export const createTask = async (userToken, taskData) => {
   try {
+    console.log("RESPONSE2");
+    console.log("User Token inside createTask:", userToken);
+    console.log("Task Data inside createTask:", taskData);
     const response = await axios.post(`${BASE_URL}tasks/`, taskData, {
       headers: {
         Authorization: `Bearer ${userToken}`,
         "Content-Type": "application/json",
       },
     });
+    console.log("RESPONSE3");
     return response.data;
   } catch (error) {
     console.error("Error creating task:", error);
