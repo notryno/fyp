@@ -17,7 +17,7 @@ import ProfileScreen from "../screens/profile/ProfileScreen";
 import NotificationScreen from "../screens/NotificationScreen";
 import { SafeAreaView, Text, View, TouchableOpacity } from "react-native";
 import PersonalDetails from "../screens/profile/PersonalDetails";
-import TaskScreen from "../screens/TaskScreen";
+import TaskScreen from "../screens/task/TaskScreen";
 import { useNavigation } from "@react-navigation/native";
 import ChangeFirstName from "../screens/profile/ChangeFirstName";
 import ChangeLastName from "../screens/profile/ChangeLastName";
