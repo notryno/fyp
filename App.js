@@ -2,7 +2,7 @@
 
 import { NavigationContainer } from "@react-navigation/native";
 import { AuthProvider } from "./api/authContext";
-import MainNavigator, { HomeStack } from "./navigation/stack";
+import MainNavigator, { HomeStack } from "./navigation/MainNavigator";
 
 export default function App() {
   return (

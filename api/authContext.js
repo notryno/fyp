@@ -1,7 +1,7 @@
 // authContext.js
 
 import React, { createContext, useContext, useState } from "react";
-import { getTasks } from "./authApi";
+import { getTasks } from "./taskApi";
 
 const AuthContext = createContext();
 

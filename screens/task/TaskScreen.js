@@ -18,10 +18,10 @@ import {
   deleteTask,
   getTasks,
   updateTask,
-} from "../../api/authApi";
+} from "../../api/taskApi";
 import DatePicker from "@react-native-community/datetimepicker";
 import TaskForm from "./TaskForm";
-import Overlay from "../Components/Overlay";
+import Overlay from "../../components/Overlay";
 import { Ionicons } from "@expo/vector-icons";
 
 const TaskScreen = () => {
