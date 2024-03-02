@@ -1,6 +1,110 @@
 import axios from "axios";
 import { BASE_URL } from "./authApi";
 
+export const fetchEventsAndSpecialSchedules = async (userToken) => {
+  try {
+    const eventData = await fetchEvents(userToken);
+    const specialScheduleData = await fetchSpecialSchedules(userToken);
+
+    console.log("response2", specialScheduleData);
+
+    // Merge regular events and special schedules
+    const mergedEvents =
+      specialScheduleData.length > 0
+        ? mergeEvents(eventData, specialScheduleData)
+        : eventData;
+
+    return mergedEvents;
+  } catch (error) {
+    console.error("Error fetching events and special schedules:", error);
+    throw error;
+  }
+};
+
+const mergeEvents = (events, specialSchedules) => {
+  // Create a copy of events to avoid mutating the original array
+  const mergedEvents = [...events];
+  console.log("mergedEventsFIRST", mergedEvents);
+
+  // Iterate over each special schedule
+  specialSchedules.forEach((specialSchedule) => {
+    const specialDate = new Date(specialSchedule.special_date);
+    const options = {
+      month: "long",
+      day: "2-digit",
+      year: "numeric",
+      weekday: "long",
+    };
+    const formattedDate = specialDate.toLocaleDateString("en-US", options);
+
+    console.log(specialSchedule.title);
+    console.log(specialSchedule.start_time);
+    console.log(specialSchedule.end_time);
+    console.log(specialSchedule.location);
+    console.log(specialSchedule.type);
+
+    // Find if an event with the same date exists
+    // Find if an event with the same date and title exists
+    const existingEventIndex = mergedEvents.findIndex(
+      (event) =>
+        event.date === formattedDate &&
+        event.data[0].title === specialSchedule.schedule.title
+    );
+
+    console.log(existingEventIndex);
+
+    // If an event with the same date exists
+    if (existingEventIndex !== -1) {
+      // Add data from the special schedule instead of the original event
+      mergedEvents[existingEventIndex].data[0].time =
+        formatTime(specialSchedule.start_time) +
+        " - " +
+        formatTime(specialSchedule.end_time);
+      mergedEvents[existingEventIndex].data[0].location =
+        specialSchedule.location;
+      mergedEvents[existingEventIndex].data[0].type = specialSchedule.type;
+    } else {
+      // If no event with the same date exists, create a new event object with the special schedule data
+
+      const existingEvent = mergedEvents.find(
+        (event) => event.title === specialSchedule.title
+      );
+      console.log("existingEvent", existingEvent);
+      const specialDate = new Date(specialSchedule.special_date);
+      const options = {
+        month: "long",
+        day: "2-digit",
+        year: "numeric",
+        weekday: "long",
+      };
+      const formattedDate = specialDate.toLocaleDateString("en-US", options);
+      mergedEvents.push({
+        date: formattedDate,
+        data: [
+          {
+            title: specialSchedule.schedule.title,
+            time:
+              formatTime(specialSchedule.start_time) +
+              " - " +
+              formatTime(specialSchedule.end_time),
+            type: specialSchedule.type,
+            location: specialSchedule.location,
+            color: specialSchedule.schedule.color,
+          },
+        ],
+      });
+    }
+  });
+
+  console.log("mergedEventssadadads", mergedEvents);
+
+  const convertedEvents = convertToNewFormat(mergedEvents);
+
+  console.log("convertedEvents", convertedEvents);
+
+  return groupEventsByDate(convertedEvents);
+};
+
 export const fetchEvents = async (userToken) => {
   try {
     const response = await axios.get(`${BASE_URL}schedules/`, {
@@ -8,6 +112,12 @@ export const fetchEvents = async (userToken) => {
         Authorization: `Bearer ${userToken}`,
       },
     });
+
+    console.log("response", response.data);
+
+    if (!response.data || !Array.isArray(response.data)) {
+      throw new Error("Invalid response data format");
+    }
 
     const events = [];
 
@@ -74,15 +184,29 @@ const formatTime = (timeString) => {
   return `${hours12}:${minutes}${amPm}`;
 };
 
+const convertToNewFormat = (mergedEvents) => {
+  return mergedEvents.map((event) => ({
+    color: event.data[0].color,
+    date: event.date,
+    location: event.data[0].location,
+    time: event.data[0].time,
+    title: event.data[0].title,
+    type: event.data[0].type,
+  }));
+};
+
 const groupEventsByDate = (events) => {
   // Group events by date
   const groupedEvents = {};
+  console.log("events", events);
   events.forEach((event) => {
     if (!groupedEvents[event.date]) {
       groupedEvents[event.date] = [];
     }
     groupedEvents[event.date].push(event);
   });
+
+  console.log("groupedEvents", groupedEvents);
 
   // Convert groupedEvents object to array and sort by date
   const sortedGroupedEvents = Object.keys(groupedEvents)
@@ -106,5 +230,56 @@ const groupEventsByDate = (events) => {
       }),
     }));
 
+  // sortedGroupedEvents.forEach((event) => {
+  //   console.log("Date:", event.date);
+  //   event.data.forEach((data) => {
+  //     console.log("Data:", data);
+  //     // Log individual properties if needed
+  //     console.log("Title:", data.title);
+  //     console.log("Time:", data.time);
+  //     console.log("Type:", data.type);
+  //     console.log("Location:", data.location);
+  //     console.log("Color:", data.color);
+  //   });
+  // });
+
   return sortedGroupedEvents;
+};
+
+export const fetchSpecialSchedules = async (userToken) => {
+  try {
+    const response = await axios.get(`${BASE_URL}special-schedules/`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+
+    return response.data.map((specialSchedule) => ({
+      ...specialSchedule,
+      schedule: {
+        ...specialSchedule.schedule,
+      },
+    }));
+  } catch (error) {
+    console.error("Error fetching special schedules:", error);
+    throw error;
+  }
+};
+
+export const createSpecialSchedule = async (userToken, specialScheduleData) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}special-schedules/`,
+      specialScheduleData,
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error creating special schedule:", error);
+    throw error;
+  }
 };

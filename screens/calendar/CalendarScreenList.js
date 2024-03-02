@@ -8,7 +8,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { fetchEvents } from "../../api/scheduleApi";
+import { fetchEventsAndSpecialSchedules } from "../../api/scheduleApi";
 import { useAuth } from "../../api/authContext";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
@@ -76,12 +76,13 @@ const EventsPage = () => {
   const [events, setEvents] = useState([]);
   const { userToken } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
+
   const fetchData = async () => {
     try {
-      const data = await fetchEvents(userToken);
-      setEvents(data);
+      const mergedEvents = await fetchEventsAndSpecialSchedules(userToken);
+      setEvents(mergedEvents);
     } catch (error) {
-      console.error("Error fetching events:", error);
+      console.error("Error fetching data:", error);
     }
   };
 
@@ -93,11 +94,39 @@ const EventsPage = () => {
 
   useEffect(() => {
     fetchData();
-
-    return () => {
-      // Cleanup logic here if needed
-    };
   }, []);
+
+  const mergeEvents = (events, specialSchedules) => {
+    const mergedEvents = [...events];
+    specialSchedules.forEach((specialSchedule) => {
+      const index = mergedEvents.findIndex(
+        (event) => event.date === specialSchedule.special_date
+      );
+      if (index !== -1) {
+        mergedEvents[index].data.push({
+          title: specialSchedule.schedule.title,
+          time: `${specialSchedule.start_time} - ${specialSchedule.end_time}`,
+          type: specialSchedule.schedule.type,
+          location: specialSchedule.schedule.location,
+          color: specialSchedule.color,
+        });
+      } else {
+        mergedEvents.push({
+          date: specialSchedule.special_date,
+          data: [
+            {
+              title: specialSchedule.schedule.title,
+              time: `${specialSchedule.start_time} - ${specialSchedule.end_time}`,
+              type: specialSchedule.schedule.type,
+              location: specialSchedule.schedule.location,
+              color: specialSchedule.color,
+            },
+          ],
+        });
+      }
+    });
+    return mergedEvents;
+  };
 
   return (
     <ScrollView
@@ -160,7 +189,7 @@ const styles = StyleSheet.create({
     color: "white",
   },
   eventContainer: {
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 10,
     marginBottom: 10,
