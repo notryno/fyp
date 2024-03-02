@@ -1,4 +1,4 @@
-// stack.js
+// MainNavigator.js
 
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -22,6 +22,7 @@ import { useNavigation } from "@react-navigation/native";
 import ChangeFirstName from "../screens/profile/ChangeFirstName";
 import ChangeLastName from "../screens/profile/ChangeLastName";
 import ChangePassword from "../screens/profile/ChangePassword";
+import EventDescriptionScreen from "../screens/calendar/EventDescriptionScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -264,11 +265,16 @@ const CalendarStackNavigator = () => {
       <CalendarStack.Screen
         name="CalendarTopTab"
         component={CalendarTopTab}
-        options={{ headerShown: false }}
+        options={{ title: "List", headerShown: false }}
       />
       <CalendarStack.Screen
         name="CalendarTask"
         component={TaskScreen}
+        options={{ title: "Task" }}
+      />
+      <CalendarStack.Screen
+        name="EventDescription"
+        component={EventDescriptionScreen}
         options={{ title: "Task" }}
       />
     </CalendarStack.Navigator>

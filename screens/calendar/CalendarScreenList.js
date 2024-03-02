@@ -5,28 +5,67 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { fetchEvents } from "../../api/scheduleApi";
 import { useAuth } from "../../api/authContext";
+import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 
-const EventItem = ({ title, time, type, location }) => {
+const EventItem = ({ title, time, type, location, color }) => {
+  const navigation = useNavigation();
+
+  const handlePress = () => {
+    navigation.navigate("EventDescription", {
+      title: title,
+      time: time,
+      type: type,
+      location: location,
+      color: color,
+    });
+  };
+
   return (
     <TouchableOpacity
-      style={styles.eventContainer}
-      onPress={() => {
-        /* Handle onPress event */
-      }}
+      style={[styles.eventContainer, { backgroundColor: color }]}
+      onPress={handlePress}
     >
       <View style={styles.eventDetails}>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.time}>{time}</Text>
+          <Text style={[styles.title, color !== "#ffffff" && styles.whiteText]}>
+            {title}
+          </Text>
+          <Text
+            style={[
+              styles.detailText,
+              styles.time,
+              color !== "#ffffff" && styles.whiteText,
+            ]}
+          >
+            {time}
+          </Text>
         </View>
-        <Text style={styles.type}>{type}</Text>
+        <Text
+          style={[
+            styles.detailText,
+            styles.type,
+            color !== "#ffffff" && styles.whiteText,
+          ]}
+        >
+          {type}
+        </Text>
         <View style={styles.locationContainer}>
-          <MaterialIcons name="location-on" size={24} color="black" />
-          <Text style={styles.location}>{location}</Text>
+          <Ionicons name="location-outline" size={18} color="white" />
+          <Text
+            style={[
+              styles.detailText,
+              styles.location,
+              color !== "#ffffff" && styles.whiteText,
+            ]}
+          >
+            {location}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -36,84 +75,23 @@ const EventItem = ({ title, time, type, location }) => {
 const EventsPage = () => {
   const [events, setEvents] = useState([]);
   const { userToken } = useAuth();
+  const [refreshing, setRefreshing] = useState(false);
+  const fetchData = async () => {
+    try {
+      const data = await fetchEvents(userToken);
+      setEvents(data);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
+  };
 
-  // const events = [
-  //   {
-  //     date: "March 1, 2024 Friday",
-  //     data: [
-  //       {
-  //         title: "Sample Event 1",
-  //         time: "7AM - 8AM",
-  //         type: "Lecture",
-  //         location: "Sample Location 1",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     date: "March 2, 2024 Saturday",
-  //     data: [
-  //       {
-  //         title: "Sample Event 2",
-  //         time: "9AM - 10AM",
-  //         type: "Workshop",
-  //         location: "Sample Location 2",
-  //       },
-  //       {
-  //         title: "Sample Event 3",
-  //         time: "11AM - 12PM",
-  //         type: "Tutorial",
-  //         location: "Sample Location 3",
-  //       },
-  //     ],
-  //   },
-
-  //   {
-  //     date: "March 2, 2024 Saturday",
-  //     data: [
-  //       {
-  //         title: "Sample Event 2",
-  //         time: "9AM - 10AM",
-  //         type: "Workshop",
-  //         location: "Sample Location 2",
-  //       },
-  //       {
-  //         title: "Sample Event 3",
-  //         time: "11AM - 12PM",
-  //         type: "Tutorial",
-  //         location: "Sample Location 3",
-  //       },
-  //     ],
-  //   },
-
-  //   {
-  //     date: "March 2, 2024 Saturday",
-  //     data: [
-  //       {
-  //         title: "Sample Event 2",
-  //         time: "9AM - 10AM",
-  //         type: "Workshop",
-  //         location: "Sample Location 2",
-  //       },
-  //       {
-  //         title: "Sample Event 3",
-  //         time: "11AM - 12PM",
-  //         type: "Tutorial",
-  //         location: "Sample Location 3",
-  //       },
-  //     ],
-  //   },
-  // ];
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchData();
+    setRefreshing(false);
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchEvents(userToken);
-        setEvents(data);
-      } catch (error) {
-        console.error("Error fetching events:", error);
-      }
-    };
-
     fetchData();
 
     return () => {
@@ -127,6 +105,9 @@ const EventsPage = () => {
         styles.scrollViewContent,
         events.length === 0 && styles.centeredContent,
       ]}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
       <View style={styles.eventsPage}>
         {events.length === 0 ? (
@@ -145,6 +126,7 @@ const EventsPage = () => {
                   time={event.time}
                   type={event.type}
                   location={event.location}
+                  color={event.color}
                 />
               ))}
             </View>
@@ -158,7 +140,6 @@ const EventsPage = () => {
 const styles = StyleSheet.create({
   scrollViewContent: {
     flexGrow: 1,
-    paddingVertical: 20,
   },
   centeredContent: {
     justifyContent: "center",
@@ -173,6 +154,10 @@ const styles = StyleSheet.create({
   dateText: {
     fontWeight: "bold",
     marginBottom: 10,
+    fontSize: 18,
+  },
+  whiteText: {
+    color: "white",
   },
   eventContainer: {
     borderWidth: 2,
@@ -188,6 +173,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: "bold",
+    fontSize: 18,
     marginBottom: 5,
   },
   time: {
@@ -208,6 +194,10 @@ const styles = StyleSheet.create({
   noScheduleContainer: {
     alignItems: "center",
     justifyContent: "center",
+  },
+  detailText: {
+    fontSize: 14,
+    marginBottom: 5,
   },
   noScheduleText: {
     fontSize: 24,
