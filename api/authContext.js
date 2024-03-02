@@ -1,7 +1,6 @@
-// authContext.js
-
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { getTasks } from "./taskApi";
+import base64 from "base-64";
 
 const AuthContext = createContext();
 
@@ -9,13 +8,30 @@ export const AuthProvider = ({ children }) => {
   const [userToken, setUserToken] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
 
+  useEffect(() => {
+    const isTokenExpired = () => {
+      if (!userToken) return true;
+      const tokenExpiration = decodeToken(userToken).exp;
+      console.log("Token expiration:", new Date(tokenExpiration * 1000));
+      return Date.now() >= tokenExpiration * 1000;
+    };
+
+    if (isTokenExpired()) {
+      signOut();
+    }
+  }, [userToken]);
+
+  const decodeToken = (token) => {
+    const payload = token.split(".")[1];
+    return JSON.parse(base64.decode(payload));
+  };
+
   const signIn = async (token, profile) => {
     setUserToken(token);
     setUserProfile(profile);
 
     try {
       const response = await getTasks(token);
-      // You can handle the tasks data as needed
       console.log("Tasks after sign in:", response);
     } catch (error) {
       console.error("Error fetching tasks after sign in:", error);
