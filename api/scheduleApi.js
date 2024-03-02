@@ -23,11 +23,17 @@ export const fetchEvents = async (userToken) => {
 
       const frequencyPerWeek = event.frequency_per_week || 1;
       const numberOfInstances = event.number_of_instances || 1;
+      const dayOfWeek = event.day_of_week; // get the day of the week for the event
 
-      // Calculate and push instances of the event
+      let instanceDate = new Date(startDate);
+
+      // Find the starting day that matches the day of the week
+      while (instanceDate.getDay() !== dayOfWeek) {
+        instanceDate.setDate(instanceDate.getDate() + 1);
+      }
+
+      // Push instances of the event
       for (let i = 0; i < numberOfInstances; i++) {
-        const instanceDate = new Date(startDate);
-        instanceDate.setDate(startDate.getDate() + i * 7 * frequencyPerWeek);
         const instanceFormattedDate = instanceDate.toLocaleDateString(
           "en-US",
           options
@@ -42,12 +48,17 @@ export const fetchEvents = async (userToken) => {
           location: event.location,
           color: event.color,
         });
+
+        // Increase the instance date based on frequency per week
+        instanceDate.setDate(instanceDate.getDate() + frequencyPerWeek * 7);
       }
     });
 
+    console.log("events", events);
     // Sort events by date
     events.sort((a, b) => new Date(a.date) - new Date(b.date));
-    console.log(events);
+
+    console.log("events", events);
 
     return groupEventsByDate(events);
   } catch (error) {
@@ -73,9 +84,27 @@ const groupEventsByDate = (events) => {
     groupedEvents[event.date].push(event);
   });
 
-  // Convert groupedEvents object to array
-  return Object.keys(groupedEvents).map((date) => ({
-    date,
-    data: groupedEvents[date],
-  }));
+  // Convert groupedEvents object to array and sort by date
+  const sortedGroupedEvents = Object.keys(groupedEvents)
+    .sort((a, b) => {
+      // Manually parse date strings into a format that JavaScript can understand
+      const dateA = new Date(Date.parse(a.replace(/,/g, "")));
+      const dateB = new Date(Date.parse(b.replace(/,/g, "")));
+      return dateA - dateB;
+    })
+    .map((date) => ({
+      date,
+      data: groupedEvents[date].sort((a, b) => {
+        // Extract time from the event objects and convert to 24-hour format for comparison
+        const [hoursA, minutesA] = a.time.split(" ")[0].split(":").map(Number);
+        const [hoursB, minutesB] = b.time.split(" ")[0].split(":").map(Number);
+
+        // Handle cases where minutes are zero
+        const timeA = hoursA * 60 + (minutesA || 0);
+        const timeB = hoursB * 60 + (minutesB || 0);
+        return timeA - timeB;
+      }),
+    }));
+
+  return sortedGroupedEvents;
 };
