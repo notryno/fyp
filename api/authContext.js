@@ -16,9 +16,17 @@ export const AuthProvider = ({ children }) => {
       return Date.now() >= tokenExpiration * 1000;
     };
 
+    console.log("Rendering");
     if (isTokenExpired()) {
       signOut();
     }
+    const tokenExpirationCheckInterval = setInterval(() => {
+      if (isTokenExpired()) {
+        signOut();
+      }
+    }, 15 * 60 * 1000); // Check token expiration every 15 minutes
+
+    return () => clearInterval(tokenExpirationCheckInterval);
   }, [userToken]);
 
   const decodeToken = (token) => {
