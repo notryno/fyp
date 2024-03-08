@@ -6,6 +6,7 @@ export const fetchEventsAndSpecialSchedules = async (userToken) => {
     const eventData = await fetchEvents(userToken);
     const specialScheduleData = await fetchSpecialSchedules(userToken);
 
+    console.log("response", eventData);
     console.log("response2", specialScheduleData);
 
     // Merge regular events and special schedules
@@ -113,8 +114,6 @@ export const fetchEvents = async (userToken) => {
       },
     });
 
-    console.log("response", response.data);
-
     if (!response.data || !Array.isArray(response.data)) {
       throw new Error("Invalid response data format");
     }
@@ -164,11 +163,8 @@ export const fetchEvents = async (userToken) => {
       }
     });
 
-    console.log("events", events);
     // Sort events by date
     events.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    console.log("events", events);
 
     return groupEventsByDate(events);
   } catch (error) {
@@ -198,7 +194,6 @@ const convertToNewFormat = (mergedEvents) => {
 const groupEventsByDate = (events) => {
   // Group events by date
   const groupedEvents = {};
-  console.log("events", events);
   events.forEach((event) => {
     if (!groupedEvents[event.date]) {
       groupedEvents[event.date] = [];
@@ -211,7 +206,6 @@ const groupEventsByDate = (events) => {
   // Convert groupedEvents object to array and sort by date
   const sortedGroupedEvents = Object.keys(groupedEvents)
     .sort((a, b) => {
-      // Manually parse date strings into a format that JavaScript can understand
       const dateA = new Date(Date.parse(a.replace(/,/g, "")));
       const dateB = new Date(Date.parse(b.replace(/,/g, "")));
       return dateA - dateB;
@@ -219,14 +213,10 @@ const groupEventsByDate = (events) => {
     .map((date) => ({
       date,
       data: groupedEvents[date].sort((a, b) => {
-        // Extract time from the event objects and convert to 24-hour format for comparison
-        const [hoursA, minutesA] = a.time.split(" ")[0].split(":").map(Number);
-        const [hoursB, minutesB] = b.time.split(" ")[0].split(":").map(Number);
-
-        // Handle cases where minutes are zero
-        const timeA = hoursA * 60 + (minutesA || 0);
-        const timeB = hoursB * 60 + (minutesB || 0);
-        return timeA - timeB;
+        // Extract start time from the event objects and convert to a comparable format
+        const startTimeA = extractTime(a.time);
+        const startTimeB = extractTime(b.time);
+        return startTimeA - startTimeB;
       }),
     }));
 
@@ -244,6 +234,17 @@ const groupEventsByDate = (events) => {
   // });
 
   return sortedGroupedEvents;
+};
+
+const extractTime = (timeString) => {
+  // Split the time string to get the start time part
+  const [startTime] = timeString.split(" - ");
+  // Parse the start time string to get hours and minutes
+  const [hours, minutes, period] = startTime.split(/:| /).map(Number);
+  // Convert to 24-hour format
+  const hours24 = period === 12 ? hours : hours + (period === 1 ? 12 : 0);
+  // Return minutes since midnight
+  return hours24 * 60 + minutes;
 };
 
 export const fetchSpecialSchedules = async (userToken) => {
