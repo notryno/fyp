@@ -5,9 +5,11 @@ import { useNavigation } from "@react-navigation/native";
 import { fetchEventsAndSpecialSchedules } from "../../api/scheduleApi";
 import { useAuth } from "../../api/authContext";
 import EventItem from "../../components/EventItem";
+import { getTasks } from "../../api/taskApi";
 
 const CalendarScreen = () => {
   const [events, setEvents] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [markedDates, setMarkedDates] = useState({});
   const [selectedEvents, setSelectedEvents] = useState([]);
   const { userToken } = useAuth();
@@ -16,6 +18,10 @@ const CalendarScreen = () => {
     try {
       const mergedEvents = await fetchEventsAndSpecialSchedules(userToken);
       setEvents(mergedEvents);
+
+      const response = await getTasks(userToken);
+      setTasks(response);
+      console.log("response calendar", response);
 
       // Mark the dates with events
       const markedDatesObj = {};

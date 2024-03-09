@@ -31,9 +31,9 @@ const mergeEvents = (events, specialSchedules) => {
   specialSchedules.forEach((specialSchedule) => {
     const specialDate = new Date(specialSchedule.special_date);
     const options = {
+      year: "numeric",
       month: "long",
       day: "2-digit",
-      year: "numeric",
       weekday: "long",
     };
     const formattedDate = specialDate.toLocaleDateString("en-US", options);

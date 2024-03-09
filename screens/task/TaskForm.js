@@ -51,7 +51,7 @@ const TaskForm = ({ onSubmit, onCancel }) => {
           style={styles.input}
           placeholder="Description"
           value={description}
-          onChangeText={(text) => setDescription(text)}
+          onChangeText={(text) => setDescription(text || null)}
         />
         <View style={styles.rowContainer}>
           <View style={styles.labelContainer}>
