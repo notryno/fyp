@@ -12,6 +12,7 @@ const CalendarScreen = () => {
   const [tasks, setTasks] = useState([]);
   const [markedDates, setMarkedDates] = useState({});
   const [selectedEvents, setSelectedEvents] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null); // State to store the selected date
   const { userToken } = useAuth();
 
   const fetchData = async () => {
@@ -54,6 +55,7 @@ const CalendarScreen = () => {
   };
 
   const handleDayPress = (day) => {
+    setSelectedDate(day.dateString); // Update selected date
     // Format the selected day to match day.dateString format (YYYY-MM-DD)
     const selectedDate = new Date(day.timestamp); // Convert timestamp to Date object
     const formattedDate = selectedDate.toISOString().split("T")[0]; // Format as YYYY-MM-DD
@@ -74,7 +76,16 @@ const CalendarScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Calendar markedDates={markedDates} onDayPress={handleDayPress} />
+      <Calendar
+        markedDates={{
+          ...markedDates,
+          [selectedDate]: {
+            selected: true,
+            selectedColor: "lightblue",
+          },
+        }}
+        onDayPress={handleDayPress}
+      />
       <View style={styles.eventsContainer}>
         {selectedEvents.map((group, index) => (
           <View key={index} style={styles.eventGroup}>
