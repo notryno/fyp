@@ -83,14 +83,16 @@ const EventsPage = () => {
           mergedData.map((data, index) => (
             <View key={index} style={styles.eventGroup}>
               <Text style={styles.dateText}>{data.date}</Text>
-              {data.tasks.map((task, idx) => (
-                <TaskItem
-                  key={idx}
-                  title={task.title}
-                  completed={task.completed}
-                  onPress={() => {}}
-                />
-              ))}
+              {data.tasks
+                .filter((task) => !task.completed) // Filter out completed tasks
+                .map((task, idx) => (
+                  <TaskItem
+                    key={idx}
+                    title={task.title}
+                    completed={task.completed}
+                    onPress={() => {}}
+                  />
+                ))}
               {data.events.map((event, idx) => (
                 <EventItem
                   key={idx}
