@@ -24,8 +24,6 @@ const TaskForm = ({ onSubmit, onCancel }) => {
       const dueDateTime = new Date(dueDate);
       dueDateTime.setHours(dueTime.getHours(), dueTime.getMinutes());
       formattedDueTime = dueTime.toTimeString().split(" ")[0];
-    } else {
-      const dueDateTime = new Date(dueDate.setHours(0, 0, 0, 0));
     }
 
     onSubmit({
@@ -60,15 +58,19 @@ const TaskForm = ({ onSubmit, onCancel }) => {
           <View style={styles.datePickerContainer}>
             <DatePicker
               style={styles.datePicker}
-              value={dueDate}
+              value={dueDate} // Ensure dueDate is a Date object
               mode="date"
               format="YYYY-MM-DD"
-              minDate="2000-01-01"
-              maxDate="2100-12-31"
+              minDate={new Date(2000, 0, 1)} // Use Date constructor to set minDate
+              maxDate={new Date(2100, 11, 31)} // Use Date constructor to set maxDate
               confirmBtnText="Confirm"
               cancelBtnText="Cancel"
               customStyles={styles.datePickerCustomStyles}
-              onDateChange={(date) => setDueDate(date)}
+              onChange={(event, date) => {
+                if (date !== undefined) {
+                  setDueDate(date);
+                }
+              }} // Update dueDate state if date is defined
             />
           </View>
         </View>
@@ -80,13 +82,17 @@ const TaskForm = ({ onSubmit, onCancel }) => {
             <View style={styles.datePickerContainer}>
               <DatePicker
                 style={styles.datePicker}
-                value={dueTime}
+                value={dueTime} // Ensure dueTime is a Date object
                 mode="time"
                 format="HH:mm"
                 confirmBtnText="Confirm"
                 cancelBtnText="Cancel"
                 customStyles={styles.datePickerCustomStyles}
-                onDateChange={(time) => setDueTime(time)}
+                onChange={(event, time) => {
+                  if (time !== undefined) {
+                    setDueTime(time);
+                  }
+                }} // Update dueTime state if time is defined
               />
             </View>
           </View>

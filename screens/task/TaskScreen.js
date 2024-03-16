@@ -23,12 +23,15 @@ import DatePicker from "@react-native-community/datetimepicker";
 import TaskForm from "./TaskForm";
 import Overlay from "../../components/Overlay";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import TaskDescriptionScreen from "./TaskDescriptionScreen";
 
 const TaskScreen = () => {
   const [tasks, setTasks] = useState([]);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const { userToken } = useAuth();
   const [showAddTaskButton, setShowAddTaskButton] = useState(true);
+  const { navigate } = useNavigation();
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -113,6 +116,28 @@ const TaskScreen = () => {
     );
   };
 
+  const navigateToTaskDescription = (taskId) => {
+    const task = tasks.find((task) => task.id === taskId);
+    const formattedDueDate = task
+      ? new Date(task.due_date).toLocaleDateString()
+      : "";
+    const formattedDueTime = task
+      ? new Date(`1970-01-01T${task.due_time}Z`).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "";
+
+    navigate("TaskDescriptionScreen", {
+      title: task?.title || "",
+      description: task?.description || "",
+      dueDate: formattedDueDate,
+      dueTime: formattedDueTime,
+      onMarkCompleted: () => handleCompleteTask(taskId),
+      onDelete: () => confirmDeleteTask(taskId),
+    });
+  };
+
   return (
     <View style={{ flex: 1, padding: 10 }}>
       <Text>Task Screen</Text>
@@ -121,79 +146,85 @@ const TaskScreen = () => {
         data={tasks}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginVertical: 5,
-            }}
-          >
-            <TouchableOpacity
-              onPress={() =>
-                !item.completed
-                  ? handleCompleteTask(item.id)
-                  : handleIncompleteTask(item.id)
-              }
-              style={{ flex: 1, alignItems: "center" }}
+          <TouchableOpacity onPress={() => navigateToTaskDescription(item.id)}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginVertical: 5,
+              }}
             >
-              <View
-                style={{
-                  width: 20,
-                  height: 20,
-                  borderRadius: 10,
-                  borderWidth: 2,
-                  borderColor: !item.completed ? "green" : "orange",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+              <TouchableOpacity
+                onPress={() =>
+                  !item.completed
+                    ? handleCompleteTask(item.id)
+                    : handleIncompleteTask(item.id)
+                }
+                style={{ flex: 1, alignItems: "center" }}
               >
-                {item.completed && (
-                  <View
-                    style={{
-                      width: 10,
-                      height: 10,
-                      borderRadius: 5,
-                      backgroundColor: !item.completed ? "green" : "orange",
-                    }}
-                  />
-                )}
-              </View>
-            </TouchableOpacity>
+                <View
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: 10,
+                    borderWidth: 2,
+                    borderColor: !item.completed ? "green" : "orange",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {item.completed && (
+                    <View
+                      style={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: 5,
+                        backgroundColor: !item.completed ? "green" : "orange",
+                      }}
+                    />
+                  )}
+                </View>
+              </TouchableOpacity>
 
-            <View style={{ flex: 8, paddingHorizontal: 10 }}>
-              <Text
-                style={{
-                  textDecorationLine: item.completed ? "line-through" : "none",
-                  opacity: item.completed ? 0.5 : 1,
-                }}
+              <View style={{ flex: 8, paddingHorizontal: 10 }}>
+                <Text
+                  style={{
+                    textDecorationLine: item.completed
+                      ? "line-through"
+                      : "none",
+                    opacity: item.completed ? 0.5 : 1,
+                  }}
+                >
+                  {item.title}
+                </Text>
+                <Text
+                  style={{
+                    textDecorationLine: item.completed
+                      ? "line-through"
+                      : "none",
+                    opacity: item.completed ? 0.5 : 1,
+                  }}
+                >
+                  {item.description}
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                onPress={() => confirmDeleteTask(item.id)}
+                style={{ flex: 1, alignItems: "center" }}
               >
-                {item.title}
-              </Text>
-              <Text
-                style={{
-                  textDecorationLine: item.completed ? "line-through" : "none",
-                  opacity: item.completed ? 0.5 : 1,
-                }}
-              >
-                {item.description}
-              </Text>
+                <View
+                  style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Ionicons name="close-circle-outline" size={25} color="red" />
+                </View>
+              </TouchableOpacity>
             </View>
-
-            <TouchableOpacity
-              onPress={() => confirmDeleteTask(item.id)}
-              style={{ flex: 1, alignItems: "center" }}
-            >
-              <View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Ionicons name="close-circle-outline" size={25} color="red" />
-              </View>
-            </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         )}
       />
       <Overlay visible={showTaskForm} zIndex={2}>

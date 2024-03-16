@@ -23,6 +23,7 @@ import ChangeFirstName from "../screens/profile/ChangeFirstName";
 import ChangeLastName from "../screens/profile/ChangeLastName";
 import ChangePassword from "../screens/profile/ChangePassword";
 import EventDescriptionScreen from "../screens/calendar/EventDescriptionScreen";
+import TaskDescriptionScreen from "../screens/task/TaskDescriptionScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -49,8 +50,8 @@ const HomeStack = () => {
       />
       <Stack.Screen
         name="HomeTask"
-        component={TaskScreen}
-        options={{ title: "Task" }}
+        component={TaskStack}
+        options={{ headerShown: false }}
       />
       <Stack.Screen name="Event" component={EventData} />
     </Stack.Navigator>
@@ -77,8 +78,8 @@ const SearchStack = () => {
       />
       <Stack.Screen
         name="SearchTask"
-        component={TaskScreen}
-        options={{ title: "Task" }}
+        component={TaskStack}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
@@ -164,8 +165,8 @@ const NotificationStack = () => {
       />
       <Stack.Screen
         name="NotificationTask"
-        component={TaskScreen}
-        options={{ title: "Task" }}
+        component={TaskStack}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
@@ -198,8 +199,8 @@ const ProfileStack = () => {
       />
       <Stack.Screen
         name="ProfileTask"
-        component={TaskScreen}
-        options={{ title: "Task" }}
+        component={TaskStack}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="ChangeFirstName"
@@ -269,8 +270,8 @@ const CalendarStackNavigator = () => {
       />
       <CalendarStack.Screen
         name="CalendarTask"
-        component={TaskScreen}
-        options={{ title: "Task" }}
+        component={TaskStack}
+        options={{ headerShown: false }}
       />
       <CalendarStack.Screen
         name="EventDescription"
@@ -281,10 +282,46 @@ const CalendarStackNavigator = () => {
   );
 };
 
+const TaskStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="TaskList"
+        component={TaskScreen}
+        options={{ title: "TaskStack" }}
+      />
+      <Stack.Screen
+        name="TaskDescriptionScreen"
+        component={TaskDescriptionScreen}
+        options={{ title: "Task Description" }}
+      />
+    </Stack.Navigator>
+  );
+};
+
 const MainNavigator = () => {
   const { userToken } = useAuth();
 
   return userToken ? (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Tabs"
+        component={TabNavigator}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="TaskTab"
+        component={TaskStack}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  ) : (
+    <AuthStack />
+  );
+};
+
+const TabNavigator = () => {
+  return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
@@ -332,9 +369,6 @@ const MainNavigator = () => {
         options={{ headerShown: false, tabBarLabel: "Profile" }}
       />
     </Tab.Navigator>
-  ) : (
-    <AuthStack />
   );
 };
-
 export default MainNavigator;
