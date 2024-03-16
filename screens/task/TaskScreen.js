@@ -24,8 +24,10 @@ import Overlay from "../../components/Overlay";
 const TaskScreen = () => {
   const [tasks, setTasks] = useState([]);
   const [showTaskForm, setShowTaskForm] = useState(false);
-  const { userToken } = useAuth();
   const [showAddTaskButton, setShowAddTaskButton] = useState(true);
+  const [sortBy, setSortBy] = useState("title"); // Default sorting by title
+  const [sortOrder, setSortOrder] = useState("asc"); // Default sorting order ascending
+  const { userToken } = useAuth();
   const { navigate } = useNavigation();
 
   const fetchTasks = async () => {
@@ -133,12 +135,69 @@ const TaskScreen = () => {
     });
   };
 
+  const handleSort = (sortByField) => {
+    if (sortByField === sortBy) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(sortByField);
+      setSortOrder("asc");
+    }
+  };
+
+  const sortedTasks = [...tasks];
+
+  sortedTasks.sort((a, b) => {
+    // Completed tasks should be sorted to the bottom
+    if (a.completed && !b.completed) return 1;
+    if (!a.completed && b.completed) return -1;
+
+    if (sortBy === "title") {
+      // Sort by title only, ignoring the date
+      return sortOrder === "asc"
+        ? a.title.localeCompare(b.title)
+        : b.title.localeCompare(a.title);
+    }
+
+    // Sort by due date
+    const dateA = new Date(a.due_date).getTime();
+    const dateB = new Date(b.due_date).getTime();
+
+    if (dateA === dateB) {
+      // Sort all-day tasks first
+      if (!a.due_time && !b.due_time) return 0;
+      if (!a.due_time) return -1;
+      if (!b.due_time) return 1;
+
+      // Sort by due time
+      const timeA = new Date(`1970-01-01T${a.due_time}Z`).getTime();
+      const timeB = new Date(`1970-01-01T${b.due_time}Z`).getTime();
+
+      return sortOrder === "asc" ? timeA - timeB : timeB - timeA;
+    } else {
+      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+    }
+  });
+
   return (
     <View style={styles.container}>
       <Text>Task Screen</Text>
 
+      <TouchableOpacity
+        onPress={() => handleSort("title")}
+        style={styles.sortButton}
+      >
+        <Text>Sort by Title</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => handleSort("due_date")}
+        style={styles.sortButton}
+      >
+        <Text>Sort by Due Date</Text>
+      </TouchableOpacity>
+
       <FlatList
-        data={tasks}
+        data={sortedTasks}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => navigateToTaskDescription(item.id)}>
@@ -201,6 +260,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
+  },
+  sortButton: {
+    marginVertical: 5,
+    padding: 10,
+    backgroundColor: "lightgray",
   },
   taskItem: {
     flexDirection: "row",
