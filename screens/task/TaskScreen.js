@@ -130,7 +130,6 @@ const TaskScreen = () => {
       dueDate: formattedDueDate,
       dueTime: formattedDueTime,
       markCompleted: task?.completed,
-      taskDeleted: task?.deleted,
     });
   };
 

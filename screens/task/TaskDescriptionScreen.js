@@ -7,16 +7,8 @@ import { updateTask, deleteTask } from "../../api/taskApi";
 import { useAuth } from "../../api/authContext";
 
 const TaskDescriptionScreen = ({ route, navigation }) => {
-  const {
-    taskId,
-    title,
-    description,
-    dueDate,
-    dueTime,
-    markCompleted,
-    taskDeleted,
-    onDelete,
-  } = route.params;
+  const { taskId, title, description, dueDate, dueTime, markCompleted } =
+    route.params;
 
   const [completed, setCompleted] = useState(markCompleted);
   const { userToken } = useAuth();
@@ -61,6 +53,21 @@ const TaskDescriptionScreen = ({ route, navigation }) => {
       ]
     );
   };
+  const renderDueTime = () => {
+    if (dueTime === "Invalid Date") {
+      return (
+        <Text style={styles.infoText}>
+          <Ionicons name="time-outline" size={20} /> Time: All Day
+        </Text>
+      );
+    } else {
+      return (
+        <Text style={styles.infoText}>
+          <Ionicons name="time-outline" size={20} /> Time: {dueTime}
+        </Text>
+      );
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -77,19 +84,14 @@ const TaskDescriptionScreen = ({ route, navigation }) => {
         <Text style={styles.infoText}>
           <Ionicons name="calendar-outline" size={20} /> Due Date: {dueDate}
         </Text>
-        <Text style={styles.infoText}>
-          <Ionicons name="time-outline" size={20} /> Time: {dueTime}
-        </Text>
+        {renderDueTime()}
       </View>
       <View style={styles.buttonContainer}>
         <Button
           title={completed ? "Mark Uncomplete" : "Mark Completed"}
           onPress={handleMarkCompleted}
         />
-        <Button
-          title={taskDeleted ? "Restore" : "Delete"}
-          onPress={confirmDeleteTask}
-        />
+        <Button title="Delete" onPress={confirmDeleteTask} />
       </View>
     </View>
   );
