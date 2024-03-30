@@ -125,7 +125,7 @@ const TaskScreen = () => {
         })
       : "";
 
-    navigate("TaskDescriptionScreen", {
+    navigate("TaskDetailScreen", {
       taskId,
       title: task?.title || "",
       description: task?.description || "",

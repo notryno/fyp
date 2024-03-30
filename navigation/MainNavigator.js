@@ -53,6 +53,16 @@ const HomeStack = () => {
         component={TaskStack}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="TaskDetailScreen"
+        component={TaskDescriptionScreen}
+        options={{ title: "Task Description" }}
+      />
+      <Stack.Screen
+        name="EventDescription"
+        component={EventDescriptionScreen}
+        options={{ title: "Event" }}
+      />
       <Stack.Screen name="Event" component={EventData} />
     </Stack.Navigator>
   );
@@ -296,7 +306,7 @@ const TaskStack = () => {
         options={{ title: "TaskStack" }}
       />
       <Stack.Screen
-        name="TaskDescriptionScreen"
+        name="TaskDetailScreen"
         component={TaskDescriptionScreen}
         options={{ title: "Task Description" }}
       />
