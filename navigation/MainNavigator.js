@@ -278,6 +278,11 @@ const CalendarStackNavigator = () => {
         component={EventDescriptionScreen}
         options={{ title: "Event" }}
       />
+      <CalendarStack.Screen
+        name="TaskDetailScreen"
+        component={TaskDescriptionScreen}
+        options={{ title: "Task" }}
+      />
     </CalendarStack.Navigator>
   );
 };

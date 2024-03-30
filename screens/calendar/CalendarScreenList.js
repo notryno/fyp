@@ -29,7 +29,6 @@ const EventsPage = () => {
         ...task,
         due_date: formatDate(new Date(task.due_date)),
       }));
-      console.log("response list", formattedTasks);
       setTasks(formattedTasks);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -60,8 +59,21 @@ const EventsPage = () => {
   const mergedData = events.map((eventGroup) => ({
     date: eventGroup.date,
     events: eventGroup.data,
-    tasks: tasks.filter((task) => task.due_date === eventGroup.date),
+    tasks: tasks
+      .filter((task) => task.due_date === eventGroup.date)
+      .sort((task1, task2) => {
+        // Sort by due_time, with null times (All Day tasks) on top
+        if (task1.due_time === null && task2.due_time !== null) return -1;
+        if (task1.due_time !== null && task2.due_time === null) return 1;
+        if (task1.due_time === null && task2.due_time === null) return 0;
+        // Convert due_time strings to Date objects for comparison
+        const time1 = new Date(`1970-01-01T${task1.due_time}Z`);
+        const time2 = new Date(`1970-01-01T${task2.due_time}Z`);
+        return time1 - time2;
+      }),
   }));
+
+  console.log("Tasks:", tasks);
 
   return (
     <ScrollView
@@ -88,9 +100,13 @@ const EventsPage = () => {
                 .map((task, idx) => (
                   <TaskItem
                     key={idx}
+                    taskId={task.id} // Assuming task.id is the correct ID for the task
                     title={task.title}
+                    description={task.description}
+                    dueDate={task.due_date} // Correct the prop name to due_date
+                    dueTime={task.due_time} // Correct the prop name to due_time
+                    markCompleted={task.completed} // Correct the prop name to completed
                     completed={task.completed}
-                    onPress={() => {}}
                   />
                 ))}
               {data.events.map((event, idx) => (

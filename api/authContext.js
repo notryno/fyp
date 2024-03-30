@@ -16,7 +16,6 @@ export const AuthProvider = ({ children }) => {
       return Date.now() >= tokenExpiration * 1000;
     };
 
-    console.log("Rendering");
     if (isTokenExpired()) {
       signOut();
     }

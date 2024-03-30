@@ -54,16 +54,31 @@ const TaskDescriptionScreen = ({ route, navigation }) => {
     );
   };
   const renderDueTime = () => {
-    if (dueTime === "Invalid Date") {
+    if (dueTime === null || dueTime === "Invalid Date") {
       return (
         <Text style={styles.infoText}>
           <Ionicons name="time-outline" size={20} /> Time: All Day
         </Text>
       );
     } else {
+      // Convert dueTime to a Date object
+      const time = new Date(`1970-01-01T${dueTime}Z`);
+
+      // Get hours and minutes
+      const hours = time.getHours();
+      const minutes = time.getMinutes();
+
+      // Convert hours to 12-hour format
+      const formattedHours = hours % 12 || 12; // 12 will be shown instead of 0
+      const formattedMinutes = minutes.toString().padStart(2, "0"); // Add leading zero if needed
+
+      // Determine AM or PM
+      const ampm = hours >= 12 ? "PM" : "AM";
+
       return (
         <Text style={styles.infoText}>
-          <Ionicons name="time-outline" size={20} /> Time: {dueTime}
+          <Ionicons name="time-outline" size={20} /> Time: {formattedHours}:
+          {formattedMinutes} {ampm}
         </Text>
       );
     }

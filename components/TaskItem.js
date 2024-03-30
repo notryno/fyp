@@ -1,10 +1,44 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
-const TaskItem = ({ title, completed, onPress }) => {
+const TaskItem = ({
+  taskId,
+  title,
+  description,
+  dueDate,
+  dueTime,
+  markCompleted,
+  completed,
+}) => {
+  const navigation = useNavigation();
+
+  // console.log(
+  //   "TaskItem:",
+  //   `\n Task ID: ${taskId}`,
+  //   `\n Title: ${title}`,
+  //   `\n Description: ${description}`,
+  //   `\n Due Date: ${dueDate}`,
+  //   `\n Due Time: ${dueTime}`,
+  //   `\n Completed: ${markCompleted}`,
+  //   `\n Completed locally: ${completed}`
+  // );
+
+  const handlePress = () => {
+    console.log("Task ID:", taskId);
+    navigation.navigate("TaskDetailScreen", {
+      taskId,
+      title,
+      description,
+      dueDate,
+      dueTime,
+      markCompleted,
+    });
+  };
+
   return (
-    <TouchableOpacity style={styles.taskContainer} onPress={onPress}>
+    <TouchableOpacity style={styles.taskContainer} onPress={handlePress}>
       <Ionicons
         name={"checkmark-circle-outline"}
         size={24}

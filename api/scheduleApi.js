@@ -6,9 +6,6 @@ export const fetchEventsAndSpecialSchedules = async (userToken) => {
     const eventData = await fetchEvents(userToken);
     const specialScheduleData = await fetchSpecialSchedules(userToken);
 
-    console.log("response", eventData);
-    console.log("response2", specialScheduleData);
-
     // Merge regular events and special schedules
     const mergedEvents =
       specialScheduleData.length > 0
@@ -25,7 +22,6 @@ export const fetchEventsAndSpecialSchedules = async (userToken) => {
 const mergeEvents = (events, specialSchedules) => {
   // Create a copy of events to avoid mutating the original array
   const mergedEvents = [...events];
-  console.log("mergedEventsFIRST", mergedEvents);
 
   // Iterate over each special schedule
   specialSchedules.forEach((specialSchedule) => {
@@ -37,13 +33,6 @@ const mergeEvents = (events, specialSchedules) => {
       weekday: "long",
     };
     const formattedDate = specialDate.toLocaleDateString("en-US", options);
-
-    console.log(specialSchedule.title);
-    console.log(specialSchedule.start_time);
-    console.log(specialSchedule.end_time);
-    console.log(specialSchedule.location);
-    console.log(specialSchedule.type);
-
     // Find if an event with the same date exists
     // Find if an event with the same date and title exists
     const existingEventIndex = mergedEvents.findIndex(
@@ -51,8 +40,6 @@ const mergeEvents = (events, specialSchedules) => {
         event.date === formattedDate &&
         event.data[0].title === specialSchedule.schedule.title
     );
-
-    console.log(existingEventIndex);
 
     // If an event with the same date exists
     if (existingEventIndex !== -1) {
@@ -70,7 +57,7 @@ const mergeEvents = (events, specialSchedules) => {
       const existingEvent = mergedEvents.find(
         (event) => event.title === specialSchedule.title
       );
-      console.log("existingEvent", existingEvent);
+
       const specialDate = new Date(specialSchedule.special_date);
       const options = {
         month: "long",
@@ -97,11 +84,7 @@ const mergeEvents = (events, specialSchedules) => {
     }
   });
 
-  console.log("mergedEventssadadads", mergedEvents);
-
   const convertedEvents = convertToNewFormat(mergedEvents);
-
-  console.log("convertedEvents", convertedEvents);
 
   return groupEventsByDate(convertedEvents);
 };
@@ -201,8 +184,6 @@ const groupEventsByDate = (events) => {
     groupedEvents[event.date].push(event);
   });
 
-  console.log("groupedEvents", groupedEvents);
-
   // Convert groupedEvents object to array and sort by date
   const sortedGroupedEvents = Object.keys(groupedEvents)
     .sort((a, b) => {
@@ -219,19 +200,6 @@ const groupEventsByDate = (events) => {
         return startTimeA - startTimeB;
       }),
     }));
-
-  // sortedGroupedEvents.forEach((event) => {
-  //   console.log("Date:", event.date);
-  //   event.data.forEach((data) => {
-  //     console.log("Data:", data);
-  //     // Log individual properties if needed
-  //     console.log("Title:", data.title);
-  //     console.log("Time:", data.time);
-  //     console.log("Type:", data.type);
-  //     console.log("Location:", data.location);
-  //     console.log("Color:", data.color);
-  //   });
-  // });
 
   return sortedGroupedEvents;
 };

@@ -117,7 +117,6 @@ export const updateUserData = async (userToken, newData) => {
       }
     );
 
-    console.log("Response from updateUserData:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error updating user data:", error);
