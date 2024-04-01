@@ -24,6 +24,7 @@ import ChangeLastName from "../screens/profile/ChangeLastName";
 import ChangePassword from "../screens/profile/ChangePassword";
 import EventDescriptionScreen from "../screens/calendar/EventDescriptionScreen";
 import TaskDescriptionScreen from "../screens/task/TaskDescriptionScreen";
+import ClassScreen from "../screens/ClassScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -247,6 +248,13 @@ const ProfileStack = () => {
         component={ChangePassword}
         options={{
           title: "Change Password",
+        }}
+      />
+      <Stack.Screen
+        name="Classroom"
+        component={ClassScreen}
+        options={{
+          title: "Classroom",
         }}
       />
     </Stack.Navigator>
