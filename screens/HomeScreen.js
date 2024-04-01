@@ -6,6 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  FlatList,
+  Alert,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { fetchEventsAndSpecialSchedules } from "../api/scheduleApi";
@@ -13,8 +15,10 @@ import { useAuth } from "../api/authContext";
 import { getUserData } from "../api/authApi";
 import EventItem from "../components/EventItem";
 import TaskItem from "../components/TaskItem";
-import { getTasks } from "../api/taskApi";
+import { createTask, deleteTask, getTasks, updateTask } from "../api/taskApi";
 import { useFocusEffect } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 
 const HomeScreen = () => {
   const [events, setEvents] = useState([]);
@@ -22,6 +26,7 @@ const HomeScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [userData, setUserData] = useState(false);
   const { userToken } = useAuth();
+  const { navigate } = useNavigation();
 
   const fetchData = async () => {
     try {
@@ -91,6 +96,79 @@ const HomeScreen = () => {
       taskDueDate.getFullYear() === today.getFullYear()
     );
   });
+  const handleCancelAddTask = () => {
+    setShowTaskForm(false);
+    setShowAddTaskButton(true);
+  };
+
+  const handleCompleteTask = async (taskId) => {
+    try {
+      await updateTask(userToken, taskId, { completed: true });
+      const response = await getTasks(userToken);
+      setTasks(response);
+    } catch (error) {
+      console.error("Error completing task:", error);
+    }
+  };
+
+  const handleIncompleteTask = async (taskId) => {
+    try {
+      await updateTask(userToken, taskId, { completed: false });
+      const response = await getTasks(userToken);
+      setTasks(response);
+    } catch (error) {
+      console.error("Error marking task as incomplete:", error);
+    }
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    try {
+      await deleteTask(userToken, taskId);
+      const response = await getTasks(userToken);
+      setTasks(response);
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+  };
+
+  const confirmDeleteTask = (taskId) => {
+    Alert.alert(
+      "Confirm Delete",
+      "Are you sure you want to delete this task?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: () => handleDeleteTask(taskId),
+        },
+      ]
+    );
+  };
+
+  const navigateToTaskDescription = (taskId) => {
+    const task = tasks.find((task) => task.id === taskId);
+    const formattedDueDate = task
+      ? new Date(task.due_date).toLocaleDateString()
+      : "";
+    const formattedDueTime = task
+      ? new Date(`1970-01-01T${task.due_time}Z`).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "";
+
+    navigate("TaskDetailScreen", {
+      taskId,
+      title: task?.title || "",
+      description: task?.description || "",
+      dueDate: formattedDueDate,
+      dueTime: formattedDueTime,
+      markCompleted: task?.completed,
+    });
+  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -140,20 +218,54 @@ const HomeScreen = () => {
             You have {todayTasks.length}{" "}
             {todayTasks.length === 1 ? "task" : "tasks"} due today.
           </Text>
-          <View style={styles.eventsPage}>
-            {todayTasks.map((task, idx) => (
-              <TaskItem
-                key={idx}
-                taskId={task.id} // Assuming task.id is the correct ID for the task
-                title={task.title}
-                description={task.description}
-                dueDate={task.due_date} // Correct the prop name to due_date
-                dueTime={task.due_time} // Correct the prop name to due_time
-                markCompleted={task.completed} // Correct the prop name to completed
-                completed={task.completed}
-              />
-            ))}
-          </View>
+          <FlatList
+            data={todayTasks}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => navigateToTaskDescription(item.id)}
+              >
+                <View style={styles.taskItem}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      !item.completed
+                        ? handleCompleteTask(item.id)
+                        : handleIncompleteTask(item.id)
+                    }
+                    style={styles.completeButton}
+                  >
+                    <View style={styles.completeButtonInner}>
+                      {item.completed && (
+                        <View style={styles.completeIndicator} />
+                      )}
+                    </View>
+                  </TouchableOpacity>
+
+                  <View style={styles.taskTextContainer}>
+                    <Text
+                      style={[
+                        styles.taskTitle,
+                        item.completed && styles.completedTaskTitle,
+                      ]}
+                    >
+                      {item.title}
+                    </Text>
+                  </View>
+
+                  <TouchableOpacity
+                    onPress={() => confirmDeleteTask(item.id)}
+                    style={styles.deleteButton}
+                  >
+                    <Ionicons
+                      name="close-circle-outline"
+                      size={25}
+                      color="red"
+                    />
+                  </TouchableOpacity>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
         </View>
       </View>
     </ScrollView>
@@ -183,6 +295,62 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
     marginTop: 20,
+  },
+  container: {
+    flex: 1,
+    padding: 10,
+  },
+  sortButton: {
+    marginVertical: 5,
+    padding: 10,
+    backgroundColor: "lightgray",
+  },
+  taskItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginVertical: 5,
+  },
+  completeButton: {
+    flex: 1,
+    alignItems: "center",
+  },
+  completeButtonInner: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  completeIndicator: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "black", // Add this line to give the dot a color
+  },
+  taskTextContainer: {
+    flex: 8,
+    paddingHorizontal: 10,
+  },
+  taskTitle: {
+    fontSize: 16,
+  },
+  completedTaskTitle: {
+    textDecorationLine: "line-through",
+    opacity: 0.5,
+  },
+  deleteButton: {
+    flex: 1,
+    alignItems: "center",
+  },
+  addButtonContainer: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "lightblue",
+    padding: 10,
+    borderRadius: 50, // Make the add button round
   },
 });
 
