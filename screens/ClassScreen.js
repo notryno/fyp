@@ -14,6 +14,7 @@ const ClassScreen = () => {
         const usersData = await getTasks(userToken);
         setUsers(usersData);
         setLoading(false);
+        console.log(usersData);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -31,11 +32,10 @@ const ClassScreen = () => {
       <Text>List of Users in Class:</Text>
       <FlatList
         data={users}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.email}
         renderItem={({ item }) => (
-          <View style={{ padding: 10 }}>
-            <Text>{item.username}</Text>
-            {/* Display other user details as needed */}
+          <View>
+            <Text>1 {`${item.first_name} ${item.last_name}`}</Text>
           </View>
         )}
       />
