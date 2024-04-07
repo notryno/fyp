@@ -21,12 +21,8 @@ class Schedule(models.Model):
     location = models.CharField(max_length=255)
     description = models.TextField()
     number_of_instances = models.IntegerField(default=1)
-    frequency_per_week = models.IntegerField(
-        default=1
-    )  # For example, 1 for daily, 7 for weekly
-    day_of_week = models.IntegerField(
-        choices=[(i, i) for i in range(1, 8)], default=1
-    )  # 1 for Monday, 2 for Tuesday, ..., 7 for Sunday
+    frequency_per_week = models.IntegerField(default=1)
+    day_of_week = models.IntegerField(choices=[(i, i) for i in range(7)], default=0)
     color = models.CharField(max_length=20, default="#ffffff")
 
     def generate_schedule(self):
