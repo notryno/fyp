@@ -1,13 +1,30 @@
 from rest_framework import serializers
 
+from classroom.serializers import ClassroomSerializer
+
 from .models import Schedule, SpecialSchedule
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
+    classroom = ClassroomSerializer
 
     class Meta:
         model = Schedule
-        fields = "__all__"  # Include all fields in the serializer
+        fields = (
+            "id",
+            "classroom",
+            "title",
+            "start_date",
+            "start_time",
+            "end_time",
+            "type",
+            "location",
+            "description",
+            "number_of_instances",
+            "frequency_per_week",
+            "day_of_week",
+            "color",
+        )
 
 
 class SpecialScheduleSerializer(serializers.ModelSerializer):
