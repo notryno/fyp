@@ -13,4 +13,6 @@ urlpatterns = [
         views.SpecialScheduleListView.as_view(),
         name="special-schedule-list",
     ),
+    path("create-schedule/", views.create_schedule, name="create-schedule"), 
+
 ]

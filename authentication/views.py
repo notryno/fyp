@@ -80,7 +80,7 @@ class LoginView(generics.CreateAPIView):
         print(f"User '{user.email}' successfully logged in!")
 
         data = {
-            "message": "Registration successful",
+            "message": "Login successful",
             "access_token": str(refresh.access_token),
             "refresh_token": str(refresh),
             "profile_picture": serialized_user.data["profile_picture"],
