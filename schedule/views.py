@@ -25,6 +25,22 @@ class ScheduleListView(generics.ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class AllScheduleListView(generics.ListAPIView):
+    queryset = Schedule.objects.all()
+    serializer_class = ScheduleSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ScheduleDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Schedule.objects.all()
+    serializer_class = ScheduleSerializer
+    permission_classes = [IsAuthenticated]
+
+
 # class ScheduleListView(generics.ListCreateAPIView):
 #     permission_classes = [IsAuthenticated]
 
@@ -65,9 +81,6 @@ def create_schedule(request):
     if request.method == "POST":
         data = JSONParser().parse(request)
         serializer = ScheduleSerializer(data=data)
-        print("data", data)
-        print("serializer", serializer)
-        print(serializer.is_valid())
         if serializer.is_valid():
             serializer.save()
             print("Schedule created")
