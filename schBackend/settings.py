@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     "task",
     "schedule",
     "classroom",
+    "courses",
+    "grades",
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
@@ -49,7 +51,7 @@ INSTALLED_APPS = [
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
