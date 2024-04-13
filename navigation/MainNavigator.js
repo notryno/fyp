@@ -35,25 +35,7 @@ const HomeStack = () => {
   const navigation = useNavigation();
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          headerRight: () => (
-            <TouchableOpacity
-              style={{ marginRight: 16 }}
-              onPress={() => navigation.navigate("HomeTask")}
-            >
-              <Ionicons name="list-outline" size={24} color="#007aff" />
-            </TouchableOpacity>
-          ),
-        }}
-      />
-      <Stack.Screen
-        name="HomeTask"
-        component={TaskStack}
-        options={{ headerShown: false }}
-      />
+      <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen
         name="TaskDetailScreen"
         component={TaskDescriptionScreen}
@@ -73,25 +55,7 @@ const SearchStack = () => {
   const navigation = useNavigation();
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="Search"
-        component={SearchScreen}
-        options={{
-          headerRight: () => (
-            <TouchableOpacity
-              style={{ marginRight: 16 }}
-              onPress={() => navigation.navigate("SearchTask")}
-            >
-              <Ionicons name="list-outline" size={24} color="#007aff" />
-            </TouchableOpacity>
-          ),
-        }}
-      />
-      <Stack.Screen
-        name="SearchTask"
-        component={TaskStack}
-        options={{ headerShown: false }}
-      />
+      <Stack.Screen name="Search" component={SearchScreen} />
     </Stack.Navigator>
   );
 };
@@ -108,9 +72,6 @@ const CalendarTopTab = () => {
         }}
       >
         <Text style={{ fontSize: 20, fontWeight: "bold" }}>Calendar</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("CalendarTask")}>
-          <Ionicons name="list-outline" size={24} color="#007aff" />
-        </TouchableOpacity>
       </View>
       <TopTab.Navigator>
         <TopTab.Screen
@@ -160,25 +121,7 @@ const NotificationStack = () => {
   const navigation = useNavigation();
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="Notification"
-        component={NotificationScreen}
-        options={{
-          headerRight: () => (
-            <TouchableOpacity
-              style={{ marginRight: 16 }}
-              onPress={() => navigation.navigate("NotificationTask")}
-            >
-              <Ionicons name="list-outline" size={24} color="#007aff" />
-            </TouchableOpacity>
-          ),
-        }}
-      />
-      <Stack.Screen
-        name="NotificationTask"
-        component={TaskStack}
-        options={{ headerShown: false }}
-      />
+      <Stack.Screen name="Notification" component={NotificationScreen} />
     </Stack.Navigator>
   );
 };
@@ -187,31 +130,13 @@ const ProfileStack = () => {
   const navigation = useNavigation();
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          headerRight: () => (
-            <TouchableOpacity
-              style={{ marginRight: 16 }}
-              onPress={() => navigation.navigate("ProfileTask")}
-            >
-              <Ionicons name="list-outline" size={24} color="#007aff" />
-            </TouchableOpacity>
-          ),
-        }}
-      />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen
         name="PersonalDetails"
         component={PersonalDetails}
         options={{
           title: "Personal Details",
         }}
-      />
-      <Stack.Screen
-        name="ProfileTask"
-        component={TaskStack}
-        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="ChangeFirstName"
@@ -287,19 +212,9 @@ const CalendarStackNavigator = () => {
         options={{ title: "List", headerShown: false }}
       />
       <CalendarStack.Screen
-        name="CalendarTask"
-        component={TaskStack}
-        options={{ headerShown: false }}
-      />
-      <CalendarStack.Screen
         name="EventDescription"
         component={EventDescriptionScreen}
         options={{ title: "Event" }}
-      />
-      <CalendarStack.Screen
-        name="TaskDetailScreen"
-        component={TaskDescriptionScreen}
-        options={{ title: "Task" }}
       />
     </CalendarStack.Navigator>
   );
@@ -311,7 +226,7 @@ const TaskStack = () => {
       <Stack.Screen
         name="TaskList"
         component={TaskScreen}
-        options={{ title: "TaskStack" }}
+        options={{ title: "Tasks" }}
       />
       <Stack.Screen
         name="TaskDetailScreen"
@@ -352,8 +267,8 @@ const TabNavigator = () => {
 
           if (route.name === "HomeTab") {
             iconName = "home";
-          } else if (route.name === "SearchTab") {
-            iconName = "search";
+          } else if (route.name === "TaskTab") {
+            iconName = "list-outline";
           } else if (route.name === "CalendarTab") {
             iconName = "calendar";
           } else if (route.name === "NotificationTab") {
@@ -372,9 +287,9 @@ const TabNavigator = () => {
         options={{ headerShown: false, tabBarLabel: "Home" }}
       />
       <Tab.Screen
-        name="SearchTab"
-        component={SearchStack}
-        options={{ headerShown: false, tabBarLabel: "Search" }}
+        name="TaskTab"
+        component={TaskStack}
+        options={{ headerShown: false, tabBarLabel: "Task" }}
       />
       <Tab.Screen
         name="CalendarTab"
