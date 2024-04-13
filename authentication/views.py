@@ -140,3 +140,27 @@ def update_password(request):
     return Response(
         {"message": "Password updated successfully"}, status=status.HTTP_200_OK
     )
+
+
+class GetStudentsDataView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request):
+        students = CustomUser.objects.filter(is_staff=False)
+        serializer = GetUserDataSerializer(students, many=True)
+        data = {
+            "students_data": serializer.data,
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class GetTeachersDataView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request):
+        teachers = CustomUser.objects.filter(is_staff=True)
+        serializer = GetUserDataSerializer(teachers, many=True)
+        data = {
+            "teachers_data": serializer.data,
+        }
+        return Response(data, status=status.HTTP_200_OK)

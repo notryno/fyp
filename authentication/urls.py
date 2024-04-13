@@ -3,6 +3,8 @@
 from django.urls import path
 
 from .views import (
+    GetStudentsDataView,
+    GetTeachersDataView,
     GetUserDataView,
     LoginView,
     RegisterView,
@@ -16,4 +18,6 @@ urlpatterns = [
     path("get_user_data/", GetUserDataView.as_view(), name="get_user_data"),
     path("update_user_data/", UpdateUserDataView.as_view(), name="update_user_data"),
     path("update_password/", update_password, name="update_password"),
+    path("students/", GetStudentsDataView.as_view(), name="get_students_data"),
+    path("teachers/", GetTeachersDataView.as_view(), name="get_teachers_data"),
 ]
