@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "classroom",
     "courses",
     "grades",
+    "events",
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
