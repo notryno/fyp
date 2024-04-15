@@ -38,7 +38,14 @@ class GetUserDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ["email", "first_name", "last_name", "profile_picture", "classroom"]
+        fields = [
+            "email",
+            "first_name",
+            "last_name",
+            "profile_picture",
+            "classroom",
+            "username",
+        ]
 
     def update(self, instance, validated_data):
         instance.email = validated_data.get("email", instance.email)

@@ -148,10 +148,7 @@ class GetStudentsDataView(APIView):
     def get(self, request):
         students = CustomUser.objects.filter(is_staff=False)
         serializer = GetUserDataSerializer(students, many=True)
-        data = {
-            "students_data": serializer.data,
-        }
-        return Response(data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GetTeachersDataView(APIView):
@@ -160,7 +157,4 @@ class GetTeachersDataView(APIView):
     def get(self, request):
         teachers = CustomUser.objects.filter(is_staff=True)
         serializer = GetUserDataSerializer(teachers, many=True)
-        data = {
-            "teachers_data": serializer.data,
-        }
-        return Response(data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
