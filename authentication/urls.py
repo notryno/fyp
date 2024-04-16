@@ -2,6 +2,8 @@
 
 from django.urls import path
 
+from utilities.email_otp import resend_otp
+
 from .views import (
     GetStudentsDataView,
     GetTeachersDataView,
@@ -10,6 +12,7 @@ from .views import (
     RegisterView,
     UpdateUserDataView,
     update_password,
+    verify_otp,
 )
 
 urlpatterns = [
@@ -20,4 +23,6 @@ urlpatterns = [
     path("update_password/", update_password, name="update_password"),
     path("students/", GetStudentsDataView.as_view(), name="get_students_data"),
     path("teachers/", GetTeachersDataView.as_view(), name="get_teachers_data"),
+    path("verify_otp/", verify_otp, name="verify_otp"),
+    path("resend_otp/", resend_otp, name="resend_otp"),
 ]

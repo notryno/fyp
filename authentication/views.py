@@ -1,14 +1,23 @@
 # views.py
 
+import json
+
+import pyotp
+from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import check_password, make_password
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from utilities.email_otp import generate_and_send_otp
 
 from .models import CustomUser
 from .serializers import GetUserDataSerializer, PartialUserSerializer, UserSerializer
@@ -41,6 +50,8 @@ class RegisterView(generics.CreateAPIView):
             "profile_picture": serialized_user.data["profile_picture"],
         }
         print("User profile picture URL:", data["profile_picture"])
+
+        generate_and_send_otp(user)
 
         return Response(data, status=status.HTTP_201_CREATED)
 
@@ -158,3 +169,47 @@ class GetTeachersDataView(APIView):
         teachers = CustomUser.objects.filter(is_staff=True)
         serializer = GetUserDataSerializer(teachers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@csrf_exempt
+def verify_otp(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        otp_entered = data.get("otp")
+        print("Type", type(otp_entered))
+        print("otp_entered:", otp_entered)
+        if otp_entered:
+            email = data.get("email")
+            print("email:", email)
+            try:
+                user = CustomUser.objects.get(email=email)
+                print("User:", user)
+                print("User.otp_secret:", user.otp_secret)
+                print("User.otp_secret:", type(user.otp_secret))
+                otp = pyotp.TOTP(user.otp_secret, interval=120)
+                print("OTP from DB:", otp)
+                if otp.verify(otp_entered):
+                    # OTP matched, mark email as verified
+                    print("OTP matched!")
+                    user.email_verified = True
+                    user.save()
+                    return JsonResponse(
+                        {"success": True, "message": "Email verified successfully!"},
+                        status=200,
+                    )
+                else:
+                    print("OTP did not match!")
+                    return JsonResponse(
+                        {
+                            "success": False,
+                            "message": "Invalid OTP. Please try again.",
+                        },
+                        status=400,
+                    )
+            except CustomUser.DoesNotExist:
+                return JsonResponse(
+                    {"success": False, "message": "Invalid email"}, status=400
+                )
+    return JsonResponse(
+        {"success": False, "message": "Invalid request method"}, status=405
+    )

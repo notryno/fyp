@@ -27,6 +27,9 @@ class CustomUser(AbstractUser):
         null=True,
         blank=True,
     )
+    otp_secret = models.CharField(max_length=64, blank=True)
+    otp_created_at = models.DateTimeField(null=True, blank=True)
+    email_verified = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.email
