@@ -45,6 +45,7 @@ class GetUserDataSerializer(serializers.ModelSerializer):
             "profile_picture",
             "classroom",
             "username",
+            "email_verified",
         ]
 
     def update(self, instance, validated_data):
