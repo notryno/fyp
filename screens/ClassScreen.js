@@ -47,11 +47,14 @@ const ClassScreen = ({ navigation }) => {
     )
   );
 
-  const renderUserItem = ({ item }) => (
+  const renderUserItem = ({ item, index }) => (
     <TouchableOpacity
       style={styles.userItem}
       onPress={() => navigation.navigate("UserDetails", { userId: item.id })}
     >
+      <View style={styles.numberContainer}>
+        <Text style={styles.numberText}>{index + 1}</Text>
+      </View>
       {item.profile_picture ? (
         <Image
           source={{ uri: item.profile_picture }}
@@ -153,6 +156,16 @@ const styles = StyleSheet.create({
     color: "black",
     padding: 5,
     borderRadius: 5,
+  },
+  numberContainer: {
+    width: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  numberText: {
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 
