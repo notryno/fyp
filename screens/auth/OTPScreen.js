@@ -54,7 +54,7 @@ const OTPScreen = () => {
   const handleOTPVerification = async () => {
     try {
       const otpValue = otp.join("");
-      const result = await verifyOtp(email, otpValue);
+      const result = await verifyOtp(email, otpValue, "otp");
       console.log("OTP verification successful:", result);
       if (result.success) {
         if (origin === "profile") {
@@ -108,7 +108,9 @@ const OTPScreen = () => {
 
   const renderMaskedEmail = (email) => {
     const parts = email.split("@");
-    const maskedEmail = `${parts[0][0]}${"*".repeat(5)}@${parts[1]}`;
+    const maskedEmail = `${parts[0][0]}${"*".repeat(parts[0].length - 2)}${
+      parts[0][parts[0].length - 1]
+    }@${parts[1]}`;
     return maskedEmail;
   };
 

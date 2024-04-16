@@ -27,6 +27,8 @@ import TaskDescriptionScreen from "../screens/task/TaskDescriptionScreen";
 import ClassScreen from "../screens/ClassScreen";
 import OTPScreen from "../screens/auth/OTPScreen";
 import RegisterSuccess from "../screens/auth/RegisterSuccess";
+import ForgotPasswordScreen from "../screens/auth/ForgotPasswordScreen";
+import PasswordResetScreen from "../screens/auth/PasswordResetScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -228,6 +230,44 @@ const AuthStack = () => {
       <Stack.Screen
         name="OTPScreen"
         component={OTPScreen}
+        options={({ navigation, route }) => ({
+          headerTitle: "",
+          headerShown: true,
+          headerStyle: {
+            shadowColor: "transparent",
+          },
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={{ marginLeft: 16 }}
+            >
+              <Ionicons name="chevron-back-outline" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+      <Stack.Screen
+        name="ForgotPassword"
+        component={ForgotPasswordScreen}
+        options={({ navigation, route }) => ({
+          headerTitle: "",
+          headerShown: true,
+          headerStyle: {
+            shadowColor: "transparent",
+          },
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={{ marginLeft: 16 }}
+            >
+              <Ionicons name="chevron-back-outline" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+      <Stack.Screen
+        name="PasswordResetScreen"
+        component={PasswordResetScreen}
         options={({ navigation, route }) => ({
           headerTitle: "",
           headerShown: true,

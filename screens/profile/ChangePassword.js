@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import { updatePassword } from "../../api/authApi";
 import { useAuth } from "../../api/authContext";
+import { useNavigation } from "@react-navigation/native";
 
 const ChangePassword = () => {
   const { userToken } = useAuth();
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const navigation = useNavigation();
 
   const handleChangePassword = async () => {
     try {
@@ -22,6 +24,7 @@ const ChangePassword = () => {
       }
       await updatePassword(userToken, { oldPassword, newPassword });
       alert("Password updated successfully");
+      navigation.goBack();
     } catch (error) {
       console.error("Error updating password:", error);
       alert("Error updating password. Please try again.");

@@ -45,11 +45,8 @@ const ChangeLastName = ({ navigation }) => {
       const updatedData = await updateUserData(userToken, {
         last_name: lastName,
       });
-
-      // Handle success, if needed
       console.log("Last name updated successfully:", updatedData);
     } catch (error) {
-      // Handle error, if needed
       console.error("Error updating last name:", error);
     }
   };

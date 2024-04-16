@@ -182,11 +182,12 @@ export const updatePassword = async (userToken, passwordData) => {
   }
 };
 
-export const verifyOtp = async (email, otp) => {
+export const verifyOtp = async (email, otp, origin) => {
   try {
     const response = await axios.post(`${BASE_URL}verify_otp/`, {
       email,
       otp,
+      origin,
     });
 
     return response.data;
@@ -204,5 +205,19 @@ export const resendOtp = async (email) => {
     return response.data;
   } catch (error) {
     console.error("Error resending OTP:", error);
+  }
+};
+
+export const resetPassword = async (email, password, resetToken) => {
+  try {
+    const response = await axios.post(`${BASE_URL}reset_password/`, {
+      email,
+      password,
+      resetToken,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error resetting password:", error);
   }
 };
