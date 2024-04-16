@@ -53,6 +53,7 @@ export const login = async (userData) => {
 };
 
 const extractCSRFTokenFromCookies = (response) => {
+  console.log(response.headers);
   const cookies = response.headers["set-cookie"];
   if (cookies) {
     const csrfCookie = cookies.find((cookie) =>
@@ -186,5 +187,30 @@ export const updatePassword = async (userToken, passwordData) => {
   } catch (error) {
     console.error("Error updating password:", error);
     throw "Error updating password";
+  }
+};
+
+export const verifyOtp = async (email, otp) => {
+  try {
+    const response = await axios.post(`${BASE_URL}verify_otp/`, {
+      email,
+      otp,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+  }
+};
+
+export const resendOtp = async (email) => {
+  try {
+    const response = await axios.post(`${BASE_URL}resend_otp/`, {
+      email,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error resending OTP:", error);
   }
 };

@@ -1,9 +1,16 @@
-// RegisterScreen.js
-
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
 import { register } from "../../api/authApi";
-import RegisterSuccess from "./RegisterSuccess";
+import OTPScreen from "./OTPScreen";
 import * as ImagePicker from "expo-image-picker";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
@@ -16,6 +23,7 @@ const RegisterScreen = ({ navigation }) => {
   const [error, setError] = useState(null);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [profile_picture, setProfilePicture] = useState(null);
+  const [loading, setLoading] = useState(false);
   const timestamp = new Date().getTime();
   const fileName = `profile_picture_${timestamp}.jpg`;
 
@@ -53,38 +61,45 @@ const RegisterScreen = ({ navigation }) => {
         return;
       }
 
+      if (!first_name || !last_name || !email || !password) {
+        setError("Please fill in all fields");
+        return;
+      }
+
+      setLoading(true);
+
       const formData = new FormData();
       formData.append("first_name", first_name);
       formData.append("last_name", last_name);
       formData.append("username", email);
       formData.append("email", email);
       formData.append("password", password);
-      formData.append("profile_picture", {
-        uri: profile_picture,
-        type: "image/jpeg",
-        name: fileName,
-      });
+      if (profile_picture) {
+        formData.append("profile_picture", {
+          uri: profile_picture,
+          type: "image/jpeg",
+          name: fileName,
+        });
+      }
 
       console.log("Registration Process", formData);
 
       const result = await register(formData);
 
       console.log("Registration successful:", result);
-      setRegistrationSuccess(true);
+      navigation.navigate("OTPScreen", { email: email });
     } catch (error) {
       setError("Registration failed. Please try again.");
       console.log(error);
       console.error("Registration failed:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (registrationSuccess) {
-    return <RegisterSuccess />;
-  }
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Register</Text>
+      <Text style={styles.title}>Create Account</Text>
       {profile_picture ? (
         <Image source={{ uri: profile_picture }} style={styles.profileImage} />
       ) : (
@@ -94,6 +109,9 @@ const RegisterScreen = ({ navigation }) => {
       )}
 
       <Button title="Add Picture" onPress={pickImage} />
+      <View style={{ height: 20 }}>
+        {error && <Text style={styles.errorText}>{error}</Text>}
+      </View>
       <TextInput
         style={styles.input}
         placeholder="First Name"
@@ -127,14 +145,25 @@ const RegisterScreen = ({ navigation }) => {
         autoCapitalize="none"
       />
       <View style={{ marginBottom: 10 }} />
-      <Button title="Register" onPress={handleRegister} />
-      {error && <Text style={{ color: "red" }}>{error}</Text>}
-      <Text
-        style={styles.loginText}
+      {loading ? (
+        <ActivityIndicator />
+      ) : (
+        <TouchableOpacity
+          title="Register"
+          style={styles.button}
+          onPress={handleRegister}
+        >
+          <View style={styles.buttonContent}>
+            <Text style={styles.buttonText}>Register</Text>
+          </View>
+        </TouchableOpacity>
+      )}
+      <TouchableOpacity
         onPress={() => navigation.navigate("Login")}
+        style={styles.linkText}
       >
-        Already have an account? Login here.
-      </Text>
+        <Text style={styles.loginText}>Already have an account?</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -144,24 +173,29 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#f4f4f4",
   },
   title: {
     fontSize: 24,
     marginBottom: 16,
+    color: "#333",
+    fontWeight: "bold",
   },
   input: {
     width: "80%",
     height: 50,
     borderRadius: 8,
-    borderColor: "gray",
+    borderColor: "#ccc",
     borderWidth: 1,
     marginTop: 16,
     paddingLeft: 8,
+    backgroundColor: "#fff",
   },
-  loginText: {
-    marginTop: 20,
-    color: "blue",
-    textDecorationLine: "underline",
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    lineHeight: 0,
+    margin: 0,
   },
   defaultProfileContainer: {
     width: 150,
@@ -175,6 +209,40 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     borderRadius: 75,
+  },
+  loginText: {
+    marginTop: 20,
+    color: "#333",
+    fontSize: 16,
+  },
+  linkText: {
+    color: "blue",
+    position: "absolute",
+    bottom: "5%",
+  },
+  button: {
+    width: 340,
+    height: 50,
+    padding: 10,
+    borderRadius: "50%",
+    borderColor: "#333",
+    borderWidth: 1,
+    marginBottom: 16,
+    backgroundColor: "black",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  buttonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 

@@ -25,6 +25,7 @@ import ChangePassword from "../screens/profile/ChangePassword";
 import EventDescriptionScreen from "../screens/calendar/EventDescriptionScreen";
 import TaskDescriptionScreen from "../screens/task/TaskDescriptionScreen";
 import ClassScreen from "../screens/ClassScreen";
+import OTPScreen from "../screens/auth/OTPScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -198,6 +199,25 @@ const AuthStack = () => {
         name="Register"
         component={RegisterScreen}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="OTPScreen"
+        component={OTPScreen}
+        options={({ navigation, route }) => ({
+          headerTitle: "",
+          headerShown: true,
+          headerStyle: {
+            shadowColor: "transparent",
+          },
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={{ marginLeft: 16 }}
+            >
+              <Ionicons name="chevron-back-outline" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+        })}
       />
     </Stack.Navigator>
   );

@@ -1,7 +1,12 @@
-// LoginScreen.js
-
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { login } from "../../api/authApi";
 import { useAuth } from "../../api/authContext";
 
@@ -16,6 +21,11 @@ const LoginScreen = ({ navigation }) => {
       const userData = { email, password };
       console.log("Login Process", userData);
 
+      if (!email || !password) {
+        setError("Please enter email and password.");
+        return;
+      }
+
       const result = await login(userData);
       console.log("Login successful:", result);
       console.log("Profile Picture result:", result.profile_picture);
@@ -28,7 +38,11 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Sign In</Text>
+      <View style={{ height: 40 }}>
+        {error && <Text style={styles.errorText}>{error}</Text>}
+      </View>
+
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -42,14 +56,26 @@ const LoginScreen = ({ navigation }) => {
         onChangeText={(text) => setPassword(text)}
         autoCapitalize="none"
       />
-      <Button title="Login" onPress={handleLogin} />
-      {error && <Text style={{ color: "red" }}>{error}</Text>}
-      <Text
-        style={styles.registerText}
-        onPress={() => navigation.navigate("Register")}
+      <TouchableOpacity
+        title="Login"
+        style={styles.button}
+        onPress={handleLogin}
       >
-        Don't have an account? Register here.
-      </Text>
+        <View style={styles.buttonContent}>
+          <Text style={styles.buttonText}>Sign In</Text>
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity>
+        <Text style={styles.forgotText}>Forgotton Password?</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("Register")}
+        style={styles.registerButton}
+      >
+        <View style={styles.registerContent}>
+          <Text style={styles.registerText}>Create new account</Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -59,24 +85,79 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#f4f4f4",
   },
   title: {
     fontSize: 24,
     marginBottom: 16,
+    color: "#333",
+    fontWeight: "bold",
   },
   input: {
     width: "80%",
     height: 50,
     borderRadius: 8,
-    borderColor: "gray",
+    borderColor: "#ccc",
     borderWidth: 1,
     marginBottom: 16,
     paddingLeft: 8,
+    backgroundColor: "#fff",
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  button: {
+    width: 340,
+    height: 50,
+    padding: 10,
+    borderRadius: "50%",
+    borderColor: "#333",
+    borderWidth: 1,
+    marginBottom: 16,
+    backgroundColor: "black",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  registerButton: {
+    width: 340,
+    height: 50,
+    borderRadius: "50%",
+    borderColor: "#333",
+    borderWidth: 2,
+    marginBottom: 16,
+    top: "90%",
+    position: "absolute",
+  },
+  registerContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
   },
   registerText: {
-    marginTop: 20,
+    color: "#333",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  linkText: {
     color: "blue",
     textDecorationLine: "underline",
+  },
+  forgotText: {
+    color: "black",
   },
 });
 
