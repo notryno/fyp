@@ -3,9 +3,12 @@
 import json
 
 import pyotp
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
@@ -191,12 +194,30 @@ def verify_otp(request):
                 if otp.verify(otp_entered):
                     # OTP matched, mark email as verified
                     print("OTP matched!")
-                    user.email_verified = True
-                    user.save()
-                    return JsonResponse(
-                        {"success": True, "message": "Email verified successfully!"},
-                        status=200,
-                    )
+                    origin = data.get("origin")
+                    print("Origin", origin)
+                    if origin == "login" or origin == "otp":
+                        user.email_verified = True
+                        user.save()
+                        return JsonResponse(
+                            {
+                                "success": True,
+                                "message": "Email verified successfully!",
+                            },
+                            status=200,
+                        )
+                    elif origin == "reset_password":
+                        print("In reset password")
+                        reset_token = generate_token(user)
+                        print("Reset token:", reset_token)
+                        return JsonResponse(
+                            {
+                                "success": True,
+                                "message": "Email verified successfully!",
+                                "reset_token": reset_token,
+                            },
+                            status=200,
+                        )
                 else:
                     print("OTP did not match!")
                     return JsonResponse(
@@ -213,3 +234,51 @@ def verify_otp(request):
     return JsonResponse(
         {"success": False, "message": "Invalid request method"}, status=405
     )
+
+
+@csrf_exempt
+def reset_password(request):
+    data = json.loads(request.body)
+    email = data.get("email")
+    password = data.get("password")
+    reset_token = data.get("resetToken")
+
+    try:
+        user = CustomUser.objects.get(email=email)
+        print("User:", user)
+        print("Reset token:", reset_token)
+
+        if not validate_token(user, reset_token):
+            return JsonResponse(
+                {"error": "Invalid or expired reset token"},
+                status=400,
+            )
+        print(validate_token(user, reset_token))
+
+        print("Password:", password)
+        user.set_password(password)
+        user.save()
+        send_mail(
+            "Password Changed",
+            "Your password has been changed successfully. If you did not make this change, please contact the administrator.",
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            fail_silently=False,
+        )
+        print("Password changed!")
+        return JsonResponse(
+            {"message": "Password changed successfully", "success": True},
+            status=200,
+        )
+    except CustomUser.DoesNotExist:
+        return JsonResponse({"error": "Invalid email", "success": False}, status=400)
+
+
+def generate_token(user):
+    token_generator = PasswordResetTokenGenerator()
+    return token_generator.make_token(user)
+
+
+def validate_token(user, token):
+    token_generator = PasswordResetTokenGenerator()
+    return token_generator.check_token(user, token)
