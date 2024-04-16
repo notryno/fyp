@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useAuth } from "../../api/authContext";
 import * as ImagePicker from "expo-image-picker";
-import { BASE_URL, getUserData, updateUserData } from "../../api/authApi";
+import { BASE_URL, getUserData, resendOtp } from "../../api/authApi";
 import { useRoute, useFocusEffect } from "@react-navigation/native";
 import { updateProfilePicture } from "../../api/authApi";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,13 +25,13 @@ const PersonalDetails = ({ navigation }) => {
   const route = useRoute();
   const [isPressedFirstName, setIsPressedFirstName] = useState(false);
   const [isPressedLastName, setIsPressedLastName] = useState(false);
+  const [isPressedEmail, setIsPressedEmail] = useState(false);
 
   const modifiedURL = BASE_URL.replace(/\/api\/$/, "");
 
   const fetchData = async () => {
     try {
       const data = await getUserData(userToken);
-      console.log("Personal details in the screen:", data);
       setNewData(data.user_data);
     } catch (error) {
       console.error("Error fetching personal details:", error);
@@ -54,6 +54,17 @@ const PersonalDetails = ({ navigation }) => {
       fetchData();
     }, [])
   );
+  const handleEmailVerification = async () => {
+    try {
+      await resendOtp(newData.email);
+      navigation.navigate("OTPScreen", {
+        email: newData.email,
+        origin: "profile",
+      });
+    } catch (error) {
+      console.error("Error updating email verification:", error);
+    }
+  };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -146,7 +157,21 @@ const PersonalDetails = ({ navigation }) => {
 
       <View style={styles.rightLine} />
 
-      <View style={styles.inputContainer}>
+      <TouchableOpacity
+        style={[
+          styles.inputContainer,
+          isPressedEmail && { backgroundColor: "#dcdcdc" },
+        ]}
+        onPressIn={() => {
+          setIsPressedEmail(true);
+        }}
+        onPressOut={() => {
+          setIsPressedEmail(false);
+        }}
+        onPress={newData.email_verified ? null : handleEmailVerification}
+        activeOpacity={1}
+        disabled={newData.email_verified}
+      >
         <Text style={styles.label}>Email</Text>
         <TextInput
           style={styles.input}
@@ -154,7 +179,22 @@ const PersonalDetails = ({ navigation }) => {
           value={newData.email}
           editable={false}
         />
-      </View>
+        {newData.email_verified ? (
+          <Ionicons
+            name="shield-checkmark-outline"
+            size={20}
+            color="green"
+            style={{ marginLeft: 4 }}
+          />
+        ) : (
+          <Ionicons
+            name="warning-outline"
+            size={20}
+            color="red"
+            style={{ marginLeft: 4 }}
+          />
+        )}
+      </TouchableOpacity>
 
       <View style={styles.line} />
 

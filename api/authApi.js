@@ -86,7 +86,6 @@ const getCSRFToken = async () => {
 
 export const getUserData = async (userToken) => {
   try {
-    console.log("User Token inside getUser:", userToken);
     const response = await axios.get(`${BASE_URL}get_user_data/`, {
       headers: {
         Authorization: `Bearer ${userToken}`,
@@ -139,8 +138,6 @@ export const updateProfilePicture = async (userToken, newProfilePicture) => {
         type: "image/jpeg",
       });
     }
-    console.log("User Token inside updateProfilePicture:", userToken);
-    console.log("FormData inside updateProfilePicture:", formData);
     const response = await axios.patch(
       `${BASE_URL}update_user_data/`,
       formData,
@@ -152,10 +149,8 @@ export const updateProfilePicture = async (userToken, newProfilePicture) => {
       }
     );
 
-    console.log("Response from updateProfilePicture:", response.data);
     return response.data;
   } catch (error) {
-    console.log("Error updating profile picture:", error);
     console.error("Error updating profile picture:", error);
     throw "Error updating profile picture";
   }
@@ -164,9 +159,6 @@ export const updateProfilePicture = async (userToken, newProfilePicture) => {
 export const updatePassword = async (userToken, passwordData) => {
   try {
     const csrfToken = await getCSRFToken();
-    console.log("User Token inside updatePassword:", userToken);
-    console.log("CSRF Token inside updatePassword:", csrfToken);
-    console.log("Password Data inside updatePassword:", passwordData);
 
     const response = await axios.patch(
       `${BASE_URL}update_password/`,

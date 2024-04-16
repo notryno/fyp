@@ -15,7 +15,7 @@ import { useRoute } from "@react-navigation/native";
 
 const OTPScreen = () => {
   const route = useRoute();
-  const { email } = route.params;
+  const { email, origin } = route.params;
   const navigation = useNavigation();
   const [otp, setOTP] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState(null);
@@ -57,7 +57,11 @@ const OTPScreen = () => {
       const result = await verifyOtp(email, otpValue);
       console.log("OTP verification successful:", result);
       if (result.success) {
-        navigation.navigate("Login");
+        if (origin === "profile") {
+          navigation.navigate("PersonalDetails");
+        } else {
+          navigation.navigate("RegisterSuccess");
+        }
       } else {
         setError("OTP verification failed. Please try again.");
       }

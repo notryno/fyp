@@ -9,12 +9,14 @@ const RegisterSuccess = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Success</Text>
-      <Text style={styles.text}>Your account has been created</Text>
+      <Text style={styles.text}>
+        Your email has been verified and your {"\n"}account has been created
+      </Text>
       <Ionicons
         name="checkmark-circle-outline"
-        size={100}
         color="#4CAF50"
         style={styles.checkMark}
+        size={100}
       />
       <TouchableOpacity
         style={styles.continueButton}
@@ -33,27 +35,35 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   checkMark: {
-    width: 100,
-    height: 100,
-    marginBottom: 16,
+    width: 150,
+    height: 150,
   },
   header: {
-    fontSize: 26,
+    fontSize: 28,
+    fontWeight: "bold",
     marginBottom: 8,
   },
   text: {
     fontSize: 16,
+    textAlign: "center",
+    marginBottom: 60,
   },
   continueButton: {
     padding: 12,
-    backgroundColor: "#4CAF50",
-    borderRadius: 8,
-    marginTop: 8,
+    height: 50,
+    width: 200,
+    marginTop: 60,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    borderRadius: "50%",
+    backgroundColor: "black",
   },
   continueText: {
     color: "white",
     fontSize: 16,
     textAlign: "center",
+    fontWeight: "bold",
   },
   checkMark: {
     width: 100,

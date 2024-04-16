@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useAuth } from "../../api/authContext";
 import { BASE_URL, getUserData } from "../../api/authApi";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 const ProfileScreen = () => {
   const { signOut, userProfile, userToken } = useAuth();
@@ -20,26 +20,29 @@ const ProfileScreen = () => {
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getUserData(userToken);
-        setUserData(data.user_data);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
-
     fetchData();
   }, [userToken]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchData();
+    }, [])
+  );
+
+  const fetchData = async () => {
+    try {
+      const data = await getUserData(userToken);
+      setUserData(data.user_data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
 
   const handleLogout = () => {
     signOut();
   };
-  console.log("User Profile:", userProfile);
 
   const modifiedURL = BASE_URL.replace(/\/api\/$/, "");
-
-  console.log("Profile Picture:", modifiedURL + userProfile);
 
   return (
     <View style={styles.container}>
@@ -57,7 +60,24 @@ const ProfileScreen = () => {
       <View style={styles.infoContainer}>
         {userData && (
           <>
-            <Text style={styles.emailText}>{userData.email}</Text>
+            <Text style={styles.emailText}>
+              {userData.email}{" "}
+              {userData.email_verified ? (
+                <Ionicons
+                  name="shield-checkmark-outline"
+                  size={20}
+                  color="green"
+                  style={{ marginLeft: 4 }}
+                />
+              ) : (
+                <Ionicons
+                  name="warning-outline"
+                  size={20}
+                  color="red"
+                  style={{ marginLeft: 4 }}
+                />
+              )}
+            </Text>
             <Text style={styles.nameText}>
               {userData.first_name} {userData.last_name}
             </Text>
