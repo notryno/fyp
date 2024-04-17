@@ -53,7 +53,6 @@ export const login = async (userData) => {
 };
 
 const extractCSRFTokenFromCookies = (response) => {
-  console.log(response.headers);
   const cookies = response.headers["set-cookie"];
   if (cookies) {
     const csrfCookie = cookies.find((cookie) =>
