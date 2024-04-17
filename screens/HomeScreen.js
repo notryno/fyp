@@ -9,7 +9,7 @@ import {
   FlatList,
   Alert,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { fetchEventsAndSpecialSchedules } from "../api/scheduleApi";
 import { useAuth } from "../api/authContext";
 import { getUserData } from "../api/authApi";
@@ -18,7 +18,6 @@ import TaskItem from "../components/TaskItem";
 import { createTask, deleteTask, getTasks, updateTask } from "../api/taskApi";
 import { useFocusEffect } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
 
 const HomeScreen = () => {
   const [events, setEvents] = useState([]);
@@ -343,14 +342,6 @@ const styles = StyleSheet.create({
   deleteButton: {
     flex: 1,
     alignItems: "center",
-  },
-  addButtonContainer: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-    backgroundColor: "lightblue",
-    padding: 10,
-    borderRadius: 50, // Make the add button round
   },
 });
 

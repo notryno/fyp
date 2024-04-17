@@ -11,8 +11,9 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { fetchEventsAndSpecialSchedules } from "../../api/scheduleApi";
 import { useAuth } from "../../api/authContext";
 import EventItem from "../../components/EventItem";
-import TaskItem from "../../components/TaskItem"; // Import the TaskItem component
+import TaskItem from "../../components/TaskItem";
 import { getTasks } from "../../api/taskApi";
+import { useFocusEffect } from "@react-navigation/native";
 
 const EventsPage = () => {
   const [events, setEvents] = useState([]);
@@ -55,6 +56,12 @@ const EventsPage = () => {
     fetchData();
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchData();
+    }, [])
+  );
+
   // Merge events and tasks based on their dates
   const mergedData = events.map((eventGroup) => ({
     date: eventGroup.date,
@@ -72,8 +79,6 @@ const EventsPage = () => {
         return time1 - time2;
       }),
   }));
-
-  console.log("Tasks:", tasks);
 
   return (
     <ScrollView
@@ -100,13 +105,14 @@ const EventsPage = () => {
                 .map((task, idx) => (
                   <TaskItem
                     key={idx}
-                    taskId={task.id} // Assuming task.id is the correct ID for the task
+                    taskId={task.id}
                     title={task.title}
                     description={task.description}
-                    dueDate={task.due_date} // Correct the prop name to due_date
-                    dueTime={task.due_time} // Correct the prop name to due_time
-                    markCompleted={task.completed} // Correct the prop name to completed
+                    dueDate={task.due_date}
+                    dueTime={task.due_time}
+                    markCompleted={task.completed}
                     completed={task.completed}
+                    origin={"calendar-list"}
                   />
                 ))}
               {data.events.map((event, idx) => (

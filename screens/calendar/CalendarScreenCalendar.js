@@ -4,8 +4,9 @@ import { Calendar } from "react-native-calendars";
 import { fetchEventsAndSpecialSchedules } from "../../api/scheduleApi";
 import { useAuth } from "../../api/authContext";
 import EventItem from "../../components/EventItem";
-import TaskItem from "../../components/TaskItem"; // Import the TaskItem component
+import TaskItem from "../../components/TaskItem";
 import { getTasks } from "../../api/taskApi";
+import { useFocusEffect } from "@react-navigation/native";
 
 const CalendarScreen = () => {
   const [events, setEvents] = useState([]);
@@ -63,7 +64,6 @@ const CalendarScreen = () => {
       });
 
       setMarkedDates(markedDatesObj);
-      console.log("Marked Dates:", markedDatesObj);
     } catch (error) {
       console.error("Error fetching data inside calendar:", error);
     }
@@ -116,7 +116,6 @@ const CalendarScreen = () => {
     }
 
     setSelectedEvents([mergedData]);
-    // console.log("Merged data:", mergedData);
   };
 
   useEffect(() => {
@@ -128,6 +127,12 @@ const CalendarScreen = () => {
       mergeTasksAndEvents();
     }
   }, [selectedDate]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchData();
+    }, [])
+  );
 
   const convertHexToColorString = (hexColor) => {
     // Remove the "#" symbol from the hexadecimal color
@@ -197,6 +202,7 @@ const CalendarScreen = () => {
                     dueTime={task.due_time}
                     markCompleted={task.completed}
                     completed={task.completed}
+                    origin={"calendar-calendar"}
                   />
                 ))}
               {data.events.map((event, idx) => (

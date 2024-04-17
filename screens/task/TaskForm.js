@@ -27,15 +27,11 @@ const TaskForm = ({ onSubmit, onCancel }) => {
     let formattedDueTime = null;
     const formattedDueDate = dueDate.toISOString().split("T")[0];
 
-    console.log("DUE TIME", dueTime);
-
     if (!allDay) {
       const dueDateTime = new Date(dueDate);
       dueDateTime.setHours(dueTime.getHours(), dueTime.getMinutes());
       formattedDueTime = dueTime.toTimeString().split(" ")[0];
     }
-
-    console.log("FORMATTED DUE TIME", formattedDueTime);
 
     onSubmit({
       title: newTaskTitle,
