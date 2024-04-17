@@ -7,6 +7,7 @@ from .models import Schedule, SpecialSchedule
 
 class ScheduleSerializer(serializers.ModelSerializer):
     classroom = ClassroomSerializer
+    title = serializers.SerializerMethodField()
 
     class Meta:
         model = Schedule
@@ -25,6 +26,9 @@ class ScheduleSerializer(serializers.ModelSerializer):
             "day_of_week",
             "color",
         )
+
+    def get_title(self, obj):
+        return obj.course.name
 
 
 class SpecialScheduleSerializer(serializers.ModelSerializer):

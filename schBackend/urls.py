@@ -33,6 +33,9 @@ urlpatterns = [
         "api/token/refresh/", jwt_views.TokenRefreshView.as_view(), name="token_refresh"
     ),
     path("api/", include("classroom.urls")),
+    # path("api/", include("grades.urls")),
+    # path("api/", include("events.urls")),
+    path("api/", include("courses.urls")),
 ]
 
 if settings.DEBUG:

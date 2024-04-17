@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from classroom.models import Classroom
+from courses.models import Course
 
 User = get_user_model()
 
@@ -13,7 +14,7 @@ User = get_user_model()
 class Schedule(models.Model):
     # user = models.ForeignKey(User, on_delete=models.CASCADE)
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, null=True)
-    title = models.CharField(max_length=255)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
     start_date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
@@ -36,7 +37,7 @@ class Schedule(models.Model):
             schedule.append(
                 {
                     "date": current_date,
-                    "title": self.title,
+                    "title": self.course.name,
                     "start_time": self.start_time,
                     "end_time": self.end_time,
                     "type": self.type,
