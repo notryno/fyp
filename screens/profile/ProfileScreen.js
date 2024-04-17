@@ -119,7 +119,7 @@ const ProfileScreen = () => {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate("PersonalDetails")}
+        onPress={() => navigation.navigate("Grades")}
       >
         <View style={styles.buttonContent}>
           <View style={styles.iconContainer}>

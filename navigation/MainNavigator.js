@@ -31,6 +31,7 @@ import ForgotPasswordScreen from "../screens/auth/ForgotPasswordScreen";
 import PasswordResetScreen from "../screens/auth/PasswordResetScreen";
 import CoursesScreen from "../screens/Courses";
 import CourseDetailsScreen from "../screens/CourseDetails";
+import GradesScreen from "../screens/GradesScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -199,6 +200,13 @@ const ProfileStack = () => {
         name="CourseDetails"
         component={CourseDetailsScreen}
         options={{ title: "Course Details" }}
+      />
+      <Stack.Screen
+        name="Grades"
+        component={GradesScreen}
+        options={{
+          title: "Grades",
+        }}
       />
       <Stack.Screen
         name="OTPScreen"
