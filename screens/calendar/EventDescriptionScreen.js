@@ -2,10 +2,10 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
 const EventDescriptionScreen = ({ route }) => {
-  const { title, time, type, location, description } = route.params;
+  const { title, time, type, location, description, color } = route.params;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: color }]}>
       <Text style={styles.title}>Title: {title}</Text>
       <Text style={styles.text}>Time: {time}</Text>
       <Text style={styles.text}>Type: {type}</Text>
@@ -26,10 +26,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 10,
+    color: "white",
   },
   text: {
     fontSize: 18,
     marginBottom: 5,
+    color: "white",
   },
 });
 
