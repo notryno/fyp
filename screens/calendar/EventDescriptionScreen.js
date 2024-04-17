@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
 const EventDescriptionScreen = ({ route }) => {
-  const { title, time, type, location } = route.params;
+  const { title, time, type, location, description } = route.params;
 
   return (
     <View style={styles.container}>
@@ -10,6 +10,7 @@ const EventDescriptionScreen = ({ route }) => {
       <Text style={styles.text}>Time: {time}</Text>
       <Text style={styles.text}>Type: {type}</Text>
       <Text style={styles.text}>Location: {location}</Text>
+      <Text style={styles.text}>Description: {description}</Text>
     </View>
   );
 };

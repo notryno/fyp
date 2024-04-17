@@ -11,7 +11,6 @@ export const fetchEventsAndSpecialSchedules = async (userToken) => {
       specialScheduleData.length > 0
         ? mergeEvents(eventData, specialScheduleData)
         : eventData;
-
     return mergedEvents;
   } catch (error) {
     console.error("Error fetching events and special schedules:", error);
@@ -139,6 +138,7 @@ export const fetchEvents = async (userToken) => {
           type: event.type,
           location: event.location,
           color: event.color,
+          description: event.description,
         });
 
         // Increase the instance date based on frequency per week
@@ -171,6 +171,7 @@ const convertToNewFormat = (mergedEvents) => {
     time: event.data[0].time,
     title: event.data[0].title,
     type: event.data[0].type,
+    description: event.data[0].description,
   }));
 };
 

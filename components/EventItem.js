@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
-const EventItem = ({ title, time, type, location, color }) => {
+const EventItem = ({ title, time, type, location, color, description }) => {
   const navigation = useNavigation();
 
   const handlePress = () => {
@@ -15,6 +15,7 @@ const EventItem = ({ title, time, type, location, color }) => {
       type: type,
       location: location,
       color: color,
+      description: description,
     });
   };
 

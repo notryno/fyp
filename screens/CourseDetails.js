@@ -15,7 +15,6 @@ const CourseDetailsScreen = ({ route, navigation }) => {
   const fetchSchedule = async () => {
     try {
       const scheduleData = await getCourseSchedule(userToken, courseId);
-      console.log("Schedule data:", scheduleData);
       setSchedule(scheduleData); // Set the retrieved schedule data
     } catch (error) {
       console.error("Error fetching course schedule:", error);

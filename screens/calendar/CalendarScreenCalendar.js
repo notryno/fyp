@@ -213,6 +213,7 @@ const CalendarScreen = () => {
                   type={event.type}
                   location={event.location}
                   color={event.color}
+                  description={event.description}
                 />
               ))}
             </View>
