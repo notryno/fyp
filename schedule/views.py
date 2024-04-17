@@ -7,6 +7,7 @@ from rest_framework import generics, status
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import Schedule, SpecialSchedule
 from .serializers import ScheduleSerializer, SpecialScheduleSerializer
@@ -89,3 +90,16 @@ def create_schedule(request):
             print("Errors:", serializer.errors)
             return JsonResponse(serializer.errors, status=400)
     return JsonResponse({"error": "Only POST requests are allowed"}, status=400)
+
+
+class SingleScheduleView(APIView):
+    def get(self, request, course_id):
+        try:
+            schedules = Schedule.objects.filter(course_id=course_id)
+            serializer = ScheduleSerializer(schedules, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Schedule.DoesNotExist:
+            return Response(
+                {"error": "Schedules for the specified course not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )

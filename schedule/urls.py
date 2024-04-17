@@ -5,6 +5,7 @@ from .views import (
     AllScheduleListView,
     ScheduleDetailView,
     ScheduleListView,
+    SingleScheduleView,
     SpecialScheduleListView,
 )
 
@@ -21,4 +22,9 @@ urlpatterns = [
     path("schedules/all/", AllScheduleListView.as_view(), name="all-schedule-list"),
     path("schedule/<int:pk>/", ScheduleDetailView.as_view(), name="schedule-detail"),
     path("create-schedule/", views.create_schedule, name="create-schedule"),
+    path(
+        "single-schedule/<int:course_id>/",
+        views.SingleScheduleView.as_view(),
+        name="single-schedule",
+    ),
 ]
