@@ -6,6 +6,9 @@ import {
   Button,
   Switch,
   StyleSheet,
+  KeyboardAvoidingView,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import DatePicker from "@react-native-community/datetimepicker";
 
@@ -16,15 +19,23 @@ const TaskForm = ({ onSubmit, onCancel }) => {
   const [dueTime, setDueTime] = useState(new Date());
   const [allDay, setAllDay] = useState(false);
 
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
   const handleAddTask = () => {
     let formattedDueTime = null;
     const formattedDueDate = dueDate.toISOString().split("T")[0];
+
+    console.log("DUE TIME", dueTime);
 
     if (!allDay) {
       const dueDateTime = new Date(dueDate);
       dueDateTime.setHours(dueTime.getHours(), dueTime.getMinutes());
       formattedDueTime = dueTime.toTimeString().split(" ")[0];
     }
+
+    console.log("FORMATTED DUE TIME", formattedDueTime);
 
     onSubmit({
       title: newTaskTitle,
@@ -36,81 +47,102 @@ const TaskForm = ({ onSubmit, onCancel }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.formContainer}>
-        <Text style={styles.heading}>New Task</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="New Task Title"
-          value={newTaskTitle}
-          onChangeText={(text) => setNewTaskTitle(text)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Description"
-          value={description}
-          onChangeText={(text) => setDescription(text || null)}
-        />
-        <View style={styles.rowContainer}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>Due Date:</Text>
-          </View>
-          <View style={styles.datePickerContainer}>
-            <DatePicker
-              style={styles.datePicker}
-              value={dueDate} // Ensure dueDate is a Date object
-              mode="date"
-              format="YYYY-MM-DD"
-              minDate={new Date(2000, 0, 1)} // Use Date constructor to set minDate
-              maxDate={new Date(2100, 11, 31)} // Use Date constructor to set maxDate
-              confirmBtnText="Confirm"
-              cancelBtnText="Cancel"
-              customStyles={styles.datePickerCustomStyles}
-              onChange={(event, date) => {
-                if (date !== undefined) {
-                  setDueDate(date);
-                }
-              }} // Update dueDate state if date is defined
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -200}
+    >
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <View style={styles.container}>
+          <View style={styles.formContainer}>
+            <TextInput
+              style={styles.input}
+              value={newTaskTitle}
+              autoCapitalize="words"
+              onChangeText={(text) => setNewTaskTitle(text)}
+              placeholder="New Task"
+              fontWeight={newTaskTitle.length == 0 ? "bold" : "normal"}
             />
-          </View>
-        </View>
-        {!allDay && (
-          <View style={styles.rowContainer}>
-            <View style={styles.labelContainer}>
-              <Text style={styles.label}>Due Time:</Text>
-            </View>
-            <View style={styles.datePickerContainer}>
-              <DatePicker
-                style={styles.datePicker}
-                value={dueTime} // Ensure dueTime is a Date object
-                mode="time"
-                format="HH:mm"
-                confirmBtnText="Confirm"
-                cancelBtnText="Cancel"
-                customStyles={styles.datePickerCustomStyles}
-                onChange={(event, time) => {
-                  if (time !== undefined) {
-                    setDueTime(time);
-                  }
-                }} // Update dueTime state if time is defined
+            <View
+              style={{
+                flexDirection: "row",
+                marginBottom: 10,
+              }}
+            >
+              <Text
+                style={[styles.label, styles.labelContainer, { marginTop: 5 }]}
+              >
+                Description:
+              </Text>
+              <TextInput
+                style={styles.descriptionInput}
+                placeholder="Add Description"
+                multiline
+                numberOfLines={4}
+                value={description}
+                onChangeText={(text) => setDescription(text || null)}
               />
             </View>
+            <View style={styles.rowContainer}>
+              <View style={styles.labelContainer}>
+                <Text style={styles.label}>Due Date:</Text>
+              </View>
+              <View style={styles.datePickerContainer}>
+                <DatePicker
+                  style={styles.datePicker}
+                  value={dueDate}
+                  mode="date"
+                  format="YYYY-MM-DD"
+                  minDate={new Date(2000, 0, 1)}
+                  maxDate={new Date(2100, 11, 31)}
+                  confirmBtnText="Confirm"
+                  cancelBtnText="Cancel"
+                  onChange={(event, date) => {
+                    if (date !== undefined) {
+                      setDueDate(date);
+                    }
+                  }}
+                />
+              </View>
+            </View>
+            {!allDay && (
+              <View style={styles.rowContainer}>
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>Due Time:</Text>
+                </View>
+                <View style={styles.datePickerContainer}>
+                  <DatePicker
+                    style={styles.datePicker}
+                    value={dueTime}
+                    mode="time"
+                    format="HH:mm"
+                    confirmBtnText="Confirm"
+                    cancelBtnText="Cancel"
+                    onChange={(event, time) => {
+                      if (time !== undefined) {
+                        setDueTime(time);
+                      }
+                    }}
+                  />
+                </View>
+              </View>
+            )}
+            <View style={styles.switchContainer}>
+              <Text style={styles.switchLabel}>All Day:</Text>
+              <Switch
+                style={styles.switch}
+                value={allDay}
+                onValueChange={(value) => setAllDay(value)}
+              />
+            </View>
+            <View style={styles.buttonContainer}>
+              <Button title="Cancel" onPress={onCancel} />
+              <Button title="Add Task" onPress={handleAddTask} />
+            </View>
           </View>
-        )}
-        <View style={styles.switchContainer}>
-          <Text style={styles.switchLabel}>All Day</Text>
-          <Switch
-            style={styles.switch}
-            value={allDay}
-            onValueChange={(value) => setAllDay(value)}
-          />
         </View>
-        <View style={styles.buttonContainer}>
-          <Button title="Cancel" onPress={onCancel} />
-          <Button title="Add Task" onPress={handleAddTask} />
-        </View>
-      </View>
-    </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -123,6 +155,7 @@ const styles = StyleSheet.create({
   formContainer: {
     backgroundColor: "white",
     padding: 16,
+    paddingTop: 20,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
@@ -133,26 +166,19 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
+    marginBottom: 10,
+    borderRadius: 5,
+    fontSize: 20,
+  },
+  descriptionInput: {
+    height: 80,
     borderColor: "gray",
     borderWidth: 1,
     marginBottom: 10,
+    borderRadius: 5,
     padding: 8,
-  },
-  datePicker: {
-    width: 200,
-    borderWidth: 1,
-    marginLeft: -80,
-  },
-  datePickerCustomStyles: {
-    dateIcon: {
-      position: "absolute",
-      right: 0,
-      top: 4,
-      marginLeft: 0,
-    },
-    dateInput: {
-      marginRight: 36,
-    },
+    flex: 1,
+    fontSize: 16,
   },
   switchContainer: {
     flexDirection: "row",
@@ -160,16 +186,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   switchLabel: {
-    marginRight: 10,
+    marginRight: 50,
   },
-  switch: {},
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
   label: {
     fontSize: 16,
-    marginBottom: 5,
   },
   dateContainer: {
     marginBottom: 10,
@@ -178,13 +202,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
-    borderWidth: 1,
   },
   labelContainer: {
-    flex: 1,
+    width: 100,
   },
   datePickerContainer: {
-    flex: 4,
+    marginLeft: -12,
+  },
+  placeholder: {
+    fontWeight: "bold",
   },
 });
 

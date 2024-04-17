@@ -1,25 +1,47 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  TextInput,
+  Button,
+  StyleSheet,
+  Alert,
+  Text,
+  Switch,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-
-// Import your API functions here
 import { updateTask, deleteTask } from "../../api/taskApi";
 import { useAuth } from "../../api/authContext";
+import DatePicker from "@react-native-community/datetimepicker";
 
 const TaskDescriptionScreen = ({ route, navigation }) => {
-  const { taskId, title, description, dueDate, dueTime, markCompleted } =
-    route.params;
+  const {
+    taskId,
+    title: initialTitle,
+    description: initialDescription,
+    dueDate: initialDueDate,
+    dueTime: initialDueTime,
+    markCompleted,
+  } = route.params;
 
+  const [title, setTitle] = useState(initialTitle);
+  const [description, setDescription] = useState(initialDescription);
   const [completed, setCompleted] = useState(markCompleted);
+  const [dueDate, setDueDate] = useState(new Date(initialDueDate));
+  const [dueTime, setDueTime] = useState(
+    initialDueTime ? new Date(initialDueTime) : new Date()
+  );
+  const [allDay, setAllDay] = useState(
+    initialDueTime.length === 0 ? true : false
+  );
+
   const { userToken } = useAuth();
 
-  // Function to toggle completion status and update button text accordingly
   const handleMarkCompleted = async () => {
     try {
       if (!completed) {
-        await updateTask(userToken, taskId, { completed: true }); // Update task completion status in the database
+        await updateTask(userToken, taskId, { completed: true });
       } else {
-        await updateTask(userToken, taskId, { completed: false }); // Update task completion status in the database
+        await updateTask(userToken, taskId, { completed: false });
       }
       // Update local state
       setCompleted(!completed);
@@ -53,53 +75,152 @@ const TaskDescriptionScreen = ({ route, navigation }) => {
       ]
     );
   };
-  const renderDueTime = () => {
-    if (dueTime === null || dueTime === "Invalid Date") {
-      return (
-        <Text style={styles.infoText}>
-          <Ionicons name="time-outline" size={20} /> Time: All Day
-        </Text>
-      );
-    } else {
-      // Convert dueTime to a Date object
-      const time = new Date(`1970-01-01T${dueTime}Z`);
 
-      // Get hours and minutes
-      const hours = time.getHours();
-      const minutes = time.getMinutes();
-
-      // Convert hours to 12-hour format
-      const formattedHours = hours % 12 || 12; // 12 will be shown instead of 0
-      const formattedMinutes = minutes.toString().padStart(2, "0"); // Add leading zero if needed
-
-      // Determine AM or PM
-      const ampm = hours >= 12 ? "PM" : "AM";
-
-      return (
-        <Text style={styles.infoText}>
-          <Ionicons name="time-outline" size={20} /> Time: {formattedHours}:
-          {formattedMinutes} {ampm}
-        </Text>
-      );
+  const handleTitleChange = async (newTitle) => {
+    try {
+      await updateTask(userToken, taskId, { title: newTitle });
+      // Update local state
+      setTitle(newTitle);
+    } catch (error) {
+      console.error("Error updating task title:", error);
     }
   };
+
+  const handleDescriptionChange = async (newDescription) => {
+    try {
+      await updateTask(userToken, taskId, { description: newDescription });
+      setDescription(newDescription);
+    } catch (error) {
+      console.error("Error updating task description:", error);
+    }
+  };
+
+  const handleDueDateChange = async () => {
+    const formattedDueDate = dueDate.toISOString().split("T")[0];
+    try {
+      await updateTask(userToken, taskId, {
+        due_date: formattedDueDate,
+      });
+    } catch (error) {
+      console.error("Error updating task due date:", error);
+    }
+  };
+
+  const handleDueTimeChange = async () => {
+    const formattedDueTime = dueTime.toTimeString().split(" ")[0];
+    try {
+      await updateTask(userToken, taskId, {
+        due_time: formattedDueTime,
+      });
+    } catch (error) {
+      console.error("Error updating task due time:", error);
+    }
+  };
+
+  const handleAllDayChange = async () => {
+    try {
+      if (!allDay) {
+        await updateTask(userToken, taskId, {
+          all_day: !allDay,
+          due_time: null,
+        });
+      } else {
+        await updateTask(userToken, taskId, {
+          all_day: !allDay,
+          due_time: dueTime.toTimeString().split(" ")[0],
+        });
+      }
+
+      setAllDay(!allDay);
+    } catch (error) {
+      console.error("Error updating task due time:", error);
+    }
+  };
+
+  useEffect(() => {
+    handleDueDateChange();
+  }, [dueDate]);
 
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
-        <Text style={[styles.title, completed && styles.completedTitle]}>
-          {title}
-        </Text>
+        <TextInput
+          style={[styles.title, completed && styles.completedTitle]}
+          value={title}
+          onChangeText={(text) => setTitle(text)}
+          onBlur={() => handleTitleChange(title)}
+        />
       </View>
       <View style={styles.infoContainer}>
-        <Text style={styles.infoText}>
-          <Ionicons name="reorder-three-outline" size={20} /> Description:{" "}
-          {description}
-        </Text>
-        <Text style={styles.infoText}>
-          <Ionicons name="calendar-outline" size={20} /> Due Date: {dueDate}
-        </Text>
-        {renderDueTime()}
+        <View style={styles.descriptionContainer}>
+          <Text style={styles.label}>
+            <Ionicons name="reorder-three-outline" size={20} /> Description:
+          </Text>
+          <TextInput
+            style={styles.input}
+            multiline
+            numberOfLines={4}
+            placeholder="Add description"
+            value={description}
+            onChangeText={(text) => setDescription(text)}
+            onBlur={() => handleDescriptionChange(description)}
+          />
+        </View>
+        <View style={styles.calendarContainer}>
+          <Text style={styles.infoText}>
+            <Ionicons name="calendar-outline" size={20} /> Due Date:
+          </Text>
+          <DatePicker
+            style={styles.datePicker}
+            value={dueDate}
+            mode="date"
+            format="YYYY-MM-DD"
+            minDate={new Date(2000, 0, 1)}
+            maxDate={new Date(2100, 11, 31)}
+            accentColor="red"
+            onChange={(event, date) => {
+              if (date !== undefined) {
+                setDueDate(date);
+              }
+            }}
+          />
+        </View>
+
+        <View style={styles.calendarContainer}>
+          <Text style={[styles.infoText, { marginRight: 40 }]}>
+            <Ionicons name="time-outline" size={20} /> All Day:
+          </Text>
+          <Switch
+            style={styles.switch}
+            value={allDay}
+            onValueChange={handleAllDayChange}
+          />
+        </View>
+
+        <View style={styles.calendarContainer}>
+          {!allDay && (
+            <>
+              <Text style={[styles.infoText, { marginRight: 5 }]}>
+                <Ionicons name="time-outline" size={20} /> Due Time:
+              </Text>
+              <DatePicker
+                style={styles.datePicker}
+                value={dueTime}
+                mode="time"
+                format="HH:mm"
+                accentColor="red"
+                onChange={(event, time) => {
+                  if (time !== undefined) {
+                    setDueTime(time);
+                    handleDueTimeChange(
+                      time.toISOString().split("T")[1].split(".")[0]
+                    );
+                  }
+                }}
+              />
+            </>
+          )}
+        </View>
       </View>
       <View style={styles.buttonContainer}>
         <Button
@@ -128,18 +249,39 @@ const styles = StyleSheet.create({
     textDecorationLine: "line-through",
     opacity: 0.5,
   },
+  input: {
+    borderRadius: 5,
+    flex: 1,
+    fontSize: 16,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginRight: 10,
+  },
   infoContainer: {
     flex: 1,
   },
   infoText: {
     fontSize: 16,
-    marginBottom: 10,
+    fontWeight: "bold",
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 20,
   },
+  descriptionContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  calendarContainer: {
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  datePicker: { marginLeft: 10 },
 });
 
 export default TaskDescriptionScreen;
