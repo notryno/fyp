@@ -18,6 +18,7 @@ const ProfileScreen = () => {
   const { signOut, userProfile, userToken } = useAuth();
   const navigation = useNavigation();
   const [userData, setUserData] = useState(null);
+  const [isPressedLastName, setIsPressedLastName] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -47,10 +48,12 @@ const ProfileScreen = () => {
   return (
     <View style={styles.container}>
       {userProfile ? (
-        <Image
-          source={{ uri: modifiedURL + userProfile }}
-          style={styles.profileImage}
-        />
+        <View style={styles.defaultProfileContainer}>
+          <Image
+            source={{ uri: modifiedURL + userProfile }}
+            style={styles.profileImage}
+          />
+        </View>
       ) : (
         <View style={styles.defaultProfileContainer}>
           <Ionicons name="person-outline" size={50} color="gray" />
@@ -88,14 +91,14 @@ const ProfileScreen = () => {
       <View style={styles.line} />
 
       <TouchableOpacity
-        style={styles.button}
+        style={[styles.button]}
         onPress={() => navigation.navigate("PersonalDetails")}
       >
         <View style={styles.buttonContent}>
           <View style={styles.iconContainer}>
             <Ionicons
               name="person-outline"
-              size={40}
+              size={30}
               color="white"
               style={styles.icon}
             />
@@ -103,10 +106,10 @@ const ProfileScreen = () => {
           <View style={styles.textContainer}>
             <Text style={styles.buttonText}>Personal Details</Text>
           </View>
-          <View style={styles.iconContainer}>
+          <View style={styles.rightIconContainer}>
             <Ionicons
               name="chevron-forward-outline"
-              size={40}
+              size={30}
               color="white"
               style={styles.iconRight}
             />
@@ -122,7 +125,7 @@ const ProfileScreen = () => {
           <View style={styles.iconContainer}>
             <Ionicons
               name="school-outline"
-              size={40}
+              size={30}
               color="white"
               style={styles.icon}
             />
@@ -130,10 +133,10 @@ const ProfileScreen = () => {
           <View style={styles.textContainer}>
             <Text style={styles.buttonText}>Grades</Text>
           </View>
-          <View style={styles.iconContainer}>
+          <View style={styles.rightIconContainer}>
             <Ionicons
               name="chevron-forward-outline"
-              size={40}
+              size={30}
               color="white"
               style={styles.iconRight}
             />
@@ -149,7 +152,7 @@ const ProfileScreen = () => {
           <View style={styles.iconContainer}>
             <Ionicons
               name="people-outline"
-              size={40}
+              size={30}
               color="white"
               style={styles.icon}
             />
@@ -157,10 +160,10 @@ const ProfileScreen = () => {
           <View style={styles.textContainer}>
             <Text style={styles.buttonText}>Classroom</Text>
           </View>
-          <View style={styles.iconContainer}>
+          <View style={styles.rightIconContainer}>
             <Ionicons
               name="chevron-forward-outline"
-              size={40}
+              size={30}
               color="white"
               style={styles.iconRight}
             />
@@ -168,7 +171,56 @@ const ProfileScreen = () => {
         </View>
       </TouchableOpacity>
 
-      <Button title="Logout" onPress={handleLogout} />
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("Courses")}
+      >
+        <View style={styles.buttonContent}>
+          <View style={styles.iconContainer}>
+            <Ionicons
+              name="book-outline"
+              size={30}
+              color="white"
+              style={styles.icon}
+            />
+          </View>
+          <View style={styles.textContainer}>
+            <Text style={styles.buttonText}>Courses</Text>
+          </View>
+          <View style={styles.rightIconContainer}>
+            <Ionicons
+              name="chevron-forward-outline"
+              size={30}
+              color="white"
+              style={styles.iconRight}
+            />
+          </View>
+        </View>
+      </TouchableOpacity>
+
+      <View style={styles.line} />
+
+      <TouchableOpacity
+        style={[
+          {
+            width: "100%",
+            padding: 15,
+            paddingLeft: 30,
+            marginTop: -10,
+          },
+          isPressedLastName && { backgroundColor: "#dcdcdc" },
+        ]}
+        onPressIn={() => {
+          setIsPressedLastName(true);
+        }}
+        onPressOut={() => {
+          setIsPressedLastName(false);
+        }}
+        onPress={() => handleLogout()}
+        activeOpacity={1}
+      >
+        <Text style={{ fontSize: 16, color: "red" }}>Log out</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -186,7 +238,6 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     borderRadius: 100,
-    marginTop: 16,
     borderColor: "black",
     borderWidth: 0.2,
   },
@@ -205,11 +256,10 @@ const styles = StyleSheet.create({
   button: {
     width: "90%",
     alignSelf: "center",
-    height: 70,
+    height: 65,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 1,
-    marginVertical: 10,
+    borderRadius: 8,
   },
   buttonContent: {
     flexDirection: "row",
@@ -218,42 +268,70 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   iconContainer: {
-    flex: 0.2,
     alignItems: "center",
+    width: 50,
+    height: 50,
+    justifyContent: "center",
+    borderRadius: 70,
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  rightIconContainer: {
+    alignItems: "center",
+    width: 50,
+    height: 50,
+    justifyContent: "center",
+    borderRadius: 70,
   },
   textContainer: {
-    flex: 0.6,
-    alignItems: "center",
+    flex: 1,
+    paddingLeft: 12,
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
-    textAlign: "center",
   },
   icon: {
-    borderWidth: 1,
-    borderColor: "black",
     color: "black",
-    padding: 5,
-    borderRadius: 5,
   },
   iconRight: {
     marginLeft: 10,
-    color: "black",
+    color: "gray",
+    fontSize: 25,
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   line: {
     width: "100%",
     borderBottomColor: "lightgray",
     borderBottomWidth: 1,
-    marginVertical: 10,
+    marginVertical: 20,
   },
   defaultProfileContainer: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    marginTop: 16,
+    borderColor: "black",
+    borderWidth: 0.2,
     backgroundColor: "lightgray",
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    elevation: 5,
   },
 });
 

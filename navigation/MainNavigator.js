@@ -29,6 +29,7 @@ import OTPScreen from "../screens/auth/OTPScreen";
 import RegisterSuccess from "../screens/auth/RegisterSuccess";
 import ForgotPasswordScreen from "../screens/auth/ForgotPasswordScreen";
 import PasswordResetScreen from "../screens/auth/PasswordResetScreen";
+import CoursesScreen from "../screens/Courses";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -184,6 +185,13 @@ const ProfileStack = () => {
         component={ClassScreen}
         options={{
           title: "Classroom",
+        }}
+      />
+      <Stack.Screen
+        name="Courses"
+        component={CoursesScreen}
+        options={{
+          title: "Courses",
         }}
       />
       <Stack.Screen
