@@ -50,24 +50,25 @@ const ClassScreen = ({ navigation }) => {
   const renderUserItem = ({ item, index }) => (
     <TouchableOpacity
       style={styles.userItem}
-      onPress={() => navigation.navigate("UserDetails", { userId: item.id })}
+      // onPress={() => navigation.navigate("UserDetails", { userId: item.id })}
     >
       <View style={styles.numberContainer}>
         <Text style={styles.numberText}>{index + 1}</Text>
       </View>
-      {item.profile_picture ? (
-        <Image
-          source={{ uri: item.profile_picture }}
-          style={styles.profileImage}
-        />
-      ) : (
-        <Ionicons
-          name="person-circle-outline"
-          size={60}
-          style={styles.profileImage}
-          color={"#aaa"}
-        />
-      )}
+      <View style={styles.iconContainer}>
+        {item.profile_picture ? (
+          <Image
+            source={{ uri: item.profile_picture }}
+            style={styles.profileImage}
+          />
+        ) : (
+          <Ionicons
+            name="person-circle-outline"
+            size={60}
+            style={[styles.profileImage, { color: "#aaa" }]}
+          />
+        )}
+      </View>
       <View style={styles.userInfo}>
         <Text
           style={styles.userName}
@@ -107,15 +108,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     padding: 10,
     backgroundColor: "#f0f0f0",
-    borderColor: "black",
-    borderWidth: 1,
     borderRadius: 8,
   },
   profileImage: {
     width: 60,
     height: 60,
+
     borderRadius: 30,
-    marginRight: 16,
   },
   userInfo: {
     flex: 1,
@@ -138,8 +137,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   iconContainer: {
-    flex: 0.2,
     alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f1f1f1",
+    marginRight: 10,
+    borderRadius: 30,
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 1,
   },
   textContainer: {
     flex: 0.6,
