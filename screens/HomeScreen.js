@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   RefreshControl,
   FlatList,
@@ -15,6 +14,7 @@ import { useAuth } from "../api/authContext";
 import { getUserData } from "../api/authApi";
 import EventItem from "../components/EventItem";
 import TaskItem from "../components/TaskItem";
+import Card from "../components/Card";
 import { createTask, deleteTask, getTasks, updateTask } from "../api/taskApi";
 import { useFocusEffect } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
@@ -66,18 +66,12 @@ const HomeScreen = () => {
   };
 
   const todayEvents = events.filter((event) => {
-    // Convert event.date to the format "YYYY-MM-DD"
-    const dateParts = event.date.split(", "); // Split the date string
-    const monthName = dateParts[1].split(" ")[0]; // Get the month name
-    const day = dateParts[1].split(" ")[1]; // Get the day
-    const year = dateParts[2]; // Get the year
-
-    // Convert the month name to its corresponding number
+    const dateParts = event.date.split(", ");
+    const monthName = dateParts[1].split(" ")[0];
+    const day = dateParts[1].split(" ")[1];
+    const year = dateParts[2];
     const monthNumber = monthNamesToNumber[monthName];
-
-    // Format the date as "YYYY-MM-DD"
     const formattedDate = new Date(`${year}-${monthNumber}-${day}`);
-
     const today = new Date();
     return (
       formattedDate.getDate() === today.getDate() &&
@@ -95,10 +89,6 @@ const HomeScreen = () => {
       taskDueDate.getFullYear() === today.getFullYear()
     );
   });
-  const handleCancelAddTask = () => {
-    setShowTaskForm(false);
-    setShowAddTaskButton(true);
-  };
 
   const handleCompleteTask = async (taskId) => {
     try {
@@ -149,15 +139,11 @@ const HomeScreen = () => {
 
   const navigateToTaskDescription = (taskId) => {
     const task = tasks.find((task) => task.id === taskId);
-    const formattedDueDate = task
-      ? new Date(task.due_date).toLocaleDateString()
+    const formattedDueDate = task.due_date
+      ? new Date(task.due_date).toISOString()
       : "";
-    const formattedDueTime = task
-      ? new Date(`1970-01-01T${task.due_time}Z`).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      : "";
+
+    const formattedDueTime = task.due_time ? parseTime(task.due_time) : "";
 
     navigate("TaskDetailScreen", {
       taskId,
@@ -175,99 +161,119 @@ const HomeScreen = () => {
     }, [])
   );
 
+  const parseTime = (timeStr) => {
+    const [hours, minutes, seconds] = timeStr.split(":").map(Number);
+    const dateObj = new Date();
+    dateObj.setHours(hours);
+    dateObj.setMinutes(minutes);
+    dateObj.setSeconds(seconds);
+    return dateObj.toISOString();
+  };
+
   return (
-    <ScrollView
-      contentContainerStyle={[
-        styles.scrollViewContent,
-        events.length === 0 && styles.centeredContent,
+    <FlatList
+      contentContainerStyle={styles.container}
+      data={[
+        { key: "events" },
+        ...todayEvents,
+        { key: "tasks" },
+        ...todayTasks,
       ]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
-    >
-      <View style={styles.container}>
-        <Text style={styles.headerText}>
-          {userData ? `Hi ${userData.user_data.first_name},` : "Hello,"}
-        </Text>
-        <Text style={styles.subHeaderText}>
-          You have {todayEvents.length}{" "}
-          {todayEvents.length === 1 ? "event" : "events"} today.
-        </Text>
+      renderItem={({ item }) => {
+        if (item.key === "events") {
+          return (
+            <>
+              <Text style={styles.headerText}>
+                {userData ? `Hi ${userData.user_data.first_name},` : "Hello,"}
+              </Text>
+              <Card style={styles.eventCard}>
+                <Text style={styles.subHeaderText}>
+                  You have {todayEvents.length}{" "}
+                  {todayEvents.length === 1 ? "event" : "events"} today.
+                </Text>
 
-        <View style={styles.eventsPage}>
-          {todayEvents.map((eventGroup, idx) => (
-            <View key={idx} style={styles.eventGroup}>
-              {eventGroup.data.map((event, idx) => (
-                <EventItem
-                  key={idx}
-                  title={event.title}
-                  time={event.time}
-                  type={event.type}
-                  location={event.location}
-                  color={event.color}
-                />
-              ))}
-            </View>
-          ))}
-        </View>
-
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionHeader}>Things to do</Text>
-          <Text style={styles.subHeaderText}>
-            You have {todayTasks.length}{" "}
-            {todayTasks.length === 1 ? "task" : "tasks"} due today.
-          </Text>
-          <FlatList
-            data={todayTasks}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => navigateToTaskDescription(item.id)}
-              >
-                <View style={styles.taskItem}>
-                  <TouchableOpacity
-                    onPress={() =>
-                      !item.completed
-                        ? handleCompleteTask(item.id)
-                        : handleIncompleteTask(item.id)
-                    }
-                    style={styles.completeButton}
-                  >
-                    <View style={styles.completeButtonInner}>
-                      {item.completed && (
-                        <View style={styles.completeIndicator} />
-                      )}
-                    </View>
-                  </TouchableOpacity>
-
-                  <View style={styles.taskTextContainer}>
-                    <Text
-                      style={[
-                        styles.taskTitle,
-                        item.completed && styles.completedTaskTitle,
-                      ]}
-                    >
-                      {item.title}
-                    </Text>
+                {todayEvents.map((eventGroup, idx) => (
+                  <View key={idx} style={styles.eventGroup}>
+                    {eventGroup.data.map((event, idx) => (
+                      <EventItem
+                        key={idx}
+                        title={event.title}
+                        time={event.time}
+                        type={event.type}
+                        location={event.location}
+                        color={event.color}
+                      />
+                    ))}
                   </View>
+                ))}
+              </Card>
+            </>
+          );
+        } else if (item.key === "tasks") {
+          return (
+            <>
+              <Text style={styles.sectionHeader}>Things to do</Text>
 
-                  <TouchableOpacity
-                    onPress={() => confirmDeleteTask(item.id)}
-                    style={styles.deleteButton}
-                  >
-                    <Ionicons
-                      name="close-circle-outline"
-                      size={25}
-                      color="red"
-                    />
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-      </View>
-    </ScrollView>
+              <Card style={styles.taskCard}>
+                <Text style={styles.subHeaderText}>
+                  You have {todayTasks.length}{" "}
+                  {todayTasks.length === 1 ? "task" : "tasks"} due today.
+                </Text>
+                <FlatList
+                  data={todayTasks}
+                  keyExtractor={(item) => item.id.toString()}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      onPress={() => navigateToTaskDescription(item.id)}
+                    >
+                      <View style={styles.taskItem}>
+                        <TouchableOpacity
+                          onPress={() =>
+                            !item.completed
+                              ? handleCompleteTask(item.id)
+                              : handleIncompleteTask(item.id)
+                          }
+                          style={styles.completeButton}
+                        >
+                          <View style={styles.completeButtonInner}>
+                            {item.completed && (
+                              <View style={styles.completeIndicator} />
+                            )}
+                          </View>
+                        </TouchableOpacity>
+                        <View style={styles.taskTextContainer}>
+                          <Text
+                            style={[
+                              styles.taskTitle,
+                              item.completed && styles.completedTaskTitle,
+                            ]}
+                          >
+                            {item.title}
+                          </Text>
+                        </View>
+                        <TouchableOpacity
+                          onPress={() => confirmDeleteTask(item.id)}
+                          style={styles.deleteButton}
+                        >
+                          <Ionicons
+                            name="close-circle-outline"
+                            size={25}
+                            color="red"
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                />
+              </Card>
+            </>
+          );
+        }
+      }}
+    />
   );
 };
 
@@ -286,23 +292,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20,
   },
-  sectionContainer: {
-    marginBottom: 20,
+  eventCard: {
+    marginBottom: 15,
   },
-  sectionHeader: {
-    fontSize: 18,
-    fontWeight: "bold",
+  taskCard: {
     marginBottom: 10,
-    marginTop: 20,
   },
-  container: {
-    flex: 1,
-    padding: 10,
-  },
-  sortButton: {
-    marginVertical: 5,
-    padding: 10,
-    backgroundColor: "lightgray",
+  eventGroup: {
+    marginBottom: 10,
   },
   taskItem: {
     flexDirection: "row",
@@ -326,7 +323,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "black", // Add this line to give the dot a color
+    backgroundColor: "black",
   },
   taskTextContainer: {
     flex: 8,
@@ -342,6 +339,12 @@ const styles = StyleSheet.create({
   deleteButton: {
     flex: 1,
     alignItems: "center",
+  },
+  sectionHeader: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    marginTop: 20,
   },
 });
 
