@@ -130,6 +130,12 @@ class UpdateUserDataView(generics.UpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class UpdateDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = GetUserDataSerializer
+    permission_classes = [IsAuthenticated]
+
+
 @api_view(["PATCH"])
 @permission_classes([IsAuthenticated])
 def update_password(request):

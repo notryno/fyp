@@ -9,4 +9,5 @@ urlpatterns = [
         views.GradeRetrieveUpdateDestroyAPIView.as_view(),
         name="grade-detail",
     ),
+    path("grade/", views.CurrentUserGradeListView.as_view(), name="grade"),
 ]

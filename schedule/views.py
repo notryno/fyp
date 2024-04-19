@@ -81,7 +81,9 @@ class SpecialScheduleListView(generics.ListCreateAPIView):
 def create_schedule(request):
     if request.method == "POST":
         data = JSONParser().parse(request)
+        print("Data:", data)
         serializer = ScheduleSerializer(data=data)
+        print("Serializer:", serializer)
         if serializer.is_valid():
             serializer.save()
             print("Schedule created")

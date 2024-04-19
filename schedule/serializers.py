@@ -1,12 +1,14 @@
 from rest_framework import serializers
 
 from classroom.serializers import ClassroomSerializer
+from courses.serializers import CourseSerializer
 
 from .models import Schedule, SpecialSchedule
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
     classroom = ClassroomSerializer
+    course = CourseSerializer
     title = serializers.SerializerMethodField()
 
     class Meta:
@@ -25,6 +27,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
             "frequency_per_week",
             "day_of_week",
             "color",
+            "course",
         )
 
     def get_title(self, obj):

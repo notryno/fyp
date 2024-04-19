@@ -10,6 +10,7 @@ from .views import (
     GetUserDataView,
     LoginView,
     RegisterView,
+    UpdateDetailView,
     UpdateUserDataView,
     reset_password,
     update_password,
@@ -27,4 +28,9 @@ urlpatterns = [
     path("verify_otp/", verify_otp, name="verify_otp"),
     path("resend_otp/", resend_otp, name="resend_otp"),
     path("reset_password/", reset_password, name="reset_password"),
+    path(
+        "user/<int:pk>/",
+        UpdateDetailView.as_view(),
+        name="update_user_data_by_id",
+    ),
 ]

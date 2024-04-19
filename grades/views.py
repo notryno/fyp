@@ -24,3 +24,11 @@ class GradeRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_update(self, serializer):
         serializer.save()
+
+
+class CurrentUserGradeListView(generics.ListAPIView):
+    serializer_class = GradeSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Grade.objects.filter(student=user)
