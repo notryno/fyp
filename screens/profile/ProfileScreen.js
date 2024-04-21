@@ -13,12 +13,45 @@ import {
 import { useAuth } from "../../api/authContext";
 import { BASE_URL, getUserData } from "../../api/authApi";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+// import { generatePDF } from "../../utility/generatePDF";
+// import RNHTMLtoPDF from "react-native-html-to-pdf";
+import { printToFileAsync } from "expo-print";
+import { shareAsync } from "expo-sharing";
 
 const ProfileScreen = () => {
   const { signOut, userProfile, userToken } = useAuth();
   const navigation = useNavigation();
   const [userData, setUserData] = useState(null);
   const [isPressedLastName, setIsPressedLastName] = useState(false);
+
+  // const createPdf = async () => {
+  //   let options = {
+  //     html: "<h1>PDF TEST</h1>",
+  //     fileName: "test",
+  //     directory: "Documents",
+  //   };
+
+  //   let file = await RNHTMLtoPDF.convert(options);
+  //   // console.log(file.filePath);
+  //   alert(file.filePath);
+  // };
+
+  const html = `
+    <html>
+      <body>
+        <h1>PDF TEST</h1>
+      </body>
+    </html>
+  `;
+
+  let generatePDF = async () => {
+    const file = await printToFileAsync({
+      html: html,
+      base64: false,
+    });
+
+    await shareAsync(file.uri);
+  };
 
   useEffect(() => {
     fetchData();
@@ -221,6 +254,7 @@ const ProfileScreen = () => {
       >
         <Text style={{ fontSize: 16, color: "red" }}>Log out</Text>
       </TouchableOpacity>
+      <Button title="Generate PDF" onPress={generatePDF} />
     </View>
   );
 };
