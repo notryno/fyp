@@ -14,12 +14,99 @@ import EventItem from "../../components/EventItem";
 import TaskItem from "../../components/TaskItem";
 import { getTasks } from "../../api/taskApi";
 import { useFocusEffect } from "@react-navigation/native";
+import { Button } from "react-native-paper";
+import { printToFileAsync } from "expo-print";
+import { shareAsync } from "expo-sharing";
+import { Ionicons } from "@expo/vector-icons";
 
 const EventsPage = () => {
   const [events, setEvents] = useState([]);
   const { userToken } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+
+  const generateEventsHTML = () => {
+    return events
+      .map(
+        (eventGroup) => `
+      <div>
+        <h2>${eventGroup.date}</h2>
+        <table border="1">
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Time</th>
+              <th>Class Type</th>
+              <th>Name</th>
+              <th>Location</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${eventGroup.data
+              .map(
+                (event) => `
+              <tr>
+                <td>${eventGroup.date}</td>
+                <td>${event.time}</td>
+                <td>${event.type}</td>
+                <td>${event.title}</td>
+                <td>${event.location}</td>
+              </tr>
+            `
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </div>
+    `
+      )
+      .join("");
+  };
+
+  const html = `
+    <html>
+      <head>
+        <style>
+          /* Add any custom styles here */
+          body {
+            font-family: Arial, sans-serif;
+          }
+          h2 {
+            color: #333;
+            margin-bottom: 10px;
+          }
+          ul {
+            list-style-type: none;
+            padding-left: 0;
+          }
+          li {
+            margin-bottom: 20px;
+          }
+          strong {
+            font-weight: bold;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>All Events</h1>
+        ${generateEventsHTML()}
+      </body>
+    </html>
+  `;
+
+  let generatePDF = async () => {
+    const file = await printToFileAsync({
+      html: html,
+      base64: false,
+    });
+
+    await shareAsync(file.uri, {
+      dialogTitle: "Save PDF As",
+      UTI: "com.adobe.pdf",
+      mimeType: "application/pdf",
+      filename: "YourFileName.pdf",
+    });
+  };
 
   const fetchData = async () => {
     try {
@@ -81,56 +168,67 @@ const EventsPage = () => {
   }));
 
   return (
-    <ScrollView
-      contentContainerStyle={[
-        styles.scrollViewContent,
-        events.length === 0 && styles.centeredContent,
-      ]}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View style={styles.eventsPage}>
-        {events.length === 0 ? (
-          <View style={styles.noScheduleContainer}>
-            <MaterialIcons name="event-busy" size={48} color="grey" />
-            <Text style={styles.noScheduleText}>No Schedule</Text>
+    <>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollViewContent,
+          events.length === 0 && styles.centeredContent,
+        ]}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <TouchableOpacity onPress={generatePDF} style={styles.button}>
+          <View style={styles.buttonContainer}>
+            <Ionicons
+              name="download-outline"
+              size={24}
+              color="black"
+            ></Ionicons>
           </View>
-        ) : (
-          mergedData.map((data, index) => (
-            <View key={index} style={styles.eventGroup}>
-              <Text style={styles.dateText}>{data.date}</Text>
-              {data.tasks
-                .filter((task) => !task.completed) // Filter out completed tasks
-                .map((task, idx) => (
-                  <TaskItem
+        </TouchableOpacity>
+        <View style={styles.eventsPage}>
+          {events.length === 0 ? (
+            <View style={styles.noScheduleContainer}>
+              <MaterialIcons name="event-busy" size={48} color="grey" />
+              <Text style={styles.noScheduleText}>No Schedule</Text>
+            </View>
+          ) : (
+            mergedData.map((data, index) => (
+              <View key={index} style={styles.eventGroup}>
+                <Text style={styles.dateText}>{data.date}</Text>
+                {data.tasks
+                  .filter((task) => !task.completed) // Filter out completed tasks
+                  .map((task, idx) => (
+                    <TaskItem
+                      key={idx}
+                      taskId={task.id}
+                      title={task.title}
+                      description={task.description}
+                      dueDate={task.due_date}
+                      dueTime={task.due_time}
+                      markCompleted={task.completed}
+                      completed={task.completed}
+                      origin={"calendar-list"}
+                    />
+                  ))}
+                {data.events.map((event, idx) => (
+                  <EventItem
                     key={idx}
-                    taskId={task.id}
-                    title={task.title}
-                    description={task.description}
-                    dueDate={task.due_date}
-                    dueTime={task.due_time}
-                    markCompleted={task.completed}
-                    completed={task.completed}
-                    origin={"calendar-list"}
+                    title={event.title}
+                    time={event.time}
+                    type={event.type}
+                    location={event.location}
+                    color={event.color}
+                    description={event.description}
                   />
                 ))}
-              {data.events.map((event, idx) => (
-                <EventItem
-                  key={idx}
-                  title={event.title}
-                  time={event.time}
-                  type={event.type}
-                  location={event.location}
-                  color={event.color}
-                  description={event.description}
-                />
-              ))}
-            </View>
-          ))
-        )}
-      </View>
-    </ScrollView>
+              </View>
+            ))
+          )}
+        </View>
+      </ScrollView>
+    </>
   );
 };
 
@@ -170,6 +268,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
     textAlign: "center",
   },
+  // button: {
+  //   position: "absolute",
+  //   top: 0,
+  //   right: 0,
+  // },
 });
 
 export default EventsPage;
