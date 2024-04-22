@@ -184,16 +184,34 @@ const HomeScreen = () => {
       }
       renderItem={({ item }) => {
         if (item.key === "events") {
+          // if (todayEvents.length === 0) {
+          //   return (
+          // <View style={styles.eventBusyContainer}>
+          //   <MaterialIcons name="event-busy" size={50} color="red" />
+          //   <Text style={styles.noEventsText}>No events for today</Text>
+          // </View>
+          //   );
+          // }
+
           return (
             <>
               <Text style={styles.headerText}>
                 {userData ? `Hi ${userData.user_data.first_name},` : "Hello,"}
               </Text>
               <Card style={styles.eventCard}>
-                <Text style={styles.subHeaderText}>
-                  You have {todayEvents.length}{" "}
-                  {todayEvents.length === 1 ? "event" : "events"} today.
-                </Text>
+                {todayEvents.length > 1 ? (
+                  <Text style={styles.subHeaderText}>
+                    You have {todayEvents.length}{" "}
+                    {todayEvents.length === 1 ? "event" : "events"} today.
+                  </Text>
+                ) : (
+                  <View style={styles.eventBusyContainer}>
+                    <MaterialIcons name="event-busy" size={50} color="grey" />
+                    <Text style={styles.noEventsText}>
+                      Nothing scheduled today
+                    </Text>
+                  </View>
+                )}
 
                 {todayEvents.map((eventGroup, idx) => (
                   <View key={idx} style={styles.eventGroup}>
@@ -218,10 +236,23 @@ const HomeScreen = () => {
               <Text style={styles.sectionHeader}>Things to do</Text>
 
               <Card style={styles.taskCard}>
-                <Text style={styles.subHeaderText}>
-                  You have {todayTasks.length}{" "}
-                  {todayTasks.length === 1 ? "task" : "tasks"} due today.
-                </Text>
+                {todayTasks.length > 1 ? (
+                  <Text style={styles.subHeaderText}>
+                    You have {todayTasks.length}{" "}
+                    {todayTasks.length === 1 ? "task" : "tasks"} due today.
+                  </Text>
+                ) : (
+                  <View style={styles.eventBusyContainer}>
+                    <MaterialIcons
+                      name="playlist-add-check"
+                      size={50}
+                      color="grey"
+                    />
+                    <Text style={styles.noEventsText}>
+                      All caught up for today!
+                    </Text>
+                  </View>
+                )}
                 <FlatList
                   data={todayTasks}
                   keyExtractor={(item) => item.id.toString()}
@@ -345,6 +376,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
     marginTop: 20,
+  },
+  eventBusyContainer: {
+    // flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  noEventsText: {
+    fontSize: 14,
+    marginTop: 8,
   },
 });
 

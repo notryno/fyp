@@ -36,23 +36,6 @@ const ProfileScreen = () => {
   //   alert(file.filePath);
   // };
 
-  const html = `
-    <html>
-      <body>
-        <h1>PDF TEST</h1>
-      </body>
-    </html>
-  `;
-
-  let generatePDF = async () => {
-    const file = await printToFileAsync({
-      html: html,
-      base64: false,
-    });
-
-    await shareAsync(file.uri);
-  };
-
   useEffect(() => {
     fetchData();
   }, [userToken]);
@@ -254,7 +237,6 @@ const ProfileScreen = () => {
       >
         <Text style={{ fontSize: 16, color: "red" }}>Log out</Text>
       </TouchableOpacity>
-      <Button title="Generate PDF" onPress={generatePDF} />
     </View>
   );
 };
