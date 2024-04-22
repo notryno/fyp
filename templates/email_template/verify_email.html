@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Verify Your Email with OTP</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .otp-code {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        color: #007bff;
+        margin-bottom: 20px;
+      }
+      .otp-digit {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #007bff;
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Verify Your Email with OTP</h1>
+      <p>Your OTP is:</p>
+      <div class="otp-code">
+        <div class="otp-digit">{{ digit1 }}</div>
+        <div class="otp-digit">{{ digit2 }}</div>
+        <div class="otp-digit">{{ digit3 }}</div>
+        <div class="otp-digit">{{ digit4 }}</div>
+        <div class="otp-digit">{{ digit5 }}</div>
+        <div class="otp-digit">{{ digit6 }}</div>
+      </div>
+    </div>
+  </body>
+</html>
