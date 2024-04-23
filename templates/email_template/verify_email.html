@@ -26,8 +26,9 @@
         margin-bottom: 20px;
       }
       .otp-digit {
-        width: 40px;
-        height: 40px;
+        width: 50px;
+        height: 50px;
+        padding: 5px;
         border-radius: 50%;
         background-color: #007bff;
         color: #fff;
@@ -41,6 +42,7 @@
   <body>
     <div class="container">
       <h1>Verify Your Email with OTP</h1>
+      <p>Greetings, {{user}}</p>
       <p>Your OTP is:</p>
       <div class="otp-code">
         <div class="otp-digit">{{ digit1 }}</div>
