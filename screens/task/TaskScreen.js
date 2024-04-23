@@ -24,6 +24,8 @@ import {
 } from "../../api/taskApi";
 import TaskForm from "./TaskForm";
 import Overlay from "../../components/Overlay";
+import { printToFileAsync } from "expo-print";
+import { shareAsync } from "expo-sharing";
 
 const sortOptions = [
   { label: "Sort by Title", value: "title" },
@@ -45,6 +47,7 @@ const TaskScreen = () => {
     try {
       const response = await getTasks(userToken);
       setTasks(response);
+      console.log("Tasks", response);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
@@ -203,6 +206,77 @@ const TaskScreen = () => {
     }
   });
 
+  let generatePDF = async () => {
+    const file = await printToFileAsync({
+      html: generateHTMLForTasksPDF(),
+      base64: false,
+    });
+
+    await shareAsync(file.uri, {
+      dialogTitle: "Save PDF As",
+      UTI: "com.adobe.pdf",
+      mimeType: "application/pdf",
+      filename: "YourFileName.pdf",
+    });
+  };
+
+  const generateHTMLForTasksPDF = () => {
+    const formattedTasks = tasks.map((task) => {
+      const formattedDueDate = new Date(task.due_date).toLocaleDateString(
+        undefined,
+        {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }
+      );
+      const status = task.completed ? "Completed" : "Incomplete";
+
+      return `
+        <div class="task-item">
+          <h2>${task.title}</h2>
+          <p><strong>Description:</strong> ${task.description}</p>
+          <p><strong>Due Date:</strong> ${formattedDueDate}</p>
+          <p><strong>Status:</strong> ${status}</p>
+        </div>
+      `;
+    });
+
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tasks PDF</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+          }
+          .task-item {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+          }
+          h2 {
+            margin-bottom: 5px;
+          }
+          p {
+            margin: 5px 0;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Tasks</h1>
+        ${formattedTasks.join("")}
+      </body>
+      </html>
+    `;
+
+    return html;
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <View
@@ -214,6 +288,15 @@ const TaskScreen = () => {
         }}
       >
         <Text style={{ fontSize: 34, fontWeight: "bold" }}>Tasks</Text>
+        <TouchableOpacity onPress={() => generatePDF()}>
+          <View>
+            <Ionicons
+              name="download-outline"
+              size={28}
+              color="black"
+            ></Ionicons>
+          </View>
+        </TouchableOpacity>
       </View>
       <View style={styles.container}>
         <Dropdown
