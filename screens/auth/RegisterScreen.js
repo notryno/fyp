@@ -89,8 +89,11 @@ const RegisterScreen = ({ navigation }) => {
       console.log("Registration successful:", result);
       navigation.navigate("OTPScreen", { email: email });
     } catch (error) {
-      setError("Registration failed. Please try again.");
-      console.log(error);
+      let errorMessage = "Registration failed. Please try again.";
+      if (error.email && Array.isArray(error.email) && error.email.length > 0) {
+        errorMessage = error.email[0];
+      }
+      setError(errorMessage);
       console.error("Registration failed:", error);
     } finally {
       setLoading(false);
