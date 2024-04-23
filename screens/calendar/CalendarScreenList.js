@@ -35,69 +35,66 @@ const EventsPage = ({ navigation, route }) => {
   }, [route.params?.exportPdf]);
 
   const generateEventsHTML = () => {
-    return events
-      .map(
-        (eventGroup) => `
+    return `
       <div>
-        <h2>${eventGroup.date}</h2>
-        <table border="1">
+        <table style="border-collapse: collapse; width: 100%;">
           <thead>
             <tr>
-              <th>Day</th>
-              <th>Time</th>
-              <th>Class Type</th>
-              <th>Name</th>
-              <th>Location</th>
+              <th style="border: 1px solid #ddd; padding: 8px;">Day</th>
+              <th style="border: 1px solid #ddd; padding: 8px;">Time</th>
+              <th style="border: 1px solid #ddd; padding: 8px;">Class Type</th>
+              <th style="border: 1px solid #ddd; padding: 8px;">Name</th>
+              <th style="border: 1px solid #ddd; padding: 8px;">Location</th>
             </tr>
           </thead>
           <tbody>
-            ${eventGroup.data
+            ${events
+              .flatMap((eventGroup) => eventGroup.data)
               .map(
                 (event) => `
-              <tr>
-                <td>${eventGroup.date}</td>
-                <td>${event.time}</td>
-                <td>${event.type}</td>
-                <td>${event.title}</td>
-                <td>${event.location}</td>
-              </tr>
-            `
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${event.date}</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${event.time}</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${event.type}</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${event.title}</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${event.location}</td>
+                </tr>
+              `
               )
               .join("")}
           </tbody>
         </table>
       </div>
-    `
-      )
-      .join("");
+    `;
   };
 
   const html = `
     <html>
       <head>
         <style>
-          /* Add any custom styles here */
           body {
             font-family: Arial, sans-serif;
           }
-          h2 {
+          h1, h2 {
             color: #333;
             margin-bottom: 10px;
           }
-          ul {
-            list-style-type: none;
-            padding-left: 0;
+          table {
+            width: 100%;
+            border-collapse: collapse;
           }
-          li {
-            margin-bottom: 20px;
+          th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
           }
-          strong {
+          th {
+            background-color: #f2f2f2;
             font-weight: bold;
           }
         </style>
       </head>
       <body>
-        <h1>All Events</h1>
+        <h1>Schedule</h1>
         ${generateEventsHTML()}
       </body>
     </html>
@@ -121,6 +118,7 @@ const EventsPage = ({ navigation, route }) => {
     try {
       const mergedEvents = await fetchEventsAndSpecialSchedules(userToken);
       setEvents(mergedEvents);
+      console.log("Events:", mergedEvents);
       const response = await getTasks(userToken);
       const formattedTasks = response.map((task) => ({
         ...task,
