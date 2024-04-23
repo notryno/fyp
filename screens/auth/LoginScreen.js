@@ -48,6 +48,8 @@ const LoginScreen = ({ navigation }) => {
         placeholder="Email"
         onChangeText={(text) => setEmail(text)}
         autoCapitalize="none"
+        keyboardType="email-address"
+        autoCorrect={false}
       />
       <TextInput
         style={styles.input}

@@ -129,6 +129,8 @@ const RegisterScreen = ({ navigation }) => {
         placeholder="Email"
         onChangeText={(text) => setEmail(text)}
         autoCapitalize="none"
+        keyboardType="email-address"
+        autoCorrect={false}
       />
       <TextInput
         style={styles.input}
