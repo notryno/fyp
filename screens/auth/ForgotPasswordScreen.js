@@ -55,6 +55,8 @@ const ForgotPasswordScreen = () => {
             placeholder="Enter Email"
             onChangeText={(text) => setEmail(text)}
             autoCapitalize="none"
+            keyboardType="email-address"
+            autoCorrect={false}
           />
           <TouchableOpacity
             style={styles.button}
