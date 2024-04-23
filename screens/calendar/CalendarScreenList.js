@@ -156,23 +156,58 @@ const EventsPage = ({ navigation, route }) => {
     }, [])
   );
 
+  console.log("Tasks:", tasks);
+
   // Merge events and tasks based on their dates
-  const mergedData = events.map((eventGroup) => ({
-    date: eventGroup.date,
-    events: eventGroup.data,
-    tasks: tasks
-      .filter((task) => task.due_date === eventGroup.date)
-      .sort((task1, task2) => {
-        // Sort by due_time, with null times (All Day tasks) on top
-        if (task1.due_time === null && task2.due_time !== null) return -1;
-        if (task1.due_time !== null && task2.due_time === null) return 1;
-        if (task1.due_time === null && task2.due_time === null) return 0;
-        // Convert due_time strings to Date objects for comparison
-        const time1 = new Date(`1970-01-01T${task1.due_time}Z`);
-        const time2 = new Date(`1970-01-01T${task2.due_time}Z`);
-        return time1 - time2;
-      }),
-  }));
+  const mergedData = events
+    .map((eventGroup) => ({
+      date: eventGroup.date,
+      events: eventGroup.data,
+      tasks: tasks
+        .filter((task) => task.due_date === eventGroup.date)
+        .sort((task1, task2) => {
+          // Sort by due_time, with null times (All Day tasks) on top
+          if (task1.due_time === null && task2.due_time !== null) return -1;
+          if (task1.due_time !== null && task2.due_time === null) return 1;
+          if (task1.due_time === null && task2.due_time === null) return 0;
+          // Convert due_time strings to Date objects for comparison
+          const time1 = new Date(`1970-01-01T${task1.due_time}Z`);
+          const time2 = new Date(`1970-01-01T${task2.due_time}Z`);
+          return time1 - time2;
+        }),
+    }))
+    .sort((group1, group2) => new Date(group2.date) - new Date(group1.date));
+
+  const monthMap = {
+    January: "1",
+    February: "2",
+    March: "3",
+    April: "4",
+    May: "5",
+    June: "6",
+    July: "7",
+    August: "8",
+    September: "9",
+    October: "10",
+    November: "11",
+    December: "12",
+  };
+
+  const dateFormat = (date) => {
+    const dateComponents = date.split(", ")[1].split(" ");
+    const month = monthMap[dateComponents[0]];
+    const day = dateComponents[1];
+    const year = date.split(", ")[2];
+    // const formattedDate = new Date(year, month, day).toISOString().slice(0, 10);
+    const formattedDate = `${year}-${month}-${day}`;
+    return formattedDate;
+  };
+
+  mergedData.sort((a, b) => {
+    const dateA = new Date(dateFormat(a.date));
+    const dateB = new Date(dateFormat(b.date));
+    return dateB - dateA; // Compare dates in descending order
+  });
 
   return (
     <>

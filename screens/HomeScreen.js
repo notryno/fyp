@@ -211,7 +211,7 @@ const HomeScreen = () => {
                   {userData ? `Hi ${userData.user_data.first_name},` : "Hello,"}
                 </Text>
                 <Card style={styles.eventCard}>
-                  {todayEvents.length > 1 ? (
+                  {todayEvents.length > 0 ? (
                     <Text style={styles.subHeaderText}>
                       You have {todayEvents.length}{" "}
                       {todayEvents.length === 1 ? "event" : "events"} today.
@@ -248,7 +248,7 @@ const HomeScreen = () => {
                 <Text style={styles.sectionHeader}>Things to do</Text>
 
                 <Card style={styles.taskCard}>
-                  {todayTasks.length > 1 ? (
+                  {todayTasks.length > 0 ? (
                     <Text style={styles.subHeaderText}>
                       You have {todayTasks.length}{" "}
                       {todayTasks.length === 1 ? "task" : "tasks"} due today.
