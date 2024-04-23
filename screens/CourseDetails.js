@@ -176,6 +176,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 1,
     backgroundColor: "#ffffff",
     paddingLeft: 12,
+    flex: 3,
   },
   scheduleItem: {
     marginVertical: 6,
