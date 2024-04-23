@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from classroom.models import Classroom
+from courses.models import Course
 
 
 class CustomUser(AbstractUser):
@@ -30,6 +31,7 @@ class CustomUser(AbstractUser):
     otp_secret = models.CharField(max_length=64, blank=True)
     otp_created_at = models.DateTimeField(null=True, blank=True)
     email_verified = models.BooleanField(default=False)
+    courses = models.ManyToManyField(Course, blank=True)
 
     def __str__(self) -> str:
         return self.email

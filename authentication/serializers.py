@@ -47,13 +47,14 @@ class GetUserDataSerializer(serializers.ModelSerializer):
             "classroom",
             "username",
             "email_verified",
+            "courses",
         ]
 
     def update(self, instance, validated_data):
         instance.email = validated_data.get("email", instance.email)
         instance.first_name = validated_data.get("first_name", instance.first_name)
         instance.last_name = validated_data.get("last_name", instance.last_name)
-        instance.classroom = validated_data.get("classroom", instance.last_name)
+        instance.classroom = validated_data.get("classroom", instance.classroom)
 
         # Update the profile picture only if provided
         profile_picture = validated_data.get("profile_picture")
@@ -68,3 +69,18 @@ class PartialUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ["first_name", "last_name", "profile_picture"]
+
+
+class TeacherSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = [
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "profile_picture",
+            "username",
+            "email_verified",
+            "courses",
+        ]

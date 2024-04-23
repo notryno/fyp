@@ -10,6 +10,7 @@ from .views import (
     GetUserDataView,
     LoginView,
     RegisterView,
+    TeacherDetailsViiew,
     UpdateDetailView,
     UpdateUserDataView,
     reset_password,
@@ -33,4 +34,5 @@ urlpatterns = [
         UpdateDetailView.as_view(),
         name="update_user_data_by_id",
     ),
+    path("teachers/<int:pk>/", TeacherDetailsViiew.as_view()),
 ]

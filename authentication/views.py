@@ -23,7 +23,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from utilities.email_otp import generate_and_send_otp
 
 from .models import CustomUser
-from .serializers import GetUserDataSerializer, PartialUserSerializer, UserSerializer
+from .serializers import (
+    GetUserDataSerializer,
+    PartialUserSerializer,
+    TeacherSerializer,
+    UserSerializer,
+)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -176,7 +181,7 @@ class GetTeachersDataView(APIView):
 
     def get(self, request):
         teachers = CustomUser.objects.filter(is_staff=True)
-        serializer = GetUserDataSerializer(teachers, many=True)
+        serializer = TeacherSerializer(teachers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -288,3 +293,20 @@ def generate_token(user):
 def validate_token(user, token):
     token_generator = PasswordResetTokenGenerator()
     return token_generator.check_token(user, token)
+
+
+class TeacherDetailsViiew(generics.RetrieveUpdateDestroyAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = TeacherSerializer
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        # Print the data being sent for patch
+        print("Data being sent for PATCH request:", serializer)
+
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
