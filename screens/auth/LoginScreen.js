@@ -6,6 +6,7 @@ import {
   Button,
   StyleSheet,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import { login } from "../../api/authApi";
 import { useAuth } from "../../api/authContext";
@@ -38,7 +39,12 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign In</Text>
+      <Image
+        source={require("../../assets/logo.png")}
+        style={styles.logo}
+        resizeMode="contain"
+      />
+      <Text style={styles.title}>Pandagenda</Text>
       <View style={{ height: 40 }}>
         {error && <Text style={styles.errorText}>{error}</Text>}
       </View>
@@ -89,9 +95,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#f4f4f4",
   },
+  logo: {
+    width: 180,
+    height: 180,
+  },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     marginBottom: 16,
+    marginTop: -20,
     color: "#333",
     fontWeight: "bold",
   },
