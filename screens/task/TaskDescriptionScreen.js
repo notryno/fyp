@@ -153,9 +153,12 @@ const TaskDescriptionScreen = ({ route, navigation }) => {
       </View>
       <View style={styles.infoContainer}>
         <View style={styles.descriptionContainer}>
-          <Text style={styles.label}>
-            <Ionicons name="reorder-three-outline" size={20} /> Description:
-          </Text>
+          <Ionicons
+            name="reorder-three-outline"
+            size={20}
+            style={styles.icon}
+          />
+          <Text style={styles.label}>Description:</Text>
           <TextInput
             style={styles.input}
             multiline
@@ -167,9 +170,8 @@ const TaskDescriptionScreen = ({ route, navigation }) => {
           />
         </View>
         <View style={styles.calendarContainer}>
-          <Text style={styles.infoText}>
-            <Ionicons name="calendar-outline" size={20} /> Due Date:
-          </Text>
+          <Ionicons name="calendar-outline" size={20} style={styles.icon} />
+          <Text style={styles.infoText}>Due Date:</Text>
           <DatePicker
             style={styles.datePicker}
             value={dueDate}
@@ -187,9 +189,8 @@ const TaskDescriptionScreen = ({ route, navigation }) => {
         </View>
 
         <View style={styles.calendarContainer}>
-          <Text style={[styles.infoText, { marginRight: 40 }]}>
-            <Ionicons name="time-outline" size={20} /> All Day:
-          </Text>
+          <Ionicons name="time-outline" size={20} style={styles.icon} />
+          <Text style={[styles.infoText, { marginRight: 40 }]}>All Day:</Text>
           <Switch
             style={styles.switch}
             value={allDay}
@@ -200,8 +201,9 @@ const TaskDescriptionScreen = ({ route, navigation }) => {
         <View style={styles.calendarContainer}>
           {!allDay && (
             <>
+              <Ionicons name="time-outline" size={20} style={styles.icon} />
               <Text style={[styles.infoText, { marginRight: 5 }]}>
-                <Ionicons name="time-outline" size={20} /> Due Time:
+                Due Time:
               </Text>
               <DatePicker
                 style={styles.datePicker}
@@ -250,14 +252,15 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   input: {
-    borderRadius: 5,
-    flex: 1,
     fontSize: 16,
   },
   label: {
     fontSize: 16,
     fontWeight: "bold",
     marginRight: 10,
+  },
+  icon: {
+    marginRight: 5,
   },
   infoContainer: {
     flex: 1,
