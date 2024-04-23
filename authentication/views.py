@@ -171,7 +171,7 @@ class GetStudentsDataView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request):
-        students = CustomUser.objects.filter(is_staff=False)
+        students = CustomUser.objects.filter(is_staff=False, is_superuser=False)
         serializer = GetUserDataSerializer(students, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
