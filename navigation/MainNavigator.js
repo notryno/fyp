@@ -18,7 +18,10 @@ import NotificationScreen from "../screens/NotificationScreen";
 import { SafeAreaView, Text, View, TouchableOpacity } from "react-native";
 import PersonalDetails from "../screens/profile/PersonalDetails";
 import TaskScreen from "../screens/task/TaskScreen";
-import { useNavigation } from "@react-navigation/native";
+import {
+  useNavigation,
+  getFocusedRouteNameFromRoute,
+} from "@react-navigation/native";
 import ChangeFirstName from "../screens/profile/ChangeFirstName";
 import ChangeLastName from "../screens/profile/ChangeLastName";
 import ChangePassword from "../screens/profile/ChangePassword";
@@ -71,8 +74,10 @@ const SearchStack = () => {
   );
 };
 
-const CalendarTopTab = () => {
-  const navigation = useNavigation();
+const CalendarTopTab = ({ navigation, route }) => {
+  // const navigation = useNavigation();
+  const currentScreen = getFocusedRouteNameFromRoute(route);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <View
@@ -80,9 +85,36 @@ const CalendarTopTab = () => {
           flexDirection: "row",
           justifyContent: "space-between",
           padding: 16,
+          alignItems: "center",
         }}
       >
         <Text style={{ fontSize: 34, fontWeight: "bold" }}>Calendar</Text>
+        {currentScreen === "List" && (
+          <TouchableOpacity
+            onPress={() => navigation.navigate("List", { exportPdf: true })}
+          >
+            <View>
+              <Ionicons
+                name="download-outline"
+                size={28}
+                color="black"
+              ></Ionicons>
+            </View>
+          </TouchableOpacity>
+        )}
+        {currentScreen === "Calendar" && (
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Calendar", { exportPdf: true })}
+          >
+            <View>
+              <Ionicons
+                name="download-outline"
+                size={28}
+                color="black"
+              ></Ionicons>
+            </View>
+          </TouchableOpacity>
+        )}
       </View>
       <TopTab.Navigator>
         <TopTab.Screen

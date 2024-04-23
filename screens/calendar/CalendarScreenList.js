@@ -13,17 +13,26 @@ import { useAuth } from "../../api/authContext";
 import EventItem from "../../components/EventItem";
 import TaskItem from "../../components/TaskItem";
 import { getTasks } from "../../api/taskApi";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { Button } from "react-native-paper";
 import { printToFileAsync } from "expo-print";
 import { shareAsync } from "expo-sharing";
 import { Ionicons } from "@expo/vector-icons";
 
-const EventsPage = () => {
+const EventsPage = ({ navigation, route }) => {
   const [events, setEvents] = useState([]);
   const { userToken } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    const exportPdf = route.params?.exportPdf;
+
+    if (exportPdf) {
+      generatePDF();
+      navigation.setParams({ exportPdf: false });
+    }
+  }, [route.params?.exportPdf]);
 
   const generateEventsHTML = () => {
     return events
@@ -178,15 +187,6 @@ const EventsPage = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <TouchableOpacity onPress={generatePDF} style={styles.button}>
-          <View style={styles.buttonContainer}>
-            <Ionicons
-              name="download-outline"
-              size={24}
-              color="black"
-            ></Ionicons>
-          </View>
-        </TouchableOpacity>
         <View style={styles.eventsPage}>
           {events.length === 0 ? (
             <View style={styles.noScheduleContainer}>
