@@ -369,6 +369,18 @@ const TaskScreen = () => {
               ))}
             </View>
           ))}
+          {tasks.length === 0 && (
+            <View style={styles.noTasksContainer}>
+              <Ionicons name="checkmark-circle-outline" size={60} />
+              <Text style={[styles.noTasksText, { fontSize: 26 }]}>
+                All caught up!
+              </Text>
+              <Text style={styles.noTasksText}>
+                Use the <Ionicons name="add-circle" size={20} /> button to add
+                tasks!
+              </Text>
+            </View>
+          )}
         </ScrollView>
         {showAddTaskButton && (
           <TouchableOpacity
@@ -488,6 +500,18 @@ const styles = StyleSheet.create({
   dropdownText: {
     fontSize: 16,
     color: "black",
+  },
+  noTasksContainer: {
+    flex: 1,
+    marginTop: 180,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noTasksText: {
+    fontSize: 20,
+    marginTop: 10,
+    color: "gray",
+    alignItems: "center",
   },
 });
 
