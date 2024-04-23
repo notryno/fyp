@@ -7,6 +7,7 @@ import {
   RefreshControl,
   FlatList,
   Alert,
+  SafeAreaView,
 } from "react-native";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { fetchEventsAndSpecialSchedules } from "../api/scheduleApi";
@@ -171,140 +172,152 @@ const HomeScreen = () => {
   };
 
   return (
-    <FlatList
-      contentContainerStyle={styles.container}
-      data={[
-        { key: "events" },
-        ...todayEvents,
-        { key: "tasks" },
-        ...todayTasks,
-      ]}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-      renderItem={({ item }) => {
-        if (item.key === "events") {
-          // if (todayEvents.length === 0) {
-          //   return (
-          // <View style={styles.eventBusyContainer}>
-          //   <MaterialIcons name="event-busy" size={50} color="red" />
-          //   <Text style={styles.noEventsText}>No events for today</Text>
-          // </View>
-          //   );
-          // }
-
-          return (
-            <>
-              <Text style={styles.headerText}>
-                {userData ? `Hi ${userData.user_data.first_name},` : "Hello,"}
-              </Text>
-              <Card style={styles.eventCard}>
-                {todayEvents.length > 1 ? (
-                  <Text style={styles.subHeaderText}>
-                    You have {todayEvents.length}{" "}
-                    {todayEvents.length === 1 ? "event" : "events"} today.
-                  </Text>
-                ) : (
-                  <View style={styles.eventBusyContainer}>
-                    <MaterialIcons name="event-busy" size={50} color="grey" />
-                    <Text style={styles.noEventsText}>
-                      Nothing scheduled today
-                    </Text>
-                  </View>
-                )}
-
-                {todayEvents.map((eventGroup, idx) => (
-                  <View key={idx} style={styles.eventGroup}>
-                    {eventGroup.data.map((event, idx) => (
-                      <EventItem
-                        key={idx}
-                        title={event.title}
-                        time={event.time}
-                        type={event.type}
-                        location={event.location}
-                        color={event.color}
-                      />
-                    ))}
-                  </View>
-                ))}
-              </Card>
-            </>
-          );
-        } else if (item.key === "tasks") {
-          return (
-            <>
-              <Text style={styles.sectionHeader}>Things to do</Text>
-
-              <Card style={styles.taskCard}>
-                {todayTasks.length > 1 ? (
-                  <Text style={styles.subHeaderText}>
-                    You have {todayTasks.length}{" "}
-                    {todayTasks.length === 1 ? "task" : "tasks"} due today.
-                  </Text>
-                ) : (
-                  <View style={styles.eventBusyContainer}>
-                    <MaterialIcons
-                      name="playlist-add-check"
-                      size={50}
-                      color="grey"
-                    />
-                    <Text style={styles.noEventsText}>
-                      All caught up for today!
-                    </Text>
-                  </View>
-                )}
-                <FlatList
-                  data={todayTasks}
-                  keyExtractor={(item) => item.id.toString()}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      onPress={() => navigateToTaskDescription(item.id)}
-                    >
-                      <View style={styles.taskItem}>
-                        <TouchableOpacity
-                          onPress={() =>
-                            !item.completed
-                              ? handleCompleteTask(item.id)
-                              : handleIncompleteTask(item.id)
-                          }
-                          style={styles.completeButton}
-                        >
-                          <View style={styles.completeButtonInner}>
-                            {item.completed && (
-                              <View style={styles.completeIndicator} />
-                            )}
-                          </View>
-                        </TouchableOpacity>
-                        <View style={styles.taskTextContainer}>
-                          <Text
-                            style={[
-                              styles.taskTitle,
-                              item.completed && styles.completedTaskTitle,
-                            ]}
-                          >
-                            {item.title}
-                          </Text>
-                        </View>
-                        <TouchableOpacity
-                          onPress={() => confirmDeleteTask(item.id)}
-                          style={styles.deleteButton}
-                        >
-                          <Ionicons
-                            name="close-circle-outline"
-                            size={25}
-                            color="red"
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    </TouchableOpacity>
-                  )}
-                />
-              </Card>
-            </>
-          );
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          padding: 20,
+          backgroundColor: "white",
+        }}
+      >
+        <Text style={{ fontSize: 34, fontWeight: "bold" }}>Home</Text>
+      </View>
+      <FlatList
+        contentContainerStyle={styles.container}
+        data={[
+          { key: "events" },
+          ...todayEvents,
+          { key: "tasks" },
+          ...todayTasks,
+        ]}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-      }}
-    />
+        renderItem={({ item }) => {
+          if (item.key === "events") {
+            // if (todayEvents.length === 0) {
+            //   return (
+            // <View style={styles.eventBusyContainer}>
+            //   <MaterialIcons name="event-busy" size={50} color="red" />
+            //   <Text style={styles.noEventsText}>No events for today</Text>
+            // </View>
+            //   );
+            // }
+
+            return (
+              <>
+                <Text style={styles.headerText}>
+                  {userData ? `Hi ${userData.user_data.first_name},` : "Hello,"}
+                </Text>
+                <Card style={styles.eventCard}>
+                  {todayEvents.length > 1 ? (
+                    <Text style={styles.subHeaderText}>
+                      You have {todayEvents.length}{" "}
+                      {todayEvents.length === 1 ? "event" : "events"} today.
+                    </Text>
+                  ) : (
+                    <View style={styles.eventBusyContainer}>
+                      <MaterialIcons name="event-busy" size={50} color="grey" />
+                      <Text style={styles.noEventsText}>
+                        Nothing scheduled today
+                      </Text>
+                    </View>
+                  )}
+
+                  {todayEvents.map((eventGroup, idx) => (
+                    <View key={idx} style={styles.eventGroup}>
+                      {eventGroup.data.map((event, idx) => (
+                        <EventItem
+                          key={idx}
+                          title={event.title}
+                          time={event.time}
+                          type={event.type}
+                          location={event.location}
+                          color={event.color}
+                        />
+                      ))}
+                    </View>
+                  ))}
+                </Card>
+              </>
+            );
+          } else if (item.key === "tasks") {
+            return (
+              <>
+                <Text style={styles.sectionHeader}>Things to do</Text>
+
+                <Card style={styles.taskCard}>
+                  {todayTasks.length > 1 ? (
+                    <Text style={styles.subHeaderText}>
+                      You have {todayTasks.length}{" "}
+                      {todayTasks.length === 1 ? "task" : "tasks"} due today.
+                    </Text>
+                  ) : (
+                    <View style={styles.eventBusyContainer}>
+                      <MaterialIcons
+                        name="playlist-add-check"
+                        size={50}
+                        color="grey"
+                      />
+                      <Text style={styles.noEventsText}>
+                        All caught up for today!
+                      </Text>
+                    </View>
+                  )}
+                  <FlatList
+                    data={todayTasks}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        onPress={() => navigateToTaskDescription(item.id)}
+                      >
+                        <View style={styles.taskItem}>
+                          <TouchableOpacity
+                            onPress={() =>
+                              !item.completed
+                                ? handleCompleteTask(item.id)
+                                : handleIncompleteTask(item.id)
+                            }
+                            style={styles.completeButton}
+                          >
+                            <View style={styles.completeButtonInner}>
+                              {item.completed && (
+                                <View style={styles.completeIndicator} />
+                              )}
+                            </View>
+                          </TouchableOpacity>
+                          <View style={styles.taskTextContainer}>
+                            <Text
+                              style={[
+                                styles.taskTitle,
+                                item.completed && styles.completedTaskTitle,
+                              ]}
+                            >
+                              {item.title}
+                            </Text>
+                          </View>
+                          <TouchableOpacity
+                            onPress={() => confirmDeleteTask(item.id)}
+                            style={styles.deleteButton}
+                          >
+                            <Ionicons
+                              name="close-circle-outline"
+                              size={25}
+                              color="red"
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                  />
+                </Card>
+              </>
+            );
+          }
+        }}
+      />
+    </SafeAreaView>
   );
 };
 
@@ -313,6 +326,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 40,
+    backgroundColor: "#f2f2f2",
   },
   headerText: {
     fontSize: 24,

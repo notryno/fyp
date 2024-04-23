@@ -8,6 +8,7 @@ import {
   Button,
   StyleSheet,
   ScrollView,
+  SafeAreaView,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
@@ -203,106 +204,118 @@ const TaskScreen = () => {
   });
 
   return (
-    <View style={styles.container}>
-      <Dropdown
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+      <View
         style={{
-          borderWidth: 1,
-          padding: 5,
-          paddingHorizontal: 10,
-          borderRadius: 5,
-          marginBottom: 10,
+          flexDirection: "row",
+          justifyContent: "space-between",
+          padding: 20,
+          backgroundColor: "white",
         }}
-        data={sortOptions}
-        labelField="label"
-        valueField="value"
-        value={sortBy}
-        onFocus={() => setIsFocus(true)}
-        onChange={(item) => {
-          handleSort(item.value);
-          setIsFocus(false);
-        }}
-      />
-
-      <ScrollView style={styles.taskList}>
-        {sortedDates.map((date) => (
-          <View key={date} style={styles.taskGroup}>
-            <Text style={styles.groupHeader}>{date}</Text>
-            {groupedTasks[date].map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                onPress={() => navigateToTaskDescription(item.id)}
-              >
-                <View style={styles.taskItem}>
-                  <TouchableOpacity
-                    onPress={() =>
-                      !item.completed
-                        ? handleCompleteTask(item.id)
-                        : handleIncompleteTask(item.id)
-                    }
-                    style={styles.completeButton}
-                  >
-                    <View style={styles.completeButtonInner}>
-                      {item.completed && (
-                        <View style={styles.completeIndicator} />
-                      )}
-                    </View>
-                  </TouchableOpacity>
-
-                  <View style={styles.taskTextContainer}>
-                    <Text
-                      style={[
-                        styles.taskTitle,
-                        item.completed && styles.completedTaskTitle,
-                      ]}
-                    >
-                      {item.title}
-                    </Text>
-                  </View>
-
-                  <TouchableOpacity
-                    onPress={() => confirmDeleteTask(item.id)}
-                    style={styles.deleteButton}
-                  >
-                    <Ionicons
-                      name="close-circle-outline"
-                      size={25}
-                      color="red"
-                    />
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        ))}
-      </ScrollView>
-      {showAddTaskButton && (
-        <TouchableOpacity
-          style={styles.addButtonContainer}
-          onPress={() => {
-            setShowTaskForm(true);
-            setShowAddTaskButton(false);
+      >
+        <Text style={{ fontSize: 34, fontWeight: "bold" }}>Tasks</Text>
+      </View>
+      <View style={styles.container}>
+        <Dropdown
+          style={{
+            borderWidth: 1,
+            padding: 5,
+            paddingHorizontal: 10,
+            borderRadius: 5,
+            marginBottom: 10,
           }}
-        >
-          <Text
-            style={{
-              fontSize: 25,
-              fontWeight: "bold",
-              color: "white",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
+          data={sortOptions}
+          labelField="label"
+          valueField="value"
+          value={sortBy}
+          onFocus={() => setIsFocus(true)}
+          onChange={(item) => {
+            handleSort(item.value);
+            setIsFocus(false);
+          }}
+        />
+
+        <ScrollView style={styles.taskList}>
+          {sortedDates.map((date) => (
+            <View key={date} style={styles.taskGroup}>
+              <Text style={styles.groupHeader}>{date}</Text>
+              {groupedTasks[date].map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  onPress={() => navigateToTaskDescription(item.id)}
+                >
+                  <View style={styles.taskItem}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        !item.completed
+                          ? handleCompleteTask(item.id)
+                          : handleIncompleteTask(item.id)
+                      }
+                      style={styles.completeButton}
+                    >
+                      <View style={styles.completeButtonInner}>
+                        {item.completed && (
+                          <View style={styles.completeIndicator} />
+                        )}
+                      </View>
+                    </TouchableOpacity>
+
+                    <View style={styles.taskTextContainer}>
+                      <Text
+                        style={[
+                          styles.taskTitle,
+                          item.completed && styles.completedTaskTitle,
+                        ]}
+                      >
+                        {item.title}
+                      </Text>
+                    </View>
+
+                    <TouchableOpacity
+                      onPress={() => confirmDeleteTask(item.id)}
+                      style={styles.deleteButton}
+                    >
+                      <Ionicons
+                        name="close-circle-outline"
+                        size={25}
+                        color="red"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ))}
+        </ScrollView>
+        {showAddTaskButton && (
+          <TouchableOpacity
+            style={styles.addButtonContainer}
+            onPress={() => {
+              setShowTaskForm(true);
+              setShowAddTaskButton(false);
             }}
           >
-            +
-          </Text>
-        </TouchableOpacity>
-      )}
-      <Overlay visible={showTaskForm} zIndex={2}>
-        <TaskForm onSubmit={handleAddTask} onCancel={handleCancelAddTask} />
-      </Overlay>
-    </View>
+            <Text
+              style={{
+                fontSize: 25,
+                fontWeight: "bold",
+                color: "white",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+              }}
+            >
+              +
+            </Text>
+          </TouchableOpacity>
+        )}
+        <Overlay visible={showTaskForm} zIndex={2}>
+          <TaskForm onSubmit={handleAddTask} onCancel={handleCancelAddTask} />
+        </Overlay>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -310,6 +323,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: "#f2f2f2",
   },
   taskGroup: {
     marginBottom: 20,

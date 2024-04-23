@@ -9,6 +9,7 @@ import {
   Button,
   Image,
   TouchableOpacity,
+  SafeAreaView,
 } from "react-native";
 import { useAuth } from "../../api/authContext";
 import { BASE_URL, getUserData } from "../../api/authApi";
@@ -62,182 +63,194 @@ const ProfileScreen = () => {
   const modifiedURL = BASE_URL.replace(/\/api\/$/, "");
 
   return (
-    <View style={styles.container}>
-      {userProfile ? (
-        <View style={styles.defaultProfileContainer}>
-          <Image
-            source={{ uri: modifiedURL + userProfile }}
-            style={styles.profileImage}
-          />
-        </View>
-      ) : (
-        <View style={styles.defaultProfileContainer}>
-          <Ionicons name="person-outline" size={50} color="gray" />
-        </View>
-      )}
-
-      <View style={styles.infoContainer}>
-        {userData && (
-          <>
-            <Text style={styles.emailText}>
-              {userData.email}{" "}
-              {userData.email_verified ? (
-                <Ionicons
-                  name="shield-checkmark-outline"
-                  size={20}
-                  color="green"
-                  style={{ marginLeft: 4 }}
-                />
-              ) : (
-                <Ionicons
-                  name="warning-outline"
-                  size={20}
-                  color="red"
-                  style={{ marginLeft: 4 }}
-                />
-              )}
-            </Text>
-            <Text style={styles.nameText}>
-              {userData.first_name} {userData.last_name}
-            </Text>
-          </>
-        )}
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          padding: 20,
+          backgroundColor: "white",
+        }}
+      >
+        <Text style={{ fontSize: 34, fontWeight: "bold" }}>Profile</Text>
       </View>
-
-      <View style={styles.line} />
-
-      <TouchableOpacity
-        style={[styles.button]}
-        onPress={() => navigation.navigate("PersonalDetails")}
-      >
-        <View style={styles.buttonContent}>
-          <View style={styles.iconContainer}>
-            <Ionicons
-              name="person-outline"
-              size={30}
-              color="white"
-              style={styles.icon}
+      <View style={styles.container}>
+        {userProfile ? (
+          <View style={styles.defaultProfileContainer}>
+            <Image
+              source={{ uri: modifiedURL + userProfile }}
+              style={styles.profileImage}
             />
           </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.buttonText}>Personal Details</Text>
+        ) : (
+          <View style={styles.defaultProfileContainer}>
+            <Ionicons name="person-outline" size={50} color="gray" />
           </View>
-          <View style={styles.rightIconContainer}>
-            <Ionicons
-              name="chevron-forward-outline"
-              size={30}
-              color="white"
-              style={styles.iconRight}
-            />
-          </View>
+        )}
+
+        <View style={styles.infoContainer}>
+          {userData && (
+            <>
+              <Text style={styles.emailText}>
+                {userData.email}{" "}
+                {userData.email_verified ? (
+                  <Ionicons
+                    name="shield-checkmark-outline"
+                    size={20}
+                    color="green"
+                    style={{ marginLeft: 4 }}
+                  />
+                ) : (
+                  <Ionicons
+                    name="warning-outline"
+                    size={20}
+                    color="red"
+                    style={{ marginLeft: 4 }}
+                  />
+                )}
+              </Text>
+              <Text style={styles.nameText}>
+                {userData.first_name} {userData.last_name}
+              </Text>
+            </>
+          )}
         </View>
-      </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Grades")}
-      >
-        <View style={styles.buttonContent}>
-          <View style={styles.iconContainer}>
-            <Ionicons
-              name="school-outline"
-              size={30}
-              color="white"
-              style={styles.icon}
-            />
-          </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.buttonText}>Grades</Text>
-          </View>
-          <View style={styles.rightIconContainer}>
-            <Ionicons
-              name="chevron-forward-outline"
-              size={30}
-              color="white"
-              style={styles.iconRight}
-            />
-          </View>
-        </View>
-      </TouchableOpacity>
+        <View style={styles.line} />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Classroom")}
-      >
-        <View style={styles.buttonContent}>
-          <View style={styles.iconContainer}>
-            <Ionicons
-              name="people-outline"
-              size={30}
-              color="white"
-              style={styles.icon}
-            />
+        <TouchableOpacity
+          style={[styles.button]}
+          onPress={() => navigation.navigate("PersonalDetails")}
+        >
+          <View style={styles.buttonContent}>
+            <View style={styles.iconContainer}>
+              <Ionicons
+                name="person-outline"
+                size={30}
+                color="white"
+                style={styles.icon}
+              />
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.buttonText}>Personal Details</Text>
+            </View>
+            <View style={styles.rightIconContainer}>
+              <Ionicons
+                name="chevron-forward-outline"
+                size={30}
+                color="white"
+                style={styles.iconRight}
+              />
+            </View>
           </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.buttonText}>Classroom</Text>
-          </View>
-          <View style={styles.rightIconContainer}>
-            <Ionicons
-              name="chevron-forward-outline"
-              size={30}
-              color="white"
-              style={styles.iconRight}
-            />
-          </View>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Courses")}
-      >
-        <View style={styles.buttonContent}>
-          <View style={styles.iconContainer}>
-            <Ionicons
-              name="book-outline"
-              size={30}
-              color="white"
-              style={styles.icon}
-            />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Grades")}
+        >
+          <View style={styles.buttonContent}>
+            <View style={styles.iconContainer}>
+              <Ionicons
+                name="school-outline"
+                size={30}
+                color="white"
+                style={styles.icon}
+              />
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.buttonText}>Grades</Text>
+            </View>
+            <View style={styles.rightIconContainer}>
+              <Ionicons
+                name="chevron-forward-outline"
+                size={30}
+                color="white"
+                style={styles.iconRight}
+              />
+            </View>
           </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.buttonText}>Courses</Text>
-          </View>
-          <View style={styles.rightIconContainer}>
-            <Ionicons
-              name="chevron-forward-outline"
-              size={30}
-              color="white"
-              style={styles.iconRight}
-            />
-          </View>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
 
-      <View style={styles.line} />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Classroom")}
+        >
+          <View style={styles.buttonContent}>
+            <View style={styles.iconContainer}>
+              <Ionicons
+                name="people-outline"
+                size={30}
+                color="white"
+                style={styles.icon}
+              />
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.buttonText}>Classroom</Text>
+            </View>
+            <View style={styles.rightIconContainer}>
+              <Ionicons
+                name="chevron-forward-outline"
+                size={30}
+                color="white"
+                style={styles.iconRight}
+              />
+            </View>
+          </View>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[
-          {
-            width: "100%",
-            padding: 15,
-            paddingLeft: 30,
-            marginTop: -10,
-          },
-          isPressedLastName && { backgroundColor: "#dcdcdc" },
-        ]}
-        onPressIn={() => {
-          setIsPressedLastName(true);
-        }}
-        onPressOut={() => {
-          setIsPressedLastName(false);
-        }}
-        onPress={() => handleLogout()}
-        activeOpacity={1}
-      >
-        <Text style={{ fontSize: 16, color: "red" }}>Log out</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Courses")}
+        >
+          <View style={styles.buttonContent}>
+            <View style={styles.iconContainer}>
+              <Ionicons
+                name="book-outline"
+                size={30}
+                color="white"
+                style={styles.icon}
+              />
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.buttonText}>Courses</Text>
+            </View>
+            <View style={styles.rightIconContainer}>
+              <Ionicons
+                name="chevron-forward-outline"
+                size={30}
+                color="white"
+                style={styles.iconRight}
+              />
+            </View>
+          </View>
+        </TouchableOpacity>
+
+        <View style={styles.line} />
+
+        <TouchableOpacity
+          style={[
+            {
+              width: "100%",
+              padding: 15,
+              paddingLeft: 30,
+              marginTop: -10,
+            },
+            isPressedLastName && { backgroundColor: "#dcdcdc" },
+          ]}
+          onPressIn={() => {
+            setIsPressedLastName(true);
+          }}
+          onPressOut={() => {
+            setIsPressedLastName(false);
+          }}
+          onPress={() => handleLogout()}
+          activeOpacity={1}
+        >
+          <Text style={{ fontSize: 16, color: "red" }}>Log out</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -245,6 +258,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: "#f2f2f2",
   },
   text: {
     fontSize: 24,

@@ -42,7 +42,11 @@ const HomeStack = () => {
   const navigation = useNavigation();
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="TaskDetailScreen"
         component={TaskDescriptionScreen}
@@ -78,7 +82,7 @@ const CalendarTopTab = () => {
           padding: 16,
         }}
       >
-        <Text style={{ fontSize: 20, fontWeight: "bold" }}>Calendar</Text>
+        <Text style={{ fontSize: 34, fontWeight: "bold" }}>Calendar</Text>
       </View>
       <TopTab.Navigator>
         <TopTab.Screen
@@ -128,7 +132,11 @@ const NotificationStack = () => {
   const navigation = useNavigation();
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Notification" component={NotificationScreen} />
+      <Stack.Screen
+        name="Notification"
+        component={NotificationScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };
@@ -137,7 +145,11 @@ const ProfileStack = () => {
   const navigation = useNavigation();
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="PersonalDetails"
         component={PersonalDetails}
@@ -338,7 +350,7 @@ const TaskStack = () => {
       <Stack.Screen
         name="TaskList"
         component={TaskScreen}
-        options={{ title: "Tasks" }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="TaskDetailScreen"
