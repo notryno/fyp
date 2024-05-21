@@ -93,7 +93,7 @@ const CalendarScreen = () => {
     });
 
     const filteredTasks = tasks
-      .filter((task) => task.due_date === selectedDate && !task.completed)
+      .filter((task) => task.due_date === selectedDate)
       .sort((task1, task2) => {
         // Sort logic remains the same
         // Sort by due_time, with null times (All Day tasks) on top

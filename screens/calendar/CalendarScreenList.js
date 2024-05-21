@@ -14,10 +14,8 @@ import EventItem from "../../components/EventItem";
 import TaskItem from "../../components/TaskItem";
 import { getTasks } from "../../api/taskApi";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
-import { Button } from "react-native-paper";
 import { printToFileAsync } from "expo-print";
 import { shareAsync } from "expo-sharing";
-import { Ionicons } from "@expo/vector-icons";
 
 const EventsPage = ({ navigation, route }) => {
   const [events, setEvents] = useState([]);
@@ -118,7 +116,6 @@ const EventsPage = ({ navigation, route }) => {
     try {
       const mergedEvents = await fetchEventsAndSpecialSchedules(userToken);
       setEvents(mergedEvents);
-      console.log("Events:", mergedEvents);
       const response = await getTasks(userToken);
       const formattedTasks = response.map((task) => ({
         ...task,
@@ -156,27 +153,49 @@ const EventsPage = ({ navigation, route }) => {
     }, [])
   );
 
-  console.log("Tasks:", tasks);
+  const dateFormat = (date) => {
+    const dateComponents = date.split(", ")[1].split(" ");
+    const month = monthMap[dateComponents[0]];
+    const day = dateComponents[1];
+    const year = date.split(", ")[2];
+    const formattedDate = `${year}-${month}-${day}`;
+    return formattedDate;
+  };
 
-  // Merge events and tasks based on their dates
-  const mergedData = events
-    .map((eventGroup) => ({
-      date: eventGroup.date,
-      events: eventGroup.data,
-      tasks: tasks
-        .filter((task) => task.due_date === eventGroup.date)
-        .sort((task1, task2) => {
-          // Sort by due_time, with null times (All Day tasks) on top
-          if (task1.due_time === null && task2.due_time !== null) return -1;
-          if (task1.due_time !== null && task2.due_time === null) return 1;
-          if (task1.due_time === null && task2.due_time === null) return 0;
-          // Convert due_time strings to Date objects for comparison
-          const time1 = new Date(`1970-01-01T${task1.due_time}Z`);
-          const time2 = new Date(`1970-01-01T${task2.due_time}Z`);
-          return time1 - time2;
-        }),
-    }))
-    .sort((group1, group2) => new Date(group2.date) - new Date(group1.date));
+  const mergedData = [];
+
+  // Map to track existing dates
+  const dateMap = new Map();
+
+  // Add events to mergedData
+  events.forEach((eventGroup) => {
+    const date = eventGroup.date;
+    if (!dateMap.has(date)) {
+      dateMap.set(date, {
+        date,
+        events: eventGroup.data,
+        tasks: [],
+      });
+    } else {
+      dateMap.get(date).events = eventGroup.data;
+    }
+  });
+
+  // Add tasks to mergedData
+  tasks.forEach((task) => {
+    const date = task.due_date;
+    if (!dateMap.has(date)) {
+      dateMap.set(date, {
+        date,
+        events: [],
+        tasks: [task],
+      });
+    } else {
+      dateMap.get(date).tasks.push(task);
+    }
+  });
+
+  dateMap.forEach((value) => mergedData.push(value));
 
   const monthMap = {
     January: "1",
@@ -191,16 +210,6 @@ const EventsPage = ({ navigation, route }) => {
     October: "10",
     November: "11",
     December: "12",
-  };
-
-  const dateFormat = (date) => {
-    const dateComponents = date.split(", ")[1].split(" ");
-    const month = monthMap[dateComponents[0]];
-    const day = dateComponents[1];
-    const year = date.split(", ")[2];
-    // const formattedDate = new Date(year, month, day).toISOString().slice(0, 10);
-    const formattedDate = `${year}-${month}-${day}`;
-    return formattedDate;
   };
 
   mergedData.sort((a, b) => {
@@ -230,21 +239,19 @@ const EventsPage = ({ navigation, route }) => {
             mergedData.map((data, index) => (
               <View key={index} style={styles.eventGroup}>
                 <Text style={styles.dateText}>{data.date}</Text>
-                {data.tasks
-                  .filter((task) => !task.completed) // Filter out completed tasks
-                  .map((task, idx) => (
-                    <TaskItem
-                      key={idx}
-                      taskId={task.id}
-                      title={task.title}
-                      description={task.description}
-                      dueDate={task.due_date}
-                      dueTime={task.due_time}
-                      markCompleted={task.completed}
-                      completed={task.completed}
-                      origin={"calendar-list"}
-                    />
-                  ))}
+                {data.tasks.map((task, idx) => (
+                  <TaskItem
+                    key={idx}
+                    taskId={task.id}
+                    title={task.title}
+                    description={task.description}
+                    dueDate={task.due_date}
+                    dueTime={task.due_time}
+                    markCompleted={task.completed}
+                    completed={task.completed}
+                    origin={"calendar-list"}
+                  />
+                ))}
                 {data.events.map((event, idx) => (
                   <EventItem
                     key={idx}
@@ -284,12 +291,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 18,
   },
-  taskDate: {
-    fontWeight: "bold",
-    fontSize: 18,
-    marginTop: 10,
-    marginBottom: 5,
-  },
   noScheduleContainer: {
     alignItems: "center",
     justifyContent: "center",
@@ -301,11 +302,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     textAlign: "center",
   },
-  // button: {
-  //   position: "absolute",
-  //   top: 0,
-  //   right: 0,
-  // },
 });
 
 export default EventsPage;

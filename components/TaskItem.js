@@ -16,17 +16,6 @@ const TaskItem = ({
   const navigation = useNavigation();
 
   const handlePress = () => {
-    // console.log("Task ID:", taskId);
-    // console.log(
-    //   "TaskItem:",
-    //   `\n Task ID: ${taskId}`,
-    //   `\n Title: ${title}`,
-    //   `\n Description: ${description}`,
-    //   `\n Due Date: ${dueDate}`,
-    //   `\n Due Time: ${dueTime}`,
-    //   `\n Completed: ${markCompleted}`,
-    //   `\n Completed locally: ${completed}`
-    // );
     const monthMap = {
       January: "1",
       February: "2",
@@ -44,13 +33,11 @@ const TaskItem = ({
 
     let formattedDueDate = dueDate;
 
-    // Split the date string into its components
     if (origin === "calendar-list") {
       const dateComponents = dueDate.split(", ")[1].split(" ");
       const month = monthMap[dateComponents[0]];
       const day = dateComponents[1];
       const year = dueDate.split(", ")[2];
-      // const formattedDate = new Date(year, month, day).toISOString().slice(0, 10);
       const formattedDate = `${year}-${month}-${day}`;
 
       formattedDueDate = formattedDate
@@ -80,7 +67,13 @@ const TaskItem = ({
   };
 
   return (
-    <TouchableOpacity style={styles.taskContainer} onPress={handlePress}>
+    <TouchableOpacity
+      style={[
+        styles.taskContainer,
+        completed ? styles.completedTaskContainer : null,
+      ]}
+      onPress={handlePress}
+    >
       <Ionicons
         name={"checkmark-circle-outline"}
         size={24}
@@ -112,6 +105,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  completedTaskContainer: {
+    backgroundColor: "#A5C9FD",
   },
   icon: {
     marginRight: 10,
