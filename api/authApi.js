@@ -3,7 +3,7 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const BASE_URL = "http://localhost:8000/api/";
+export const BASE_URL = "http://192.168.1.72:8000/api/";
 
 export const register = async (userData) => {
   try {
@@ -218,5 +218,51 @@ export const resetPassword = async (email, password, resetToken) => {
     return response.data;
   } catch (error) {
     console.error("Error resetting password:", error);
+  }
+};
+
+export const encryptId = async (userToken) => {
+  try {
+    const response = await axios.get(`${BASE_URL}encrypt-id/`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error encrypting ID:", error);
+  }
+};
+
+export const getUserDataById = async (userToken, id) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}user-data/`,
+      {
+        encrypted_id: id,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    throw error;
+  }
+};
+
+export const encryptIdById = async (userToken, id) => {
+  try {
+    const response = await axios.get(`${BASE_URL}encrypt-id/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error encrypting ID:", error);
   }
 };

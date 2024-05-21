@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const response = await getTasks(token);
-      console.log("Tasks after sign in:", response);
+      // console.log("Tasks after sign in:", response);
     } catch (error) {
       console.error("Error fetching tasks after sign in:", error);
     }

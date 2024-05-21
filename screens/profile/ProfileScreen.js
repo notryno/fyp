@@ -75,18 +75,20 @@ const ProfileScreen = () => {
         <Text style={{ fontSize: 34, fontWeight: "bold" }}>Profile</Text>
       </View>
       <View style={styles.container}>
-        {userProfile ? (
-          <View style={styles.defaultProfileContainer}>
-            <Image
-              source={{ uri: modifiedURL + userProfile }}
-              style={styles.profileImage}
-            />
-          </View>
-        ) : (
-          <View style={styles.defaultProfileContainer}>
-            <Ionicons name="person-outline" size={50} color="gray" />
-          </View>
-        )}
+        <TouchableOpacity onPress={() => navigation.navigate("QrCode")}>
+          {userProfile ? (
+            <View style={styles.defaultProfileContainer}>
+              <Image
+                source={{ uri: modifiedURL + userProfile }}
+                style={styles.profileImage}
+              />
+            </View>
+          ) : (
+            <View style={styles.defaultProfileContainer}>
+              <Ionicons name="person-outline" size={50} color="gray" />
+            </View>
+          )}
+        </TouchableOpacity>
 
         <View style={styles.infoContainer}>
           {userData && (

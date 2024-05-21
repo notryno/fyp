@@ -11,6 +11,7 @@ import {
 import { getClass, getClassName } from "../api/classApi";
 import { useAuth } from "../api/authContext";
 import { Ionicons } from "@expo/vector-icons";
+import { encryptIdById } from "../api/authApi";
 
 const ClassScreen = ({ navigation }) => {
   const [users, setUsers] = useState([]);
@@ -47,10 +48,15 @@ const ClassScreen = ({ navigation }) => {
     )
   );
 
+  const handleUserPress = async (userId) => {
+    const encryptedId = await encryptIdById(userToken, userId);
+    navigation.navigate("PublicProfile", { userId: encryptedId.id });
+  };
+
   const renderUserItem = ({ item, index }) => (
     <TouchableOpacity
       style={styles.userItem}
-      // onPress={() => navigation.navigate("UserDetails", { userId: item.id })}
+      onPress={() => handleUserPress(item.id)}
     >
       <View style={styles.numberContainer}>
         <Text style={styles.numberText}>{index + 1}</Text>

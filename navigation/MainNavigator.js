@@ -1,6 +1,6 @@
 // MainNavigator.js
 
-import React from "react";
+import React, { useContext } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
@@ -35,6 +35,13 @@ import PasswordResetScreen from "../screens/auth/PasswordResetScreen";
 import CoursesScreen from "../screens/Courses";
 import CourseDetailsScreen from "../screens/CourseDetails";
 import GradesScreen from "../screens/GradesScreen";
+import QrCodeScreen from "../screens/profile/QrCodeScreen";
+import { NotificationContext } from "../api/notificationContext";
+import NotificationBanner from "../components/NotificationBanner";
+import ScanQr from "../screens/profile/ScanQr";
+import IdCard from "../screens/profile/IdCard";
+import PublicProfile from "../screens/profile/PublicProfile";
+import PublicId from "../screens/profile/PublicId";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -227,6 +234,31 @@ const ProfileStack = () => {
         }}
       />
       <Stack.Screen
+        name="QrCode"
+        component={QrCodeScreen}
+        options={{ title: "Personal ID" }}
+      />
+      <Stack.Screen
+        name="ScanQr"
+        component={ScanQr}
+        options={{ title: "Scan QR" }}
+      />
+      <Stack.Screen
+        name="IdCard"
+        component={IdCard}
+        options={{ title: "ID Card" }}
+      />
+      <Stack.Screen
+        name="PublicProfile"
+        component={PublicProfile}
+        options={{ title: "Profile" }}
+      />
+      <Stack.Screen
+        name="PublicId"
+        component={PublicId}
+        options={{ title: "Public ID" }}
+      />
+      <Stack.Screen
         name="Classroom"
         component={ClassScreen}
         options={{
@@ -403,11 +435,6 @@ const MainNavigator = () => {
         component={TabNavigator}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="TaskTab"
-        component={TaskStack}
-        options={{ headerShown: false }}
-      />
     </Stack.Navigator>
   ) : (
     <AuthStack />
@@ -415,54 +442,66 @@ const MainNavigator = () => {
 };
 
 const TabNavigator = () => {
+  const { notifications, removeNotification } = useContext(NotificationContext);
+
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ color, size }) => {
-          let iconName;
+    <>
+      {notifications.map((message, index) => (
+        <NotificationBanner
+          key={index}
+          title={message.title}
+          message={message.message}
+          onClose={() => removeNotification(index)}
+        />
+      ))}
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ color, size }) => {
+            let iconName;
 
-          if (route.name === "HomeTab") {
-            iconName = "home";
-          } else if (route.name === "TaskTab") {
-            iconName = "list-outline";
-          } else if (route.name === "CalendarTab") {
-            iconName = "calendar";
-          } else if (route.name === "NotificationTab") {
-            iconName = "notifications";
-          } else if (route.name === "ProfileTab") {
-            iconName = "person-circle";
-          }
+            if (route.name === "HomeTab") {
+              iconName = "home";
+            } else if (route.name === "TaskTab") {
+              iconName = "list-outline";
+            } else if (route.name === "CalendarTab") {
+              iconName = "calendar";
+            } else if (route.name === "NotificationTab") {
+              iconName = "notifications";
+            } else if (route.name === "ProfileTab") {
+              iconName = "person-circle";
+            }
 
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-      })}
-    >
-      <Tab.Screen
-        name="HomeTab"
-        component={HomeStack}
-        options={{ headerShown: false, tabBarLabel: "Home" }}
-      />
-      <Tab.Screen
-        name="TaskTab"
-        component={TaskStack}
-        options={{ headerShown: false, tabBarLabel: "Task" }}
-      />
-      <Tab.Screen
-        name="CalendarTab"
-        component={CalendarStackNavigator}
-        options={{ headerShown: false, tabBarLabel: "Calendar" }}
-      />
-      <Tab.Screen
-        name="NotificationTab"
-        component={NotificationStack}
-        options={{ headerShown: false, tabBarLabel: "Notification" }}
-      />
-      <Tab.Screen
-        name="ProfileTab"
-        component={ProfileStack}
-        options={{ headerShown: false, tabBarLabel: "Profile" }}
-      />
-    </Tab.Navigator>
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+        })}
+      >
+        <Tab.Screen
+          name="HomeTab"
+          component={HomeStack}
+          options={{ headerShown: false, tabBarLabel: "Home" }}
+        />
+        <Tab.Screen
+          name="TaskTab"
+          component={TaskStack}
+          options={{ headerShown: false, tabBarLabel: "Task" }}
+        />
+        <Tab.Screen
+          name="CalendarTab"
+          component={CalendarStackNavigator}
+          options={{ headerShown: false, tabBarLabel: "Calendar" }}
+        />
+        <Tab.Screen
+          name="NotificationTab"
+          component={NotificationStack}
+          options={{ headerShown: false, tabBarLabel: "Notification" }}
+        />
+        <Tab.Screen
+          name="ProfileTab"
+          component={ProfileStack}
+          options={{ headerShown: false, tabBarLabel: "Profile" }}
+        />
+      </Tab.Navigator>
+    </>
   );
 };
 export default MainNavigator;

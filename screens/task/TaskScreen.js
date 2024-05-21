@@ -47,7 +47,7 @@ const TaskScreen = () => {
     try {
       const response = await getTasks(userToken);
       setTasks(response);
-      console.log("Tasks", response);
+      // console.log("Tasks", response);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
