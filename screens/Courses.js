@@ -3,9 +3,9 @@ import {
   View,
   Text,
   TouchableOpacity,
-  FlatList,
   ActivityIndicator,
   StyleSheet,
+  SectionList,
 } from "react-native";
 import { getEnrolledCourses } from "../api/courseApi";
 import { useAuth } from "../api/authContext";
@@ -87,6 +87,20 @@ const CoursesScreen = ({ navigation }) => {
     }
   };
 
+  const groupCoursesByYear = (courses) => {
+    const grouped = courses.reduce((acc, course) => {
+      const year = course.year;
+      if (!acc[year]) {
+        acc[year] = { year, data: [] };
+      }
+      acc[year].data.push(course);
+      return acc;
+    }, {});
+    return Object.values(grouped);
+  };
+
+  const sections = groupCoursesByYear(courses);
+
   const renderCourseItem = ({ item }) => (
     <TouchableOpacity
       style={styles.courseItem}
@@ -119,11 +133,14 @@ const CoursesScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Your Enrolled Courses</Text>
-      <FlatList
-        data={courses}
-        keyExtractor={(item) => item.id}
+      <SectionList
+        sections={sections}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={renderCourseItem}
-        style={{ width: "100%" }}
+        renderSectionHeader={({ section: { year } }) => (
+          <Text style={styles.yearTitle}>Year {convertToRoman(year)}</Text>
+        )}
+        contentContainerStyle={{ paddingBottom: 20 }}
       />
     </View>
   );
@@ -139,6 +156,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 16,
+  },
+  yearTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginVertical: 10,
   },
   courseItem: {
     marginBottom: 10,
@@ -158,7 +180,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 5,
   },
-
   texts: {
     color: "black",
   },

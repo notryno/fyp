@@ -83,7 +83,7 @@ const CourseDetailsScreen = ({ route, navigation }) => {
       <Text style={styles.title}>Course Schedule</Text>
       <View style={styles.card}>
         <View style={styles.scheduleContainer}>
-          {schedule ? (
+          {schedule && schedule.length > 0 ? (
             schedule.map((item, index) => (
               <View style={styles.scheduleItem} key={index}>
                 <View style={styles.topRow}>
@@ -110,7 +110,10 @@ const CourseDetailsScreen = ({ route, navigation }) => {
               </View>
             ))
           ) : (
-            <Text>No schedule available</Text>
+            <View style={styles.noScheduleContainer}>
+              <Ionicons name="calendar-outline" size={48} color="#aaa" />
+              <Text style={styles.noScheduleText}>No schedule available</Text>
+            </View>
           )}
         </View>
       </View>
@@ -188,6 +191,16 @@ const styles = StyleSheet.create({
   scheduleType: {
     fontWeight: "bold",
     marginBottom: 4,
+  },
+  noScheduleContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 20,
+  },
+  noScheduleText: {
+    fontSize: 16,
+    color: "#aaa",
+    marginTop: 10,
   },
 });
 
