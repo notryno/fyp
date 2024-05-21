@@ -27,8 +27,6 @@ const PersonalDetails = ({ navigation }) => {
   const [isPressedLastName, setIsPressedLastName] = useState(false);
   const [isPressedEmail, setIsPressedEmail] = useState(false);
 
-  const modifiedURL = BASE_URL.replace(/\/api\/$/, "");
-
   const fetchData = async () => {
     try {
       const data = await getUserData(userToken);
@@ -74,10 +72,12 @@ const PersonalDetails = ({ navigation }) => {
       quality: 1,
     });
 
-    if (!result.cancelled) {
-      setImage(result.uri);
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
       try {
-        await updateProfilePicture(userToken, { uri: result.uri });
+        console.log("Image Picker Result URI", result);
+        console.log("Image Picker URI", result.assets[0].uri);
+        await updateProfilePicture(userToken, { uri: result.assets[0].uri });
         const updatedData = await getUserData(userToken);
         setUserData(updatedData.user_data);
         signIn(userToken, updatedData.user_data.profile_picture);
@@ -94,7 +94,7 @@ const PersonalDetails = ({ navigation }) => {
           <Image source={{ uri: image }} style={styles.profileImage} />
         ) : newData.profile_picture ? (
           <Image
-            source={{ uri: modifiedURL + newData.profile_picture }}
+            source={{ uri: newData.profile_picture }}
             style={styles.profileImage}
           />
         ) : (

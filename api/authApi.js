@@ -126,16 +126,14 @@ export const updateUserData = async (userToken, newData) => {
 export const updateProfilePicture = async (userToken, newProfilePicture) => {
   try {
     const formData = new FormData();
+    console.log("New profile picture", newProfilePicture);
 
     if (newProfilePicture && newProfilePicture.uri) {
-      const timestamp = new Date().getTime();
-      const fileName = `profile_picture_${timestamp}.jpg`;
-
-      formData.append("profile_picture", {
-        uri: newProfilePicture.uri,
-        name: fileName,
-        type: "image/jpeg",
-      });
+      let profileImageUrl = null;
+      if (newProfilePicture.uri) {
+        profileImageUrl = await uploadImageToCloudinary(newProfilePicture.uri);
+        formData.append("profile_picture", profileImageUrl);
+      }
     }
     const response = await axios.patch(
       `${BASE_URL}update_user_data/`,
@@ -152,6 +150,28 @@ export const updateProfilePicture = async (userToken, newProfilePicture) => {
   } catch (error) {
     console.error("Error updating profile picture:", error);
     throw "Error updating profile picture";
+  }
+};
+
+const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dqxfn5mdd/image/upload";
+const CLOUDINARY_UPLOAD_PRESET = "schedule";
+
+const uploadImageToCloudinary = async (imageUri) => {
+  const data = new FormData();
+  data.append("file", {
+    uri: imageUri,
+    type: "image/jpeg",
+    name: "profile_picture.jpg",
+  });
+  data.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+  try {
+    const response = await axios.post(CLOUDINARY_URL, data);
+    console.log("Image uploaded to Cloudinary:", response.data.secure_url);
+    return response.data.secure_url;
+  } catch (error) {
+    console.error("Error uploading image to Cloudinary:", error);
+    throw error;
   }
 };
 

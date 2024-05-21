@@ -16,7 +16,6 @@ const PublicProfile = ({ route }) => {
   const [userData, setUserData] = useState(null);
   const [classroom, setClassroom] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
-  const modifiedURL = BASE_URL.replace(/\/api\/$/, "");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -88,7 +87,7 @@ const PublicProfile = ({ route }) => {
                   <View style={styles.profileImage}>
                     {userProfile ? (
                       <Image
-                        source={{ uri: modifiedURL + userProfile }}
+                        source={{ uri: userProfile }}
                         style={{ width: "100%", height: "100%" }}
                       />
                     ) : (
@@ -123,7 +122,7 @@ const PublicProfile = ({ route }) => {
 
                   <View style={styles.role}>
                     <Text style={{ fontWeight: "bold", fontSize: 20 }}>
-                      {userData?.is_staff ? "Staff" : "Student"}
+                      {userData?.is_staff ? "Teacher" : "Student"}
                     </Text>
                   </View>
                 </View>

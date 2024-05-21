@@ -11,7 +11,6 @@ const IdCard = () => {
   const [encryptedId, setEncryptedId] = useState(null);
   const [userData, setUserData] = useState(null);
   const [classroom, setClassroom] = useState(null);
-  const modifiedURL = BASE_URL.replace(/\/api\/$/, "");
 
   useEffect(() => {
     const getEncryptedId = async () => {
@@ -64,7 +63,7 @@ const IdCard = () => {
               }
             </Text>
             <Text style={styles.role}>
-              {userData.is_staff ? "Staff" : "Student"}
+              {userData.is_staff ? "Teacher" : "Student"}
             </Text>
             <Text style={styles.start_date}>
               {
@@ -122,10 +121,36 @@ const IdCard = () => {
           </View>
           <View style={styles.right}>
             <View style={styles.photo}>
-              <Image
-                source={{ uri: modifiedURL + userProfile }}
-                style={{ width: "100%", height: "100%" }}
-              />
+              {userProfile ? (
+                <Image
+                  source={{ uri: userProfile }}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              ) : (
+                <View
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "white",
+                    borderWidth: 1,
+                    paddingLeft: 20,
+                  }}
+                >
+                  <View
+                    style={{
+                      justifyContent: "center",
+                      alignItems: "center",
+                      transform: [{ rotate: "45deg" }],
+                    }}
+                  >
+                    <Text style={{ fontSize: 24, fontWeight: "bold" }}>
+                      NO IMAGE
+                    </Text>
+                  </View>
+                </View>
+              )}
             </View>
           </View>
         </View>

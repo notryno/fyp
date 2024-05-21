@@ -12,30 +12,14 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useAuth } from "../../api/authContext";
-import { BASE_URL, getUserData } from "../../api/authApi";
+import { getUserData } from "../../api/authApi";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-// import { generatePDF } from "../../utility/generatePDF";
-// import RNHTMLtoPDF from "react-native-html-to-pdf";
-import { printToFileAsync } from "expo-print";
-import { shareAsync } from "expo-sharing";
 
 const ProfileScreen = () => {
   const { signOut, userProfile, userToken } = useAuth();
   const navigation = useNavigation();
   const [userData, setUserData] = useState(null);
   const [isPressedLastName, setIsPressedLastName] = useState(false);
-
-  // const createPdf = async () => {
-  //   let options = {
-  //     html: "<h1>PDF TEST</h1>",
-  //     fileName: "test",
-  //     directory: "Documents",
-  //   };
-
-  //   let file = await RNHTMLtoPDF.convert(options);
-  //   // console.log(file.filePath);
-  //   alert(file.filePath);
-  // };
 
   useEffect(() => {
     fetchData();
@@ -60,8 +44,6 @@ const ProfileScreen = () => {
     signOut();
   };
 
-  const modifiedURL = BASE_URL.replace(/\/api\/$/, "");
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <View
@@ -79,7 +61,7 @@ const ProfileScreen = () => {
           {userProfile ? (
             <View style={styles.defaultProfileContainer}>
               <Image
-                source={{ uri: modifiedURL + userProfile }}
+                source={{ uri: userProfile }}
                 style={styles.profileImage}
               />
             </View>

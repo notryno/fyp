@@ -13,6 +13,7 @@ import { register } from "../../api/authApi";
 import OTPScreen from "./OTPScreen";
 import * as ImagePicker from "expo-image-picker";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import axios from "axios";
 
 const RegisterScreen = ({ navigation }) => {
   const [first_name, setFirstName] = useState("");
@@ -26,6 +27,9 @@ const RegisterScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const timestamp = new Date().getTime();
   const fileName = `profile_picture_${timestamp}.jpg`;
+  const CLOUDINARY_URL =
+    "https://api.cloudinary.com/v1_1/dqxfn5mdd/image/upload";
+  const CLOUDINARY_UPLOAD_PRESET = "schedule";
 
   useEffect(() => {
     (async () => {
@@ -52,6 +56,25 @@ const RegisterScreen = ({ navigation }) => {
     }
   };
 
+  const uploadImageToCloudinary = async (imageUri) => {
+    const data = new FormData();
+    data.append("file", {
+      uri: imageUri,
+      type: "image/jpeg",
+      name: "profile_picture.jpg",
+    });
+    data.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+    try {
+      const response = await axios.post(CLOUDINARY_URL, data);
+      console.log("Image uploaded to Cloudinary:", response.data.secure_url);
+      return response.data.secure_url;
+    } catch (error) {
+      console.error("Error uploading image to Cloudinary:", error);
+      throw error;
+    }
+  };
+
   const handleRegister = async () => {
     try {
       if (password !== confirmPassword) {
@@ -72,19 +95,23 @@ const RegisterScreen = ({ navigation }) => {
       formData.append("username", email);
       formData.append("email", email);
       formData.append("password", password);
+
+      let profileImageUrl = null;
       if (profile_picture) {
-        formData.append("profile_picture", {
-          uri: profile_picture,
-          type: "image/jpeg",
-          name: fileName,
-        });
+        profileImageUrl = await uploadImageToCloudinary(profile_picture);
+        formData.append("profile_picture", profileImageUrl);
       }
 
-      console.log("Registration Process", formData);
+      // if (profile_picture) {
+      //   formData.append("profile_picture", {
+      //     uri: profile_picture,
+      //     type: "image/jpeg",
+      //     name: fileName,
+      //   });
+      // }
 
       const result = await register(formData);
 
-      console.log("Registration successful:", result);
       navigation.navigate("OTPScreen", { email: email });
     } catch (error) {
       let errorMessage = "Registration failed. Please try again.";
