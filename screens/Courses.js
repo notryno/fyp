@@ -6,13 +6,16 @@ import {
   ActivityIndicator,
   StyleSheet,
   SectionList,
+  ScrollView,
 } from "react-native";
 import { getEnrolledCourses } from "../api/courseApi";
 import { useAuth } from "../api/authContext";
 
 const CoursesScreen = ({ navigation }) => {
   const [courses, setCourses] = useState([]);
+  const [filteredCourses, setFilteredCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedYear, setSelectedYear] = useState("All");
   const { userToken } = useAuth();
 
   useEffect(() => {
@@ -20,6 +23,7 @@ const CoursesScreen = ({ navigation }) => {
       try {
         const coursesData = await getEnrolledCourses(userToken);
         setCourses(coursesData);
+        setFilteredCourses(coursesData);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -29,11 +33,23 @@ const CoursesScreen = ({ navigation }) => {
     fetchCourses();
   }, []);
 
+  useEffect(() => {
+    if (selectedYear === "All") {
+      setFilteredCourses(courses);
+    } else {
+      setFilteredCourses(
+        courses.filter((course) => course.year.toString() === selectedYear)
+      );
+    }
+  }, [selectedYear, courses]);
+
   if (loading) {
     return <ActivityIndicator />;
   }
 
   const convertToRoman = (num) => {
+    console.log(num);
+    console.log(typeof num);
     const romanNumerals = {
       M: 1000,
       CM: 900,
@@ -57,6 +73,7 @@ const CoursesScreen = ({ navigation }) => {
         num -= romanNumerals[key];
       }
     }
+    console.log(result);
     return result;
   };
 
@@ -99,7 +116,7 @@ const CoursesScreen = ({ navigation }) => {
     return Object.values(grouped);
   };
 
-  const sections = groupCoursesByYear(courses);
+  const sections = groupCoursesByYear(filteredCourses);
 
   const renderCourseItem = ({ item }) => (
     <TouchableOpacity
@@ -130,9 +147,41 @@ const CoursesScreen = ({ navigation }) => {
     </TouchableOpacity>
   );
 
+  const getUniqueYears = (courses) => {
+    const years = courses.map((course) => course.year);
+    return ["All", ...new Set(years)];
+  };
+
+  const uniqueYears = getUniqueYears(courses);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Your Enrolled Courses</Text>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.chipsContainer}
+      >
+        {uniqueYears.map((year) => (
+          <TouchableOpacity
+            key={year}
+            style={[
+              styles.chip,
+              selectedYear === year.toString() && styles.selectedChip,
+            ]}
+            onPress={() => setSelectedYear(year.toString())}
+          >
+            <Text
+              style={[
+                styles.chipText,
+                selectedYear === year.toString() && styles.selectedChipText,
+              ]}
+            >
+              {year === "All" ? year : `Year ${convertToRoman(year)}`}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
       <SectionList
         sections={sections}
         keyExtractor={(item) => item.id.toString()}
@@ -140,7 +189,9 @@ const CoursesScreen = ({ navigation }) => {
         renderSectionHeader={({ section: { year } }) => (
           <Text style={styles.yearTitle}>Year {convertToRoman(year)}</Text>
         )}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={{
+          paddingBottom: 100,
+        }}
       />
     </View>
   );
@@ -148,7 +199,6 @@ const CoursesScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     paddingHorizontal: 20,
     paddingTop: 20,
   },
@@ -182,6 +232,33 @@ const styles = StyleSheet.create({
   },
   texts: {
     color: "black",
+  },
+  chipsContainer: {
+    paddingLeft: 10,
+    height: 60,
+  },
+  chip: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginHorizontal: 5,
+    borderRadius: 20,
+    backgroundColor: "#E0E0E0",
+    height: 40,
+    maxWidth: 120,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  selectedChip: {
+    backgroundColor: "black",
+    color: "white",
+  },
+  chipText: {
+    color: "#757575",
+    fontWeight: "600",
+    fontSize: 16,
+  },
+  selectedChipText: {
+    color: "white",
   },
 });
 

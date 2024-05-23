@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, SafeAreaView } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import { ScrollView } from "react-native";
 
 const NotificationDetailScreen = () => {
   const route = useRoute();
@@ -14,7 +15,9 @@ const NotificationDetailScreen = () => {
           <Ionicons name="notifications-outline" size={48} color="black" />
         </View>
         <Text style={styles.title}>{notification.title}</Text>
-        <Text style={styles.message}>{notification.message}</Text>
+        <ScrollView style={styles.messageContainer}>
+          <Text style={styles.message}>{notification.message}</Text>
+        </ScrollView>
         <View style={styles.infoContainer}>
           <Text style={styles.author}>
             Author: {notification.author.first_name}{" "}
@@ -65,8 +68,13 @@ const styles = StyleSheet.create({
   message: {
     fontSize: 16,
     color: "#555",
-    marginBottom: 20,
-    textAlign: "center",
+    textAlign: "left",
+    paddingVertical: 20,
+  },
+  messageContainer: {
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+    maxHeight: 500,
   },
   infoContainer: {
     borderTopWidth: 1,

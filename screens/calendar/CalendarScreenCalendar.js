@@ -115,6 +115,11 @@ const CalendarScreen = () => {
       mergedData.tasks = filteredTasks; // Set tasks only if there are tasks for the selected date
     }
 
+    if (mergedData.events.length === 0 && !mergedData.tasks) {
+      setSelectedEvents([]); // Clear the selected events if no events or tasks are found
+      return;
+    }
+
     setSelectedEvents([mergedData]);
   };
 
@@ -253,9 +258,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   noEventContainer: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    height: 350,
   },
   noEventText: {
     fontSize: 20,

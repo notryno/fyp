@@ -45,8 +45,8 @@ const TaskForm = ({ onSubmit, onCancel }) => {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -200}
+      behavior={"padding"}
+      keyboardVerticalOffset={0}
     >
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>

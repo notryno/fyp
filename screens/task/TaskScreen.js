@@ -13,8 +13,6 @@ import {
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
-import { Dropdown } from "react-native-element-dropdown";
-
 import { useAuth } from "../../api/authContext";
 import {
   createTask,
@@ -27,12 +25,6 @@ import Overlay from "../../components/Overlay";
 import { printToFileAsync } from "expo-print";
 import { shareAsync } from "expo-sharing";
 
-const sortOptions = [
-  { label: "Sort by Title", value: "title" },
-  { label: "Sort by Due Date (Ascending)", value: "due_date_asc" },
-  { label: "Sort by Due Date (Descending)", value: "due_date_desc" },
-];
-
 const TaskScreen = () => {
   const [tasks, setTasks] = useState([]);
   const [showTaskForm, setShowTaskForm] = useState(false);
@@ -41,13 +33,12 @@ const TaskScreen = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const { userToken } = useAuth();
   const { navigate } = useNavigation();
-  const [isFocus, setIsFocus] = useState(false);
+  const [filter, setFilter] = useState("All");
 
   const fetchTasks = async () => {
     try {
       const response = await getTasks(userToken);
       setTasks(response);
-      // console.log("Tasks", response);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
@@ -128,9 +119,6 @@ const TaskScreen = () => {
     const formattedDueDate = task ? new Date(task.due_date).toISOString() : "";
     const formattedDueTime = task?.due_time ? parseTime(task.due_time) : "";
 
-    console.log("Due Time", task?.due_time);
-    console.log("Formatted Due Time", formattedDueTime);
-
     navigate("TaskDetailScreen", {
       taskId,
       title: task?.title || "",
@@ -152,14 +140,9 @@ const TaskScreen = () => {
 
   const handleSort = (sortByField) => {
     let newSortOrder = sortOrder;
+    setFilter(sortByField);
     if (sortByField === sortBy) {
       newSortOrder = sortOrder === "asc" ? "desc" : "asc";
-    } else if (sortByField === "due_date_asc") {
-      setSortBy("due_date");
-      newSortOrder = "asc";
-    } else if (sortByField === "due_date_desc") {
-      setSortBy("due_date");
-      newSortOrder = "desc";
     } else {
       setSortBy(sortByField);
       newSortOrder = "asc";
@@ -186,23 +169,56 @@ const TaskScreen = () => {
 
   Object.keys(groupedTasks).forEach((key) => {
     groupedTasks[key] = groupedTasks[key].sort((a, b) => {
-      if (a.completed && !b.completed) {
-        return 1; // Place completed tasks at the bottom
-      } else if (!a.completed && b.completed) {
-        return -1; // Place completed tasks at the bottom
-      } else {
-        return 0;
+      if (a.completed !== b.completed) {
+        return a.completed ? 1 : -1;
+      }
+
+      if (sortBy === "title") {
+        const titleA = a.title.toLowerCase();
+        const titleB = b.title.toLowerCase();
+        if (sortOrder === "asc") {
+          return titleA < titleB ? -1 : titleA > titleB ? 1 : 0;
+        } else {
+          return titleA > titleB ? -1 : titleA < titleB ? 1 : 0;
+        }
+      } else if (sortBy === "due_date") {
+        const dateA = new Date(a.due_date).getTime();
+        const dateB = new Date(b.due_date).getTime();
+        return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+      } else if (sortBy === "due_time") {
+        if (a.all_day && !b.all_day) {
+          return -1;
+        } else if (!a.all_day && b.all_day) {
+          return 1;
+        }
+
+        const timeA = a.due_time
+          ? new Date(`1970-01-01T${a.due_time}Z`).getTime()
+          : 0;
+        const timeB = b.due_time
+          ? new Date(`1970-01-01T${b.due_time}Z`).getTime()
+          : 0;
+        if (sortOrder === "asc") {
+          return timeA - timeB;
+        } else {
+          return timeB - timeA;
+        }
       }
     });
   });
 
+  // Always keep dates sorted in ascending order
   const sortedDates = Object.keys(groupedTasks).sort((a, b) => {
     const dateA = new Date(a).getTime();
     const dateB = new Date(b).getTime();
-    if (sortOrder === "asc") {
-      return dateA - dateB;
+    if (sortBy === "due_date") {
+      if (sortOrder === "asc") {
+        return dateB - dateA;
+      } else {
+        return dateA - dateB;
+      }
     } else {
-      return dateB - dateA;
+      return dateA - dateB;
     }
   });
 
@@ -284,40 +300,54 @@ const TaskScreen = () => {
           flexDirection: "row",
           justifyContent: "space-between",
           padding: 20,
+          paddingBottom: 0,
           backgroundColor: "white",
         }}
       >
         <Text style={{ fontSize: 34, fontWeight: "bold" }}>Tasks</Text>
         <TouchableOpacity onPress={() => generatePDF()}>
-          <View>
-            <Ionicons
-              name="download-outline"
-              size={28}
-              color="black"
-            ></Ionicons>
-          </View>
+          <Ionicons name="download-outline" size={28} color="black" />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.chipsContainer}>
+        <TouchableOpacity
+          style={[styles.chip, filter === "title" && styles.selectedChip]}
+          onPress={() => handleSort("title")}
+        >
+          <Text
+            style={[styles.chipText, filter === "title" && styles.selectedChip]}
+          >
+            Title
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.chip, filter === "due_date" && styles.selectedChip]}
+          onPress={() => handleSort("due_date")}
+        >
+          <Text
+            style={[
+              styles.chipText,
+              filter === "due_date" && styles.selectedChip,
+            ]}
+          >
+            Due Date
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.chip, filter === "due_time" && styles.selectedChip]}
+          onPress={() => handleSort("due_time")}
+        >
+          <Text
+            style={[
+              styles.chipText,
+              filter === "due_time" && styles.selectedChip,
+            ]}
+          >
+            Due Time
+          </Text>
         </TouchableOpacity>
       </View>
       <View style={styles.container}>
-        <Dropdown
-          style={{
-            borderWidth: 1,
-            padding: 5,
-            paddingHorizontal: 10,
-            borderRadius: 5,
-            marginBottom: 10,
-          }}
-          data={sortOptions}
-          labelField="label"
-          valueField="value"
-          value={sortBy}
-          onFocus={() => setIsFocus(true)}
-          onChange={(item) => {
-            handleSort(item.value);
-            setIsFocus(false);
-          }}
-        />
-
         <ScrollView style={styles.taskList}>
           {sortedDates.map((date) => (
             <View key={date} style={styles.taskGroup}>
@@ -342,7 +372,6 @@ const TaskScreen = () => {
                         )}
                       </View>
                     </TouchableOpacity>
-
                     <View style={styles.taskTextContainer}>
                       <Text
                         style={[
@@ -353,7 +382,6 @@ const TaskScreen = () => {
                         {item.title}
                       </Text>
                     </View>
-
                     <TouchableOpacity
                       onPress={() => confirmDeleteTask(item.id)}
                       style={styles.deleteButton}
@@ -512,6 +540,28 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: "gray",
     alignItems: "center",
+  },
+  chipsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 10,
+    paddingLeft: 10,
+  },
+  chip: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginHorizontal: 5,
+    borderRadius: 20,
+    backgroundColor: "#E0E0E0",
+  },
+  selectedChip: {
+    backgroundColor: "black",
+    color: "white",
+  },
+  chipText: {
+    color: "#757575",
+    fontWeight: "600",
+    fontSize: 16,
   },
 });
 
