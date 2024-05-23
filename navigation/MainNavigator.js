@@ -14,7 +14,7 @@ import SearchScreen from "../screens/SearchScreen";
 import CalendarScreenList from "../screens/calendar/CalendarScreenList";
 import CalendarScreenCalendar from "../screens/calendar/CalendarScreenCalendar";
 import ProfileScreen from "../screens/profile/ProfileScreen";
-import NotificationScreen from "../screens/NotificationScreen";
+import NotificationScreen from "../screens/notification/NotificationScreen";
 import { SafeAreaView, Text, View, TouchableOpacity } from "react-native";
 import PersonalDetails from "../screens/profile/PersonalDetails";
 import TaskScreen from "../screens/task/TaskScreen";
@@ -42,6 +42,7 @@ import ScanQr from "../screens/profile/ScanQr";
 import IdCard from "../screens/profile/IdCard";
 import PublicProfile from "../screens/profile/PublicProfile";
 import PublicId from "../screens/profile/PublicId";
+import NotificationDetailScreen from "../screens/notification/NotificationDetailScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -96,9 +97,9 @@ const CalendarTopTab = ({ navigation, route }) => {
         }}
       >
         <Text style={{ fontSize: 34, fontWeight: "bold" }}>Calendar</Text>
-        {currentScreen === "List" && (
+        {currentScreen === "Calendar" ? (
           <TouchableOpacity
-            onPress={() => navigation.navigate("List", { exportPdf: true })}
+            onPress={() => navigation.navigate("Calendar", { exportPdf: true })}
           >
             <View>
               <Ionicons
@@ -108,10 +109,9 @@ const CalendarTopTab = ({ navigation, route }) => {
               ></Ionicons>
             </View>
           </TouchableOpacity>
-        )}
-        {currentScreen === "Calendar" && (
+        ) : (
           <TouchableOpacity
-            onPress={() => navigation.navigate("Calendar", { exportPdf: true })}
+            onPress={() => navigation.navigate("List", { exportPdf: true })}
           >
             <View>
               <Ionicons
@@ -175,6 +175,11 @@ const NotificationStack = () => {
         name="Notification"
         component={NotificationScreen}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="NotificationDetail"
+        component={NotificationDetailScreen}
+        options={{ title: "Notification" }}
       />
     </Stack.Navigator>
   );
@@ -442,22 +447,34 @@ const MainNavigator = () => {
 };
 
 const TabNavigator = () => {
-  const { notifications, removeNotification } = useContext(NotificationContext);
+  const { notifications, newNotifications, removeNotification } =
+    useContext(NotificationContext);
+  const unreadCount = notifications.filter(
+    (notification) => !notification.read
+  ).length;
 
   return (
     <>
-      {notifications.map((message, index) => (
-        <NotificationBanner
-          key={index}
-          title={message.title}
-          message={message.message}
-          onClose={() => removeNotification(index)}
-        />
-      ))}
+      {newNotifications.map(
+        (message, index) => (
+          console.log(message),
+          (
+            <NotificationBanner
+              key={index}
+              title={message.title}
+              message={message.message}
+              created={message.created_at}
+              author={message.author}
+              onClose={() => removeNotification(index)}
+            />
+          )
+        )
+      )}
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarIcon: ({ color, size }) => {
             let iconName;
+            let showBadge = false;
 
             if (route.name === "HomeTab") {
               iconName = "home";
@@ -467,11 +484,31 @@ const TabNavigator = () => {
               iconName = "calendar";
             } else if (route.name === "NotificationTab") {
               iconName = "notifications";
+              showBadge = unreadCount > 0;
             } else if (route.name === "ProfileTab") {
               iconName = "person-circle";
             }
 
-            return <Ionicons name={iconName} size={size} color={color} />;
+            return (
+              <View>
+                <Ionicons name={iconName} size={size} color={color} />
+                {showBadge && (
+                  <View
+                    style={{
+                      position: "absolute",
+                      right: -6,
+                      top: -3,
+                      backgroundColor: "red",
+                      borderRadius: 6,
+                      width: 12,
+                      height: 12,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  />
+                )}
+              </View>
+            );
           },
         })}
       >
