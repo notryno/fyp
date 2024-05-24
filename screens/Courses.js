@@ -8,6 +8,7 @@ import {
   SectionList,
   ScrollView,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { getEnrolledCourses } from "../api/courseApi";
 import { useAuth } from "../api/authContext";
 
@@ -48,8 +49,6 @@ const CoursesScreen = ({ navigation }) => {
   }
 
   const convertToRoman = (num) => {
-    console.log(num);
-    console.log(typeof num);
     const romanNumerals = {
       M: 1000,
       CM: 900,
@@ -73,7 +72,6 @@ const CoursesScreen = ({ navigation }) => {
         num -= romanNumerals[key];
       }
     }
-    console.log(result);
     return result;
   };
 
@@ -156,43 +154,55 @@ const CoursesScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Your Enrolled Courses</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.chipsContainer}
-      >
-        {uniqueYears.map((year) => (
-          <TouchableOpacity
-            key={year}
-            style={[
-              styles.chip,
-              selectedYear === year.toString() && styles.selectedChip,
-            ]}
-            onPress={() => setSelectedYear(year.toString())}
+      {filteredCourses.length < 1 ? (
+        <View style={styles.noCoursesContainer}>
+          <Ionicons name="school-outline" size={50} color="gray" />
+          <Text style={styles.noCoursesText}>
+            You are not enrolled in any courses yet
+          </Text>
+        </View>
+      ) : (
+        <>
+          <Text style={styles.title}>Your Enrolled Courses</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.chipsContainer}
           >
-            <Text
-              style={[
-                styles.chipText,
-                selectedYear === year.toString() && styles.selectedChipText,
-              ]}
-            >
-              {year === "All" ? year : `Year ${convertToRoman(year)}`}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-      <SectionList
-        sections={sections}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderCourseItem}
-        renderSectionHeader={({ section: { year } }) => (
-          <Text style={styles.yearTitle}>Year {convertToRoman(year)}</Text>
-        )}
-        contentContainerStyle={{
-          paddingBottom: 100,
-        }}
-      />
+            {uniqueYears.map((year) => (
+              <TouchableOpacity
+                key={year}
+                style={[
+                  styles.chip,
+                  selectedYear === year.toString() && styles.selectedChip,
+                ]}
+                onPress={() => setSelectedYear(year.toString())}
+              >
+                <Text
+                  style={[
+                    styles.chipText,
+                    selectedYear === year.toString() && styles.selectedChipText,
+                  ]}
+                >
+                  {year === "All" ? year : `Year ${convertToRoman(year)}`}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          <SectionList
+            sections={sections}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderCourseItem}
+            renderSectionHeader={({ section: { year } }) => (
+              <Text style={styles.yearTitle}>Year {convertToRoman(year)}</Text>
+            )}
+            contentContainerStyle={{
+              paddingBottom: 100,
+            }}
+          />
+        </>
+      )}
     </View>
   );
 };
@@ -259,6 +269,16 @@ const styles = StyleSheet.create({
   },
   selectedChipText: {
     color: "white",
+  },
+  noCoursesContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100%",
+  },
+  noCoursesText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: "gray",
   },
 });
 

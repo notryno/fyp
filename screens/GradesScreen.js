@@ -115,61 +115,62 @@ const GradesScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Module Results</Text>
+      {grades.length === 0 ? (
+        <View style={styles.noGradesContainer}>
+          <Ionicons name="sad-outline" size={50} color="#888" />
+          <Text style={styles.noGradesText}>No grades yet</Text>
+        </View>
+      ) : (
+        <>
+          <Text style={styles.title}>Module Results</Text>
+          <ScrollView style={{ width: "100%" }}>
+            {Object.entries(groupGradesByYearAndSemester()).map(
+              ([semesterKey, semesterGrades]) => (
+                <View key={semesterKey} style={styles.card}>
+                  <Text style={styles.subtitle}>
+                    {`Year: ${getYear(
+                      semesterGrades[0].course[0]
+                    )}, Semester: ${getSemester(semesterGrades[0].course[0])}`}
+                  </Text>
+                  <DataTable>
+                    <DataTable.Header>
+                      <DataTable.Title style={styles.tableHeader25}>
+                        Code
+                      </DataTable.Title>
+                      <DataTable.Title style={styles.tableHeader55}>
+                        Name
+                      </DataTable.Title>
+                      <DataTable.Title style={styles.tableHeader10}>
+                        Mark
+                      </DataTable.Title>
+                      <DataTable.Title style={styles.tableHeader10}>
+                        Grade
+                      </DataTable.Title>
+                    </DataTable.Header>
 
-      <ScrollView style={{ width: "100%" }}>
-        {grades.length === 0 ? (
-          <View style={styles.noGradesContainer}>
-            <Ionicons name="sad-outline" size={50} color="#888" />
-            <Text style={styles.noGradesText}>No grades yet</Text>
-          </View>
-        ) : (
-          Object.entries(groupGradesByYearAndSemester()).map(
-            ([semesterKey, semesterGrades]) => (
-              <View key={semesterKey} style={styles.card}>
-                <Text style={styles.subtitle}>
-                  {`Year: ${getYear(
-                    semesterGrades[0].course[0]
-                  )}, Semester: ${getSemester(semesterGrades[0].course[0])}`}
-                </Text>
-                <DataTable>
-                  <DataTable.Header>
-                    <DataTable.Title style={styles.tableHeader25}>
-                      Code
-                    </DataTable.Title>
-                    <DataTable.Title style={styles.tableHeader55}>
-                      Name
-                    </DataTable.Title>
-                    <DataTable.Title style={styles.tableHeader10}>
-                      Mark
-                    </DataTable.Title>
-                    <DataTable.Title style={styles.tableHeader10}>
-                      Grade
-                    </DataTable.Title>
-                  </DataTable.Header>
-
-                  {semesterGrades.map((item, index) => (
-                    <DataTable.Row key={index}>
-                      <DataTable.Cell style={styles.tableCell25}>
-                        {getCode(item.course[0])}
-                      </DataTable.Cell>
-                      <DataTable.Cell style={styles.tableCell55}>
-                        {getName(item.course[0])}
-                      </DataTable.Cell>
-                      <DataTable.Cell style={styles.tableCell10}>
-                        {item.score}
-                      </DataTable.Cell>
-                      <DataTable.Cell style={styles.tableCell10}>
-                        {item.grade}
-                      </DataTable.Cell>
-                    </DataTable.Row>
-                  ))}
-                </DataTable>
-              </View>
-            )
-          )
-        )}
-      </ScrollView>
+                    {semesterGrades.map((item, index) => (
+                      <DataTable.Row key={index}>
+                        <DataTable.Cell style={styles.tableCell25}>
+                          {getCode(item.course[0])}
+                        </DataTable.Cell>
+                        <DataTable.Cell style={styles.tableCell55}>
+                          {getName(item.course[0])}
+                        </DataTable.Cell>
+                        <DataTable.Cell style={styles.tableCell10}>
+                          {item.score}
+                        </DataTable.Cell>
+                        <DataTable.Cell style={styles.tableCell10}>
+                          {item.grade}
+                        </DataTable.Cell>
+                      </DataTable.Row>
+                    ))}
+                  </DataTable>
+                </View>
+              )
+            )}
+          </ScrollView>
+        </>
+      )}
     </View>
   );
 };
@@ -227,10 +228,9 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   noGradesContainer: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 50,
+    height: "100%",
   },
   noGradesText: {
     fontSize: 20,

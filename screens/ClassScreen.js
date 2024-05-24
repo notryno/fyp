@@ -28,7 +28,7 @@ const ClassScreen = ({ navigation }) => {
         const classNameDataClass = classNameData.find(
           (element) => element.id === usersData[0].classroom
         );
-        setUserClass(classNameDataClass.name);
+        setUserClass(classNameDataClass?.name);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -86,13 +86,24 @@ const ClassScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Students in your Class - {userClass}</Text>
-      <FlatList
-        data={sortedUsers}
-        keyExtractor={(item) => item.email}
-        renderItem={renderUserItem}
-        style={{ width: "100%" }}
-      />
+      {users?.length > 1 ? (
+        <>
+          <Text style={styles.title}>Students in your Class - {userClass}</Text>
+          <FlatList
+            data={sortedUsers}
+            keyExtractor={(item) => item.email}
+            renderItem={renderUserItem}
+            style={{ width: "100%" }}
+          />
+        </>
+      ) : (
+        <View style={styles.noClassroomContainer}>
+          <Ionicons name="school-outline" size={60} color="#aaa" />
+          <Text style={styles.noClassroomText}>
+            You haven't been assigned to a classroom yet.
+          </Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -179,6 +190,17 @@ const styles = StyleSheet.create({
   numberText: {
     fontSize: 16,
     fontWeight: "bold",
+  },
+  noClassroomContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noClassroomText: {
+    marginTop: 20,
+    fontSize: 16,
+    color: "gray",
+    textAlign: "center",
   },
 });
 
