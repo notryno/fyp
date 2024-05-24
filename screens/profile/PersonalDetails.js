@@ -225,13 +225,11 @@ const PersonalDetails = ({ navigation }) => {
 
       <View style={styles.line} />
 
-      <TouchableOpacity style={styles.buttonContainer}>
-        <Text
-          style={styles.buttonText}
-          onPress={() => navigation.navigate("Support")}
-        >
-          Support
-        </Text>
+      <TouchableOpacity
+        style={styles.buttonContainer}
+        onPress={() => navigation.navigate("Support")}
+      >
+        <Text style={styles.buttonText}>Support</Text>
       </TouchableOpacity>
     </View>
   );

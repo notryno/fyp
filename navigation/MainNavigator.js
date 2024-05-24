@@ -43,6 +43,7 @@ import IdCard from "../screens/profile/IdCard";
 import PublicProfile from "../screens/profile/PublicProfile";
 import PublicId from "../screens/profile/PublicId";
 import NotificationDetailScreen from "../screens/notification/NotificationDetailScreen";
+import SupportScreen from "../screens/profile/SupportScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -290,6 +291,21 @@ const ProfileStack = () => {
         }}
       />
       <Stack.Screen
+        name="Support"
+        component={SupportScreen}
+        options={{
+          headerTitle: "Support",
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate("PersonalDetails")}
+              style={{ marginLeft: 16 }}
+            >
+              <Ionicons name="chevron-back-outline" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <Stack.Screen
         name="OTPScreen"
         component={OTPScreen}
         options={({ navigation, route }) => ({
@@ -449,7 +465,7 @@ const MainNavigator = () => {
 const TabNavigator = () => {
   const { notifications, newNotifications, removeNotification } =
     useContext(NotificationContext);
-  const unreadCount = notifications.filter(
+  const unreadCount = notifications?.filter(
     (notification) => !notification.read
   ).length;
 
