@@ -176,7 +176,7 @@ const RegisterScreen = ({ navigation }) => {
       />
       <View style={{ marginBottom: 10 }} />
       {loading ? (
-        <ActivityIndicator />
+        <ActivityIndicator style={{ marginTop: 10 }} />
       ) : (
         <TouchableOpacity
           title="Register"
