@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { getTasks } from "./taskApi";
+import { refreshAccess } from "./authApi";
 import base64 from "base-64";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [userToken, setUserToken] = useState(null);
+  const [refreshToken, setRefreshToken] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [isStaff, setIsStaff] = useState(false);
 
@@ -17,12 +19,23 @@ export const AuthProvider = ({ children }) => {
       return Date.now() >= tokenExpiration * 1000;
     };
 
+    const refreshAccessToken = async () => {
+      try {
+        const response = await refreshAccess(refreshToken);
+        setUserToken(response.access);
+        console.log("Access token refreshed:", response.access);
+      } catch (error) {
+        console.error("Error refreshing access token:", error);
+        signOut();
+      }
+    };
+
     if (isTokenExpired()) {
-      signOut();
+      if (userToken) refreshAccessToken();
     }
     const tokenExpirationCheckInterval = setInterval(() => {
       if (isTokenExpired()) {
-        signOut();
+        refreshAccessToken();
       }
     }, 15 * 60 * 1000); // Check token expiration every 15 minutes
 
@@ -34,8 +47,9 @@ export const AuthProvider = ({ children }) => {
     return JSON.parse(base64.decode(payload));
   };
 
-  const signIn = async (token, profile, is_staff) => {
+  const signIn = async (token, refreshToken, profile, is_staff) => {
     setUserToken(token);
+    setRefreshToken(refreshToken);
     setUserProfile(profile);
     setIsStaff(is_staff);
 
@@ -58,7 +72,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ userToken, userProfile, isStaff, signIn, signOut }}
+      value={{ userToken, refreshToken, userProfile, isStaff, signIn, signOut }}
     >
       {children}
     </AuthContext.Provider>

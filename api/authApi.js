@@ -286,3 +286,14 @@ export const encryptIdById = async (userToken, id) => {
     console.error("Error encrypting ID:", error);
   }
 };
+
+export const refreshAccess = async (refreshToken) => {
+  try {
+    const response = await axios.post(`${BASE_URL}token/refresh/`, {
+      refresh: refreshToken,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error refreshing access token:", error);
+  }
+};

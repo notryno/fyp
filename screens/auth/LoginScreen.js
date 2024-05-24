@@ -30,7 +30,12 @@ const LoginScreen = ({ navigation }) => {
       const result = await login(userData);
       console.log("Login successful:", result);
       console.log("Profile Picture result:", result.profile_picture);
-      signIn(result.access_token, result.profile_picture, result.is_staff);
+      signIn(
+        result.access_token,
+        result.refresh_token,
+        result.profile_picture,
+        result.is_staff
+      );
     } catch (error) {
       setError("Login failed. Please check your credentials.");
       console.error("Login failed:", error);

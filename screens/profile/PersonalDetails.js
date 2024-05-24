@@ -9,6 +9,7 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { useAuth } from "../../api/authContext";
 import * as ImagePicker from "expo-image-picker";
@@ -18,7 +19,7 @@ import { updateProfilePicture } from "../../api/authApi";
 import { Ionicons } from "@expo/vector-icons";
 
 const PersonalDetails = ({ navigation }) => {
-  const { userToken, signIn } = useAuth();
+  const { userToken, refreshToken, signIn, isStaff } = useAuth();
   const [userData, setUserData] = useState({});
   const [newData, setNewData] = useState({});
   const [image, setImage] = useState(null);
@@ -26,6 +27,7 @@ const PersonalDetails = ({ navigation }) => {
   const [isPressedFirstName, setIsPressedFirstName] = useState(false);
   const [isPressedLastName, setIsPressedLastName] = useState(false);
   const [isPressedEmail, setIsPressedEmail] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -77,10 +79,18 @@ const PersonalDetails = ({ navigation }) => {
       try {
         console.log("Image Picker Result URI", result);
         console.log("Image Picker URI", result.assets[0].uri);
+        setLoading(true);
         await updateProfilePicture(userToken, { uri: result.assets[0].uri });
+        setLoading(false);
         const updatedData = await getUserData(userToken);
+        console.log("Image changed");
         setUserData(updatedData.user_data);
-        signIn(userToken, updatedData.user_data.profile_picture);
+        signIn(
+          userToken,
+          refreshToken,
+          updatedData.user_data.profile_picture,
+          isStaff
+        );
       } catch (error) {
         console.error("Error updating profile picture:", error);
       }
@@ -90,17 +100,23 @@ const PersonalDetails = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.imageContainer}>
-        {image ? (
-          <Image source={{ uri: image }} style={styles.profileImage} />
-        ) : newData.profile_picture ? (
-          <Image
-            source={{ uri: newData.profile_picture }}
-            style={styles.profileImage}
-          />
+        {loading ? (
+          <ActivityIndicator style={styles.activityIndicator} />
         ) : (
-          <View style={styles.defaultProfileContainer}>
-            <Ionicons name="person-outline" size={50} color="gray" />
-          </View>
+          <>
+            {image ? (
+              <Image source={{ uri: image }} style={styles.profileImage} />
+            ) : newData.profile_picture ? (
+              <Image
+                source={{ uri: newData.profile_picture }}
+                style={styles.profileImage}
+              />
+            ) : (
+              <View style={styles.defaultProfileContainer}>
+                <Ionicons name="person-outline" size={50} color="gray" />
+              </View>
+            )}
+          </>
         )}
         <Button title="Edit picture" onPress={pickImage} />
       </View>
@@ -210,7 +226,12 @@ const PersonalDetails = ({ navigation }) => {
       <View style={styles.line} />
 
       <TouchableOpacity style={styles.buttonContainer}>
-        <Text style={styles.buttonText}>Support</Text>
+        <Text
+          style={styles.buttonText}
+          onPress={() => navigation.navigate("Support")}
+        >
+          Support
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -232,6 +253,14 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 100,
     marginBottom: 10,
+  },
+  activityIndicator: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#d2d2d2",
   },
   inputContainer: {
     flexDirection: "row",
