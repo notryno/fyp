@@ -7,6 +7,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [userToken, setUserToken] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
+  const [isStaff, setIsStaff] = useState(false);
 
   useEffect(() => {
     const isTokenExpired = () => {
@@ -33,9 +34,10 @@ export const AuthProvider = ({ children }) => {
     return JSON.parse(base64.decode(payload));
   };
 
-  const signIn = async (token, profile) => {
+  const signIn = async (token, profile, is_staff) => {
     setUserToken(token);
     setUserProfile(profile);
+    setIsStaff(is_staff);
 
     try {
       const response = await getTasks(token);
@@ -55,7 +57,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ userToken, userProfile, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ userToken, userProfile, isStaff, signIn, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );

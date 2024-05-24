@@ -33,7 +33,7 @@ const TaskScreen = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const { userToken } = useAuth();
   const { navigate } = useNavigation();
-  const [filter, setFilter] = useState("All");
+  const [filter, setFilter] = useState("title");
 
   const fetchTasks = async () => {
     try {
@@ -434,10 +434,10 @@ const TaskScreen = () => {
             </Text>
           </TouchableOpacity>
         )}
-        <Overlay visible={showTaskForm} zIndex={2}>
-          <TaskForm onSubmit={handleAddTask} onCancel={handleCancelAddTask} />
-        </Overlay>
       </View>
+      <Overlay visible={showTaskForm} zIndex={2}>
+        <TaskForm onSubmit={handleAddTask} onCancel={handleCancelAddTask} />
+      </Overlay>
     </SafeAreaView>
   );
 };

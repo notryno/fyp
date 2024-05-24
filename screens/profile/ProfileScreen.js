@@ -16,7 +16,7 @@ import { getUserData } from "../../api/authApi";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 const ProfileScreen = () => {
-  const { signOut, userProfile, userToken } = useAuth();
+  const { signOut, userProfile, userToken, isStaff } = useAuth();
   const navigation = useNavigation();
   const [userData, setUserData] = useState(null);
   const [isPressedLastName, setIsPressedLastName] = useState(false);
@@ -95,6 +95,9 @@ const ProfileScreen = () => {
               </Text>
               <Text style={styles.nameText}>
                 {userData.first_name} {userData.last_name}
+              </Text>
+              <Text style={styles.roleText}>
+                {isStaff ? "Teacher" : "Student"}
               </Text>
             </>
           )}
@@ -266,6 +269,10 @@ const styles = StyleSheet.create({
   },
   nameText: {
     fontSize: 16,
+  },
+  roleText: {
+    fontSize: 16,
+    color: "gray",
   },
   button: {
     width: "90%",
