@@ -12,7 +12,6 @@ User = get_user_model()
 
 
 class Schedule(models.Model):
-    # user = models.ForeignKey(User, on_delete=models.CASCADE)
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, null=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     start_date = models.DateField()

@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "authentication",
+    "notification",
     "task",
     "schedule",
     "classroom",
@@ -86,6 +88,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "schBackend.wsgi.application"
 
+ASGI_APPLICATION = "schBackend.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
+
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -97,7 +106,7 @@ DATABASES = {
     # }
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "practice",
+        "NAME": "schedule",
         "USER": "root",
         "PASSWORD": "",
         "HOST": "localhost",
@@ -172,3 +181,5 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = "np01cp4s220148@islingtoncollege.edu.np"
 EMAIL_HOST_PASSWORD = "tekq eotf vwvq gzct"
+
+FERNET_KEY = "yExh8OSZS8I02eCplGjPi25KDePY8i29mlj-aaopD6A="

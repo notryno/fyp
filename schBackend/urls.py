@@ -36,6 +36,7 @@ urlpatterns = [
     path("api/", include("grades.urls")),
     # path("api/", include("events.urls")),
     path("api/", include("courses.urls")),
+    path("api/", include("notification.urls")),
 ]
 
 if settings.DEBUG:
