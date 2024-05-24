@@ -5,8 +5,11 @@ from django.urls import path
 from utilities.email_otp import resend_otp
 
 from .views import (
+    EncryptUserIdByParamView,
+    EncryptUserIdView,
     GetStudentsDataView,
     GetTeachersDataView,
+    GetUserDataByEncryptedIdView,
     GetUserDataView,
     LoginView,
     RegisterView,
@@ -35,4 +38,15 @@ urlpatterns = [
         name="update_user_data_by_id",
     ),
     path("teachers/<int:pk>/", TeacherDetailsViiew.as_view()),
+    path("encrypt-id/", EncryptUserIdView.as_view(), name="encrypt_user_id"),
+    path(
+        "encrypt-id/<int:id>/",
+        EncryptUserIdByParamView.as_view(),
+        name="encrypt_user_id_by_param",
+    ),
+    path(
+        "user-data/",
+        GetUserDataByEncryptedIdView.as_view(),
+        name="get_user_data_by_encrypted_id",
+    ),
 ]

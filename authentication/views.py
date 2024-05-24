@@ -15,12 +15,14 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from utilities.email_otp import generate_and_send_otp
+from utilities.encryption import decrypt_id, encrypt_id
 
 from .models import CustomUser
 from .serializers import (
@@ -45,7 +47,6 @@ class RegisterView(generics.CreateAPIView):
         )
         hashed_password = make_password(serializer.validated_data["password"])
         serializer.validated_data["password"] = hashed_password
-        print("Request FILES:", self.request.FILES)
         user = serializer.create(serializer.validated_data)
 
         refresh = RefreshToken.for_user(user)
@@ -56,8 +57,8 @@ class RegisterView(generics.CreateAPIView):
             "access_token": str(refresh.access_token),
             "refresh_token": str(refresh),
             "profile_picture": serialized_user.data["profile_picture"],
+            "is_staff": serialized_user.data["is_staff"],
         }
-        print("User profile picture URL:", data["profile_picture"])
 
         generate_and_send_otp(user)
 
@@ -103,6 +104,7 @@ class LoginView(generics.CreateAPIView):
             "access_token": str(refresh.access_token),
             "refresh_token": str(refresh),
             "profile_picture": serialized_user.data["profile_picture"],
+            "is_staff": serialized_user.data["is_staff"],
         }
         return Response(data, status=status.HTTP_200_OK)
 
@@ -310,3 +312,39 @@ class TeacherDetailsViiew(generics.RetrieveUpdateDestroyAPIView):
         self.perform_update(serializer)
 
         return Response(serializer.data)
+
+
+class EncryptUserIdView(APIView):
+
+    def get(self, request):
+        user_id = request.user.id
+        encrypted_id = encrypt_id(user_id)
+        return Response({"id": encrypted_id})
+
+
+class EncryptUserIdByParamView(APIView):
+    def get(self, request, id):
+        encrypted_id = encrypt_id(id)
+        return Response({"id": encrypted_id})
+
+
+class GetUserDataByEncryptedIdView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [JSONParser]
+
+    def post(self, request):
+        try:
+            encrypted_id = request.data.get("encrypted_id", None)
+            print("Encrypted ID:", encrypted_id)
+            if encrypted_id is None:
+                return Response(
+                    {"error": "Encrypted ID is required in the request body."},
+                    status=400,
+                )
+
+            user_id = decrypt_id(encrypted_id)
+            user = CustomUser.objects.get(id=user_id)
+            serializer = GetUserDataSerializer(user)
+            return Response(serializer.data, status=200)
+        except (CustomUser.DoesNotExist, ValueError):
+            return Response({"error": "Invalid encrypted ID"}, status=400)
