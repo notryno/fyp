@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from authentication.models import CustomUser
+
 from .models import Notification, UserNotification
 from .serializers import (
     CombinedNotificationSerializer,
@@ -16,53 +18,66 @@ from .serializers import (
 )
 
 # class CreateNotificationView(APIView):
-#     serializer_class = NotificationSerializer
-#     permission_classes = [IsAuthenticated]
+#     def post(self, request):
+#         serializer = NotificationSerializer(data=request.data)
+#         if serializer.is_valid():
+#             notification = serializer.save()
 
-#     def perform_create(self, serializer):
-#         notification = serializer.save(user=self.request.user)
-#         channel_layer = get_channel_layer()
-#         group_name = f"notifications_{self.request.user.id}"
-#         async_to_sync(channel_layer.group_send)(
-#             group_name,
-#             {
-#                 "type": "send_notification",
-#                 "notification_id": notification.id,
-#             },
-#         )
+#             # Fetch the serialized data to include the nested author information
+#             notification_data = NotificationSerializer(notification).data
 
-#     def create(self, request, *args, **kwargs):
-#         serializer = self.get_serializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         self.perform_create(serializer)
-#         notification = serializer.instance
-#         combined_serializer = CombinedNotificationSerializer(
-#             notification, context={"request": request}
-#         )
-#         headers = self.get_success_headers(combined_serializer.data)
-#         return Response(
-#             combined_serializer.data, status=status.HTTP_201_CREATED, headers=headers
-#         )
+#             # Send the notification to WebSocket
+#             channel_layer = get_channel_layer()
+#             async_to_sync(channel_layer.group_send)(
+#                 f"notifications_{self.request.user.id}",  # Send to the specific user's group
+#                 {
+#                     "type": "send_notification",
+#                     "notification": notification_data,
+#                 },
+#             )
+
+#             return Response(notification_data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CreateNotificationView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
     def post(self, request):
         serializer = NotificationSerializer(data=request.data)
         if serializer.is_valid():
-            notification = serializer.save()
+            self.perform_create(serializer)
+            notification = serializer.instance
 
             # Fetch the serialized data to include the nested author information
             notification_data = NotificationSerializer(notification).data
 
             # Send the notification to WebSocket
             channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                f"notifications_{self.request.user.id}",  # Send to the specific user's group
-                {
-                    "type": "send_notification",
-                    "notification": notification_data,
-                },
-            )
+
+            if notification.user:
+                # If the notification is for a specific user
+                async_to_sync(channel_layer.group_send)(
+                    f"notifications_{notification.user.id}",  # Send to the specific user's group
+                    {
+                        "type": "send_notification",
+                        "notification": notification_data,
+                    },
+                )
+            elif notification.group:
+                # If the notification is for a specific group
+                users_in_group = CustomUser.objects.filter(classroom=notification.group)
+                for user in users_in_group:
+                    async_to_sync(channel_layer.group_send)(
+                        f"notifications_{user.id}",  # Send to each user in the group
+                        {
+                            "type": "send_notification",
+                            "notification": notification_data,
+                        },
+                    )
 
             return Response(notification_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

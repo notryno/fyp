@@ -8,7 +8,7 @@ from .models import Notification, UserNotification
 
 
 class NotificationSerializer(serializers.ModelSerializer):
-    author = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
+    author = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Notification

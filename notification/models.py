@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import UniqueConstraint
 
 from authentication.models import CustomUser
 from classroom.models import Classroom
@@ -38,6 +39,13 @@ class UserNotification(models.Model):
     )
     read = models.BooleanField(default=False)
     read_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=["user", "notification"], name="unique_user_notification"
+            )
+        ]
 
     def __str__(self):
         return f"Notification for {self.user.username} - Read: {self.read}"

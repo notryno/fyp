@@ -6,10 +6,13 @@ from .serializers import TaskSerializer
 
 
 class TaskListCreateView(generics.ListCreateAPIView):
-    print("TaskListCreateView")
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Return only tasks for the authenticated user
+        return Task.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         try:
@@ -22,6 +25,9 @@ class TaskListCreateView(generics.ListCreateAPIView):
 
 
 class TaskRetrieveUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
-    print("TaskRetrieveUpdateDeleteView")
-    queryset = Task.objects.all()
     serializer_class = TaskSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Return only tasks for the authenticated user
+        return Task.objects.filter(user=self.request.user)
