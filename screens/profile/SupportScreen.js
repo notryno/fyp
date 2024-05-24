@@ -7,14 +7,20 @@ import {
   TouchableOpacity,
   Linking,
   StyleSheet,
+  KeyboardAvoidingView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
+import { useAuth } from "../../api/authContext";
+import { BASE_URL } from "../../api/authApi";
+import { useNavigation } from "@react-navigation/native";
 
 const SupportScreen = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const { userToken } = useAuth();
+  const navigation = useNavigation();
 
   const handleSubmit = async () => {
     if (!name || !email || !message) {
@@ -23,16 +29,27 @@ const SupportScreen = () => {
     }
 
     try {
-      await axios.post("https://your-api-endpoint.com/support", {
-        name,
-        email,
-        message,
-      });
+      await axios.post(
+        `${BASE_URL}support/`,
+        {
+          name,
+          email,
+          message,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
       Alert.alert("Success", "Your message has been sent");
       setName("");
       setEmail("");
       setMessage("");
+
+      navigation.goBack();
     } catch (error) {
+      console.error("Error sending message:", error);
       Alert.alert("Error", "There was a problem sending your message");
     }
   };
@@ -42,7 +59,7 @@ const SupportScreen = () => {
   };
 
   const handleEmailPress = () => {
-    Linking.openURL("mailto:support@yourdomain.com?subject=Support%20Request");
+    Linking.openURL("mailto:support@ryan.com?subject=Support%20Request");
   };
 
   const handleMessagePress = () => {
@@ -51,29 +68,34 @@ const SupportScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Support</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={name}
-        onChangeText={setName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={[styles.input, { height: 150 }]}
-        placeholder="Message"
-        value={message}
-        onChangeText={setMessage}
-        multiline
-      />
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Submit</Text>
-      </TouchableOpacity>
+      <Text style={styles.title}>Contact Us</Text>
+      <KeyboardAvoidingView
+        behavior={"padding"}
+        style={{ width: "100%", alignItems: "center" }}
+      >
+        <TextInput
+          style={styles.input}
+          placeholder="Name"
+          value={name}
+          onChangeText={setName}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+        />
+        <TextInput
+          style={[styles.input, { height: 150, paddingTop: 15 }]}
+          placeholder="Message"
+          value={message}
+          onChangeText={setMessage}
+          multiline
+        />
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Submit</Text>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
       <View style={styles.linkContainer}>
         <TouchableOpacity onPress={handlePhonePress} style={styles.link}>
           <Ionicons name="call-outline" size={20} color="black" />

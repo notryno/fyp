@@ -8,6 +8,7 @@ import {
   Image,
   ActivityIndicator,
   TouchableOpacity,
+  KeyboardAvoidingView,
 } from "react-native";
 import { register } from "../../api/authApi";
 import OTPScreen from "./OTPScreen";
@@ -137,43 +138,49 @@ const RegisterScreen = ({ navigation }) => {
       )}
 
       <Button title="Add Picture" onPress={pickImage} />
-      <View style={{ height: 20 }}>
-        {error && <Text style={styles.errorText}>{error}</Text>}
-      </View>
-      <TextInput
-        style={styles.input}
-        placeholder="First Name"
-        autoCompleteType="name"
-        onChangeText={(text) => setFirstName(text)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Last Name"
-        autoCompleteType="name"
-        onChangeText={(text) => setLastName(text)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        onChangeText={(text) => setEmail(text)}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        autoCorrect={false}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        onChangeText={(text) => setPassword(text)}
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        secureTextEntry
-        onChangeText={(text) => setConfirmPassword(text)}
-        autoCapitalize="none"
-      />
+      <KeyboardAvoidingView
+        behavior={"padding"}
+        style={{ width: "100%", alignItems: "center" }}
+      >
+        <View style={{ height: 20 }}>
+          {error && <Text style={styles.errorText}>{error}</Text>}
+        </View>
+        <TextInput
+          style={styles.input}
+          placeholder="First Name"
+          autoCompleteType="name"
+          onChangeText={(text) => setFirstName(text)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Last Name"
+          autoCompleteType="name"
+          onChangeText={(text) => setLastName(text)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          onChangeText={(text) => setEmail(text)}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          autoCorrect={false}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          secureTextEntry
+          onChangeText={(text) => setPassword(text)}
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm Password"
+          secureTextEntry
+          onChangeText={(text) => setConfirmPassword(text)}
+          autoCapitalize="none"
+        />
+      </KeyboardAvoidingView>
+
       <View style={{ marginBottom: 10 }} />
       {loading ? (
         <ActivityIndicator style={{ marginTop: 10 }} />

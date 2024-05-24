@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  KeyboardAvoidingView,
 } from "react-native";
 import { login } from "../../api/authApi";
 import { useAuth } from "../../api/authContext";
@@ -54,30 +55,35 @@ const LoginScreen = ({ navigation }) => {
         {error && <Text style={styles.errorText}>{error}</Text>}
       </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        onChangeText={(text) => setEmail(text)}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        autoCorrect={false}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        onChangeText={(text) => setPassword(text)}
-        autoCapitalize="none"
-      />
-      <TouchableOpacity
-        title="Login"
-        style={styles.button}
-        onPress={handleLogin}
+      <KeyboardAvoidingView
+        behavior={"padding"}
+        style={{ width: "100%", alignItems: "center" }}
       >
-        <View style={styles.buttonContent}>
-          <Text style={styles.buttonText}>Sign In</Text>
-        </View>
-      </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          onChangeText={(text) => setEmail(text)}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          autoCorrect={false}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          secureTextEntry
+          onChangeText={(text) => setPassword(text)}
+          autoCapitalize="none"
+        />
+        <TouchableOpacity
+          title="Login"
+          style={styles.button}
+          onPress={handleLogin}
+        >
+          <View style={styles.buttonContent}>
+            <Text style={styles.buttonText}>Sign In</Text>
+          </View>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
       <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
         <Text style={styles.forgotText}>Forgotton Password?</Text>
       </TouchableOpacity>

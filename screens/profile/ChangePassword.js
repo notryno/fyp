@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  KeyboardAvoidingView,
+} from "react-native";
 import { updatePassword } from "../../api/authApi";
 import { useAuth } from "../../api/authContext";
 import { useNavigation } from "@react-navigation/native";
@@ -32,37 +39,42 @@ const ChangePassword = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.infoText}>
-        Your password is best to be at least six characters and should include a
-        combination of numbers, letters and special characters (!$@%).
-      </Text>
-      <TextInput
-        style={styles.input}
-        secureTextEntry
-        value={oldPassword}
-        placeholder="Current Password"
-        onChangeText={setOldPassword}
-      />
+    <KeyboardAvoidingView
+      behavior={"padding"}
+      style={{ flex: 1, justifyContent: "center" }}
+    >
+      <View style={styles.container}>
+        <Text style={styles.infoText}>
+          Your password is best to be at least six characters and should include
+          a combination of numbers, letters and special characters (!$@%).
+        </Text>
+        <TextInput
+          style={styles.input}
+          secureTextEntry
+          value={oldPassword}
+          placeholder="Current Password"
+          onChangeText={setOldPassword}
+        />
 
-      <TextInput
-        style={styles.input}
-        secureTextEntry
-        value={newPassword}
-        placeholder="New Password"
-        onChangeText={setNewPassword}
-      />
+        <TextInput
+          style={styles.input}
+          secureTextEntry
+          value={newPassword}
+          placeholder="New Password"
+          onChangeText={setNewPassword}
+        />
 
-      <TextInput
-        style={styles.input}
-        secureTextEntry
-        value={confirmPassword}
-        placeholder="Confirm New Password"
-        onChangeText={setConfirmPassword}
-      />
+        <TextInput
+          style={styles.input}
+          secureTextEntry
+          value={confirmPassword}
+          placeholder="Confirm New Password"
+          onChangeText={setConfirmPassword}
+        />
 
-      <Button title="Change Password" onPress={handleChangePassword} />
-    </View>
+        <Button title="Change Password" onPress={handleChangePassword} />
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
