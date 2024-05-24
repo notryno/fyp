@@ -85,8 +85,8 @@ const ScanQr = ({ navigation }) => {
               {
                 backgroundColor:
                   flash === Camera.Constants.FlashMode.off
-                    ? "rgba(69, 69, 69)"
-                    : "rgba(255, 255, 255)",
+                    ? "rgba(69, 69, 69, 0.9)"
+                    : "rgba(255, 255, 255, 0.9)",
               },
             ]}
             onPress={toggleFlash}

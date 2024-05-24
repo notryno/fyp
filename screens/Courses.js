@@ -244,7 +244,6 @@ const styles = StyleSheet.create({
     color: "black",
   },
   chipsContainer: {
-    paddingLeft: 10,
     height: 60,
   },
   chip: {
