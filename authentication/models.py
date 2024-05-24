@@ -17,9 +17,7 @@ class CustomUser(AbstractUser):
     username = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    profile_picture = models.ImageField(
-        upload_to="profile_pictures/", blank=True, null=True
-    )
+    profile_picture = models.URLField(blank=True, null=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
     classroom = models.ForeignKey(
