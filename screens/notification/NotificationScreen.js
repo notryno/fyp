@@ -40,12 +40,8 @@ const NotificationScreen = () => {
 
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        setNotifications((prev) => {
-          const updatedNotifications = [data.notification, ...prev];
-          return updatedNotifications.sort(
-            (a, b) => new Date(b.date) - new Date(a.date)
-          );
-        });
+        console.log("Notifications WS", data.notification);
+        fetchNotifications();
       };
 
       ws.onclose = () => {
@@ -66,6 +62,7 @@ const NotificationScreen = () => {
     try {
       const response = await getNotification(userToken);
       setNotifications(response);
+      console.log("Notifications fetched successfully", response);
     } catch (error) {
       console.error("Error fetching notifications:", error);
     }
@@ -245,7 +242,7 @@ const NotificationScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.container}>
-        {filterNotifications().length === 0 ? (
+        {filterNotifications()?.length === 0 ? (
           <View style={styles.noNotificationsContainer}>
             <Ionicons
               name="notifications-off-outline"

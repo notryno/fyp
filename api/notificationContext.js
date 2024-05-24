@@ -36,6 +36,7 @@ export const NotificationProvider = ({ children }) => {
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       setNewNotifications((prev) => [...prev, data.notification]);
+      fetchNotifications();
     };
 
     ws.onclose = () => {
