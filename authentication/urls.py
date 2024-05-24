@@ -1,6 +1,7 @@
 # urls.py
 
 from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from utilities.email_otp import resend_otp
 
@@ -49,4 +50,5 @@ urlpatterns = [
         GetUserDataByEncryptedIdView.as_view(),
         name="get_user_data_by_encrypted_id",
     ),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
