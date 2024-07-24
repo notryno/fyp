@@ -297,3 +297,16 @@ export const refreshAccess = async (refreshToken) => {
     console.error("Error refreshing access token:", error);
   }
 };
+
+export const getStudents = async (userToken) => {
+  try {
+    const response = await axios.get(`${BASE_URL}students/`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching students:", error);
+  }
+};

@@ -13,7 +13,7 @@ import { useAuth } from "../../api/authContext";
 import EventItem from "../../components/EventItem";
 import TaskItem from "../../components/TaskItem";
 import { getTasks } from "../../api/taskApi";
-import { useFocusEffect, useRoute } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import { printToFileAsync } from "expo-print";
 import { shareAsync } from "expo-sharing";
 
@@ -22,6 +22,7 @@ const EventsPage = ({ navigation, route }) => {
   const { userToken } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState("All");
 
   useEffect(() => {
     const exportPdf = route.params?.exportPdf;
@@ -218,25 +219,90 @@ const EventsPage = ({ navigation, route }) => {
     return dateB - dateA; // Compare dates in descending order
   });
 
+  const filterEvents = (eventType) => {
+    setSelectedFilter(eventType);
+  };
+
+  const filteredData = mergedData
+    .map((data) => {
+      const filteredEvents =
+        selectedFilter === "All"
+          ? data.events
+          : selectedFilter === "Tasks"
+          ? []
+          : data.events.filter((event) => event.type === selectedFilter);
+
+      const filteredTasks =
+        selectedFilter === "All" || selectedFilter === "Tasks"
+          ? data.tasks
+          : [];
+
+      return {
+        ...data,
+        events: filteredEvents,
+        tasks: filteredTasks,
+      };
+    })
+    .filter((data) => data.events.length > 0 || data.tasks.length > 0); // Filter out dates with no events or tasks
+
   return (
     <>
       <ScrollView
         contentContainerStyle={[
           styles.scrollViewContent,
-          events.length === 0 && styles.centeredContent,
+          filteredData.length === 0 && styles.centeredContent, // Use filteredData instead of events
         ]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <View style={styles.eventsPage}>
-          {events.length === 0 ? (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.chipsContainer}
+        >
+          {[
+            "All",
+            "Lecture",
+            "Workshop",
+            "Tutorial",
+            "Lab",
+            "Assessment",
+            "Tasks",
+          ].map((type) => (
+            <TouchableOpacity
+              key={type}
+              style={[
+                styles.chip,
+                selectedFilter === type && styles.selectedChip,
+              ]}
+              onPress={() => filterEvents(type)}
+            >
+              <Text
+                style={[
+                  styles.chipText,
+                  selectedFilter === type && styles.selectedChipText,
+                ]}
+              >
+                {type}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        <ScrollView
+          style={[
+            styles.eventsPage,
+            filteredData.length === 0 ? { height: "100%" } : { height: "90%" },
+          ]}
+          contentContainerStyle={filteredData.length === 0 && { flex: 1 }}
+        >
+          {filteredData.length === 0 ? (
             <View style={styles.noScheduleContainer}>
               <MaterialIcons name="event-busy" size={48} color="grey" />
               <Text style={styles.noScheduleText}>No Schedule</Text>
             </View>
           ) : (
-            mergedData.map((data, index) => (
+            filteredData.map((data, index) => (
               <View key={index} style={styles.eventGroup}>
                 <Text style={styles.dateText}>{data.date}</Text>
                 {data.tasks.map((task, idx) => (
@@ -266,7 +332,7 @@ const EventsPage = ({ navigation, route }) => {
               </View>
             ))
           )}
-        </View>
+        </ScrollView>
       </ScrollView>
     </>
   );
@@ -274,14 +340,16 @@ const EventsPage = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   scrollViewContent: {
-    flexGrow: 1,
+    height: "100%",
   },
   centeredContent: {
     justifyContent: "center",
     alignItems: "center",
+    height: "100%",
   },
   eventsPage: {
     padding: 20,
+    paddingTop: 0,
   },
   eventGroup: {
     marginBottom: 20,
@@ -294,6 +362,7 @@ const styles = StyleSheet.create({
   noScheduleContainer: {
     alignItems: "center",
     justifyContent: "center",
+    height: "100%",
   },
   noScheduleText: {
     fontSize: 24,
@@ -301,6 +370,29 @@ const styles = StyleSheet.create({
     color: "grey",
     marginTop: 10,
     textAlign: "center",
+  },
+  chipsContainer: {
+    height: 60,
+    marginTop: 10,
+    paddingHorizontal: 20,
+  },
+  chip: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    marginHorizontal: 5,
+    height: 40,
+    backgroundColor: "#E0E0E0",
+  },
+  selectedChip: {
+    backgroundColor: "black",
+  },
+  chipText: {
+    color: "#757575",
+    fontWeight: "600",
+  },
+  selectedChipText: {
+    color: "white",
   },
 });
 

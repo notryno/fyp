@@ -10,7 +10,9 @@ import {
 } from "react-native";
 import { useAuth } from "../../api/authContext";
 import {
+  createNotification,
   getNotification,
+  getSentNotifications, // Import the function for fetching sent notifications
   markAllAsRead,
   markAsRead,
 } from "../../api/notificationApi";
@@ -18,14 +20,19 @@ import { Ionicons } from "@expo/vector-icons";
 import { BASE_URL } from "../../api/authApi";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { NotificationContext } from "../../api/notificationContext";
+import Overlay from "../../components/Overlay";
+import AddNotification from "./AddNotificationScreen";
 
 const NotificationScreen = () => {
-  const { userToken } = useAuth();
+  const { userToken, isStaff } = useAuth();
   const { notifications, setNotifications, clearBanner } =
     useContext(NotificationContext);
   const modifiedURL = BASE_URL.replace("http", "ws").replace(/\/api\/$/, "");
   const navigation = useNavigation();
   const [filter, setFilter] = useState("All");
+  const [showAddButton, setShowAddButton] = useState(true);
+  const [showNotificationForm, setShowNotificationForm] = useState(false);
+  const [sentNotification, setSentNotification] = useState([]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -68,6 +75,16 @@ const NotificationScreen = () => {
     }
   };
 
+  const fetchSentNotification = async () => {
+    try {
+      const response = await getSentNotifications(userToken); // Use the correct API call to fetch sent notifications
+      setSentNotification(response);
+      console.log("Sent notifications fetched successfully", response);
+    } catch (error) {
+      console.error("Error fetching sent notifications:", error);
+    }
+  };
+
   const markAllAsReadHandler = async () => {
     try {
       await markAllAsRead(userToken);
@@ -90,6 +107,22 @@ const NotificationScreen = () => {
       })
     );
     navigation.navigate("NotificationDetail", { notification: notification });
+  };
+
+  const handleAddNotification = async (taskData) => {
+    try {
+      await createNotification(userToken, taskData);
+      fetchNotifications();
+      setShowNotificationForm(false);
+      setShowAddButton(true);
+    } catch (error) {
+      console.error("Error adding notification:", error);
+    }
+  };
+
+  const handleCancelAdd = () => {
+    setShowNotificationForm(false);
+    setShowAddButton(true);
   };
 
   const renderNotificationItem = ({ item }) => (
@@ -191,19 +224,25 @@ const NotificationScreen = () => {
         return notifications.filter((n) => !n.read);
       case "Read":
         return notifications.filter((n) => n.read);
+      case "Sent":
+        return sentNotification; // Return the sent notifications for the "Sent" filter
       default:
         return notifications;
     }
   };
+
+  useEffect(() => {
+    if (filter === "Sent") {
+      fetchSentNotification(); // Fetch sent notifications when the "Sent" filter is selected
+    }
+  }, [filter]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Notifications</Text>
         <TouchableOpacity onPress={markAllAsReadHandler}>
-          <TouchableOpacity onPress={markAllAsReadHandler}>
-            <Ionicons name="checkmark-done-outline" size={24} />
-          </TouchableOpacity>
+          <Ionicons name="checkmark-done-outline" size={24} />
         </TouchableOpacity>
       </View>
       <View style={styles.chipsContainer}>
@@ -240,6 +279,21 @@ const NotificationScreen = () => {
             Read
           </Text>
         </TouchableOpacity>
+        {isStaff && (
+          <TouchableOpacity
+            style={[styles.chip, filter === "Sent" && styles.selectedChip]}
+            onPress={() => setFilter("Sent")}
+          >
+            <Text
+              style={[
+                styles.chipText,
+                filter === "Sent" && styles.selectedChip,
+              ]}
+            >
+              Sent
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
       <View style={styles.container}>
         {filterNotifications()?.length === 0 ? (
@@ -260,6 +314,36 @@ const NotificationScreen = () => {
           />
         )}
       </View>
+      {showAddButton && isStaff && (
+        <TouchableOpacity
+          style={styles.addButtonContainer}
+          onPress={() => {
+            setShowNotificationForm(true);
+            setShowAddButton(false);
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 25,
+              fontWeight: "bold",
+              color: "white",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            }}
+          >
+            +
+          </Text>
+        </TouchableOpacity>
+      )}
+      <Overlay visible={showNotificationForm} zIndex={2}>
+        <AddNotification
+          onSubmit={handleAddNotification}
+          onCancel={handleCancelAdd}
+        />
+      </Overlay>
     </SafeAreaView>
   );
 };
@@ -429,6 +513,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#d2d2d2",
     textAlign: "center",
+  },
+  addButtonContainer: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "black",
+    height: 60,
+    width: 60,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: "100%",
   },
 });
 

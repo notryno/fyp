@@ -44,6 +44,10 @@ import PublicProfile from "../screens/profile/PublicProfile";
 import PublicId from "../screens/profile/PublicId";
 import NotificationDetailScreen from "../screens/notification/NotificationDetailScreen";
 import SupportScreen from "../screens/profile/SupportScreen";
+import GradingScreen from "../screens/profile/Grading/GradingScreen";
+import { StudentsScreen } from "../screens/profile/Grading/StudentsScreen";
+import StudentCoursesScreen from "../screens/profile/Grading/CoursesScreen";
+import AddNotification from "../screens/notification/AddNotificationScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -288,6 +292,34 @@ const ProfileStack = () => {
         component={GradesScreen}
         options={{
           title: "Grades",
+        }}
+      />
+      <Stack.Screen
+        name="Grading"
+        component={GradingScreen}
+        options={{
+          title: "Grade",
+        }}
+      />
+      <Stack.Screen
+        name="Students"
+        component={StudentsScreen}
+        options={{
+          title: "Students",
+        }}
+      />
+      <Stack.Screen
+        name="StudentCourses"
+        component={StudentCoursesScreen}
+        options={{
+          title: "StudentCourses",
+        }}
+      />
+      <Stack.Screen
+        name="AddNotification"
+        component={AddNotification}
+        options={{
+          title: "Add Notification",
         }}
       />
       <Stack.Screen

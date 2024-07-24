@@ -31,3 +31,16 @@ export const getCourseSchedule = async (userToken, courseId) => {
     throw "Error fetching course";
   }
 };
+
+export const getCoursesByStudent = async (userToken, studentId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}enrolled/${studentId}/`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

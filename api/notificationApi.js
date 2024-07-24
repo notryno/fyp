@@ -39,3 +39,31 @@ export const markAsRead = async (token, id) => {
   }
   return await response.json();
 };
+
+export const createNotification = async (token, data) => {
+  try {
+    console.log("data", data);
+    const response = await axios.post(`${BASE_URL}notification/create/`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating notification:", error);
+    throw error;
+  }
+};
+
+export const getSentNotifications = async (token) => {
+  try {
+    const response = await axios.get(`${BASE_URL}sent-notifications/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching sent notifications:", error);
+  }
+};

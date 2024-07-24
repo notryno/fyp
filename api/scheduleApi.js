@@ -6,11 +6,14 @@ export const fetchEventsAndSpecialSchedules = async (userToken) => {
     const eventData = await fetchEvents(userToken);
     const specialScheduleData = await fetchSpecialSchedules(userToken);
 
+    console.log("specialScheduleData:", specialScheduleData);
+
     // Merge regular events and special schedules
     const mergedEvents =
       specialScheduleData.length > 0
         ? mergeEvents(eventData, specialScheduleData)
         : eventData;
+
     return mergedEvents;
   } catch (error) {
     console.error("Error fetching events and special schedules:", error);
@@ -19,11 +22,15 @@ export const fetchEventsAndSpecialSchedules = async (userToken) => {
 };
 
 const mergeEvents = (events, specialSchedules) => {
+  const activeSpecialSchedules = specialSchedules.filter(
+    (schedule) => schedule.type !== "Cancelled"
+  );
+
   // Create a copy of events to avoid mutating the original array
   const mergedEvents = [...events];
 
   // Iterate over each special schedule
-  specialSchedules.forEach((specialSchedule) => {
+  activeSpecialSchedules.forEach((specialSchedule) => {
     const specialDate = new Date(specialSchedule.special_date);
     const options = {
       year: "numeric",
@@ -85,7 +92,40 @@ const mergeEvents = (events, specialSchedules) => {
 
   const convertedEvents = convertToNewFormat(mergedEvents);
 
-  return groupEventsByDate(convertedEvents);
+  const convertedEventsWithoutCancelledSchedules = removeCancelledSchedules(
+    convertedEvents,
+    specialSchedules
+  );
+
+  return groupEventsByDate(convertedEventsWithoutCancelledSchedules);
+};
+
+const removeCancelledSchedules = (convertedEvents, specialScheduleData) => {
+  // Filter out the special schedules that are marked as "Cancelled"
+  const cancelledSchedules = specialScheduleData.filter(
+    (schedule) => schedule.type === "Cancelled"
+  );
+
+  // Iterate over the cancelled schedules and remove matching events from convertedEvents
+  cancelledSchedules.forEach((cancelledSchedule) => {
+    const cancelledDate = new Date(
+      cancelledSchedule.special_date
+    ).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "2-digit",
+      weekday: "long",
+    });
+
+    // Filter out the events that match the cancelled schedule's title and date
+    convertedEvents = convertedEvents.filter(
+      (event) =>
+        event.date !== cancelledDate ||
+        event.title !== cancelledSchedule.schedule.title
+    );
+  });
+
+  return convertedEvents;
 };
 
 export const fetchEvents = async (userToken) => {

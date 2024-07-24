@@ -1,7 +1,7 @@
 // ProfileScreen.js
 
 import React, { useState, useEffect } from "react";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import {
   View,
   Text,
@@ -132,33 +132,35 @@ const ProfileScreen = () => {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("Grades")}
-        >
-          <View style={styles.buttonContent}>
-            <View style={styles.iconContainer}>
-              <Ionicons
-                name="school-outline"
-                size={30}
-                color="white"
-                style={styles.icon}
-              />
+        {!isStaff && (
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              isStaff
+                ? navigation.navigate("Grading")
+                : navigation.navigate("Grades");
+            }}
+          >
+            <View style={styles.buttonContent}>
+              <View style={styles.iconContainer}>
+                <Ionicons name="school-outline" size={30} style={styles.icon} />
+              </View>
+              <View style={styles.textContainer}>
+                <Text style={styles.buttonText}>
+                  {isStaff ? "Grading" : "Grade"}
+                </Text>
+              </View>
+              <View style={styles.rightIconContainer}>
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={30}
+                  color="white"
+                  style={styles.iconRight}
+                />
+              </View>
             </View>
-            <View style={styles.textContainer}>
-              <Text style={styles.buttonText}>Grades</Text>
-            </View>
-            <View style={styles.rightIconContainer}>
-              <Ionicons
-                name="chevron-forward-outline"
-                size={30}
-                color="white"
-                style={styles.iconRight}
-              />
-            </View>
-          </View>
-        </TouchableOpacity>
-
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate("Classroom")}
